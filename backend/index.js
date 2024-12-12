@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const cityRoutes = require('./routes/cityRoutes');
+const adRoutes = require('./routes/adRoutes');
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/cities', cityRoutes);
+app.use("/api/ads", adRoutes);
 
 
 app.listen(process.env.PORT, () => {
