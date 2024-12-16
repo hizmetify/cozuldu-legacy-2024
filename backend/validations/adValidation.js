@@ -41,10 +41,6 @@ const adValidationSchema = Joi.object({
     'array.base': 'Uygunluk tarihleri geçerli bir tarih dizisi olmalıdır',
   }),
 
-  user: Joi.string().required().messages({
-    'string.empty': 'Kullanıcı kimliği gerekli',
-  }),
-
   images: Joi.array().items(Joi.string().uri()).optional().messages({
     'array.base': "Resim URL'leri geçerli bir dizi olmalıdır",
   }),

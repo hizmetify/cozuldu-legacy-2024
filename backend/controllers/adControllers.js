@@ -1,50 +1,82 @@
 const Ad = require('../models/ad');
-const adSchema = require('../validations/adValidation');
 
 const createAd = async (req, res) => {
   try {
-    const { error } = adSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res
-        .status(400)
-        .json({ message: error.details.map((err) => err.message) });
-    }
+    const ad = new Ad({ ...req.body, user: req.user.id });
+    await ad.save();
 
-    const newAd = new Ad(req.body);
-    await newAd.save();
+    const populatedAd = await Ad.findById(ad._id).populate(
+      'user',
+      'name email'
+    );
     res.status(201).json({
-      message: 'İlan oluşturuldu',
+      success: true,
+      message: 'İlan başarıyla oluşturuldu',
+      data: populatedAd,
     });
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    res.status(500).json({
+      message:
+        'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+    });
   }
 };
 
 const updateAd = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { error } = adSchema.validate(req.body, { abortEarly: false });
-    if (error) {
-      return res.status(400).json({
-        message: error.details.map((err) => err.message),
-        message: 'Validasyon Hatası',
-      });
-    }
+    const ad = await Ad.findOneAndUpdate(
+      {
+        _id: id,
+        user: req.user.id,
+      },
+      {
+        title: req.body.title,
+        description: req.body.description,
+        price: req.body.price,
+        priceType: req.body.priceType,
+        city: req.body.city,
+        updatedAt: Date.now(),
+      },
+      { new: true }
+    );
 
-    const updatedAd = await Ad.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-
-    if (!updatedAd) {
+    if (!ad) {
       return res.status(404).json({ message: 'İlan bulunamadı' });
     }
 
-    res.status(200).json({ message: 'İlan başarıyla güncellendi' });
+    res
+      .status(200)
+      .json({ success: true, message: 'İlan başarıyla güncellendi', data: ad });
   } catch (error) {
     res.status(500).json({
       message:
-        'İlan güncellenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+        'İlan güncellenetrken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+    });
+  }
+};
+
+const getUserAds = async (req, res) => {
+  try {
+    console.log('Middleware’den gelen kullanıcı ID:', req.user.id); // Debug için
+    const userAds = await Ad.find({ user: req.user.id });
+
+    if (!userAds || userAds.length === 0) {
+      return res
+        .status(404)
+        .json({ message: 'Kullanıcıya ait ilan bulunamadı' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Kullanıcıya ait ilanlar getirildi',
+      data: userAds,
+    });
+  } catch (error) {
+    console.error('Hata Detayı:', error); // Hata detayını loglayın
+    res.status(500).json({
+      message:
+        'İlan görüntülenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
     });
   }
 };
@@ -54,6 +86,7 @@ const getAllAds = async (req, res) => {
     const ads = await Ad.find().populate('user', 'name email');
     res.status(200).json({
       success: true,
+      message: 'İlanlar başarıyla getirildi',
       data: ads,
     });
   } catch (error) {
@@ -64,13 +97,12 @@ const getAllAds = async (req, res) => {
   }
 };
 
-const getAd = async (req, res) => {
+const getSingleAd = async (req, res) => {
+  const { id } = req.params;
   try {
-    const ad = await Ad.findById(req.params.id).populate('user', 'name email');
+    const ad = await Ad.findById(id).populate('user', 'name email');
     if (!ad) {
-      return res
-        .status(404)
-        .json({ message: 'İlan bulunamadı. Kaldırılmış olabilir.' });
+      return res.status(404).json({ message: 'Böyle bir ilan bulunamadı.' });
     }
     res.status(200).json({
       success: true,
@@ -79,21 +111,25 @@ const getAd = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message:
-        'İlan getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+        'İlan görüntülenirken bir hata oluştu. Lütfen daha cemcemsonra tekrar deneyin',
     });
   }
 };
 
 const deleteAd = async (req, res) => {
-  try {
-    const deletedAd = await Ad.findByIdAndDelete(req.params.id);
-    if (!deletedAd) {
-      res.status(401).json({ message: 'İlan bulunamadı' });
-    }
+  const { id } = req.params;
 
-    res.status(200).json({ message: 'İlan başarıyla silindi' });
+  try {
+    const ad = await Ad.findOneAndDelete({
+      _id: id,
+      user: req.user.id,
+    });
+
+    if (!ad) {
+      return res.status(404).json({ message: 'İlan bulunamadı' });
+    }
+    res.status(200).json({ success: true, message: 'İlan başarıyla silindi' });
   } catch (error) {
-    console.error(error.message);
     res.status(500).json({
       message:
         'İlan silinirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
@@ -105,6 +141,7 @@ module.exports = {
   createAd,
   deleteAd,
   getAllAds,
-  getAd,
+  getUserAds,
+  getSingleAd,
   updateAd,
 };

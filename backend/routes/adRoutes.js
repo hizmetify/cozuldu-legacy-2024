@@ -1,18 +1,24 @@
 const express = require('express');
 const {
   createAd,
-  updateAd,
   deleteAd,
   getAllAds,
-  getAd,
+  getUserAds,
+  getSingleAd,
+  updateAd,
 } = require('../controllers/adControllers');
+const validateAd = require('../middlewares/adMiddleware');
+const protect = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.post('/createAd', createAd);
-router.put('/updateAd/:id', updateAd);
-router.delete('/deleteAd/:id', deleteAd);
-router.get('/getAllAds', getAllAds);
-router.get('/getAd/:id', getAd);
+router.get('/', getAllAds); // Tüm ilanlar
+router.get('/my-ads', protect, getUserAds); // Kendi ilanlarını görüntüle
+router.get('/:id', getSingleAd); // Tek ilan görüntüleme
+
+router.use(protect);
+router.post('/', validateAd, createAd); // Yeni ilan oluştur
+router.put('/:id', validateAd, updateAd); // İlan güncelle
+router.delete('/:id',protect, deleteAd); // İlan sil
 
 module.exports = router;
