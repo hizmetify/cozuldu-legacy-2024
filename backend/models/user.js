@@ -40,11 +40,9 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      required: [true, 'Profile picture URL is required'],
     },
     portfolioLink: {
       type: String,
-      required: [true, 'Portfolio link is required'],
       match: [/^https?:\/\/.+/, 'Portfolio link must be a valid URL'],
     },
     createdAt: {
