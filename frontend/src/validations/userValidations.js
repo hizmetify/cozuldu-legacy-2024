@@ -17,24 +17,39 @@ export const stepOneValidationSchema = Yup.object({
 });
 
 export const stepTwoValidationSchema = Yup.object({
-  phone: Yup.string().matches(
-    /^\d{10,15}$/,
-    'Telefon numarası sadece rakamlardan oluşmalı ve 10-15 hane arasında olmalıdır'
-  ),
+  phone: Yup.string()
+    .matches(
+      /^\d{10,15}$/,
+      'Telefon numarası sadece rakamlardan oluşmalı ve 10-15 hane arasında olmalıdır'
+    )
+    .notRequired(), // Opsiyonel hale getirildi
 
   city: Yup.string().required('Şehir alanı zorunludur'),
 
-  profilePic: Yup.string().url('Profil resmi için geçerli bir URL girin'),
+  profilePic: Yup.string()
+    .url('Profil resmi için geçerli bir URL girin')
+    .notRequired(), // Opsiyonel hale getirildi
 
-  portfolioLink: Yup.string().url('Portfolio linki geçerli bir URL olmalıdır'),
+  portfolioLink: Yup.string()
+    .url('Portfolio linki geçerli bir URL olmalıdır')
+    .notRequired(), // Opsiyonel hale getirildi
 });
 
 export const stepThreeValidationSchema = Yup.object({
   password: Yup.string()
     .required('Şifre zorunludur.')
-    .min(8, 'Şifre en az 6 karakter olmalıdır.'),
+    .min(8, 'Şifre en az 8 karakter olmalıdır.'),
 
   confirmPassword: Yup.string()
     .required('Şifrenizi doğrulama zorunludur.')
     .oneOf([Yup.ref('password'), null], 'Şifreler eşleşmiyor'),
+});
+
+export const loginValidation = Yup.object({
+  email: Yup.string()
+    .email('Hatalı ya da eksik bilgi girdiniz.')
+    .required('Hatalı ya da eksik bilgi girdiniz.'),
+  password: Yup.string()
+    .min(8, 'Hatalı ya da eksik bilgi girdiniz.')
+    .required('Hatalı ya da eksik bilgi girdiniz.'),
 });

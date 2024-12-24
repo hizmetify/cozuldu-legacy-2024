@@ -5,8 +5,11 @@ const {
   loginSchema,
 } = require('../validations/authValidation');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const register = async (req, res) => {
+  console.log(req.body);
+
   try {
     const {
       name,
@@ -31,12 +34,15 @@ const register = async (req, res) => {
     });
 
     if (error) {
+      console.log('validasyon htası', error);
       return res.status(401).json({ error: error.details[0].message });
     }
 
     const emailExists = await User.findOne({ email });
 
     if (emailExists) {
+      console.log('email exists');
+
       return res.status(400).json({ error: 'Email already exists' });
     }
     const salt = await bcrypt.genSalt(10);
@@ -57,16 +63,21 @@ const register = async (req, res) => {
 
     const token = generateToken(savedUser._id);
 
-    res.cookie("token", token, {
+    res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
       maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
+    });
 
     res.status(201).json({ message: 'Başarıyla kayıt oldunuz.', token });
   } catch (error) {
-    res.status(500).json({ error: 'Kayıt olurken sunucuda bir hata oluştu lütfen daha sonra tekrar deneyiniz.' });
+    console.log(error);
+
+    res.status(500).json({
+      error:
+        'Kayıt olurken sunucuda bir hata oluştu lütfen daha sonra tekrar deneyiniz.',
+    });
   }
 };
 
@@ -106,6 +117,22 @@ const login = async (req, res) => {
   }
 };
 
+const me = async (req, res) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ message: 'Yetkisiz erişim' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Bir hata oluştu' });
+  }
+};
+
 const logout = async (req, res) => {
   res.cookie('token', '', {
     httpOnly: true,
@@ -114,4 +141,4 @@ const logout = async (req, res) => {
   res.status(200).json({ message: 'Başarı ile çıkış yaptınız' });
 };
 
-module.exports = { register, login, logout };
+module.exports = { register, login, logout, me };

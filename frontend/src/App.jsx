@@ -1,11 +1,16 @@
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchMe } from './features/authSlice';
 import AppRoutes from './routes/routes';
 
 const App = () => {
-  return (
-    <div className="font-openSans">
-      <AppRoutes />
-    </div>
-  );
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchMe());
+  }, [dispatch]);
+
+  return <AppRoutes />;
 };
 
 export default App;

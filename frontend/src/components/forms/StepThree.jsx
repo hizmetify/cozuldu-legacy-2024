@@ -10,7 +10,7 @@ const StepThree = () => (
     />
     <InputField
       label="Şifre Tekrar"
-      name="passwordConfirm"
+      name="confirmPassword"
       type="password"
       placeholder="Şifrenizi tekrar girin"
     />

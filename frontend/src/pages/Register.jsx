@@ -1,26 +1,35 @@
 import { useState } from 'react';
 import { Formik, Form } from 'formik';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-hot-toast';
 import Stepper from '../components/UI/Stepper';
 import StepOne from '../components/forms/StepOne';
 import StepTwo from '../components/forms/StepTwo';
 import StepThree from '../components/forms/StepThree';
+import { useNavigate } from 'react-router-dom';
 import {
   stepOneValidationSchema,
   stepTwoValidationSchema,
   stepThreeValidationSchema,
 } from '../validations/userValidations';
 import FormLayout from '../layouts/FormLayout';
+import { register } from '../features/authSlice';
 
 const steps = [
   { name: 'Adım 1', component: StepOne, validation: stepOneValidationSchema },
   { name: 'Adım 2', component: StepTwo, validation: stepTwoValidationSchema },
-  { name: 'Adım 3', component: StepThree, validation: stepThreeValidationSchema },
+  {
+    name: 'Adım 3',
+    component: StepThree,
+    validation: stepThreeValidationSchema,
+  },
 ];
 
 const Register = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { status, error } = useSelector((state) => state.auth);
 
   const initialValues = {
     name: '',
@@ -39,19 +48,27 @@ const Register = () => {
 
   const handleValidationErrors = async (values) => {
     try {
-      await steps[currentStep].validation.validate(values, { abortEarly: false });
+      await steps[currentStep].validation.validate(values, {
+        abortEarly: false,
+      });
       return true;
     } catch (errors) {
       errors.inner.forEach((error) => {
-        toast.error(error.message); 
+        toast.error(error.message);
       });
       return false;
     }
   };
 
-  const handleSubmit = (values) => {
-    toast.success('Kayıt Başarılı! Bilgiler doğru bir şekilde kaydedildi.');
-    console.log('Form Verileri:', values);
+  const handleSubmit = async (values) => {
+    try {
+      await dispatch(register(values)).unwrap();
+      toast.success('Kayıt başarılı!');
+      navigate('/dashboard');
+      setCurrentStep(0);
+    } catch (err) {
+      toast.error(err);
+    }
   };
 
   const ActiveStep = steps[currentStep].component;
@@ -64,10 +81,11 @@ const Register = () => {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values) => {
+          console.log(values);
           const isValid = await handleValidationErrors(values);
           if (isValid) {
             if (currentStep === steps.length - 1) {
-              handleSubmit(values);
+              await handleSubmit(values);
             } else {
               handleNext();
             }
