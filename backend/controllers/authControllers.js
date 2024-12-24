@@ -57,9 +57,16 @@ const register = async (req, res) => {
 
     const token = generateToken(savedUser._id);
 
-    res.status(201).json({ message: 'User registered successfully', token });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+
+    res.status(201).json({ message: 'Başarıyla kayıt oldunuz.', token });
   } catch (error) {
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Kayıt olurken sunucuda bir hata oluştu lütfen daha sonra tekrar deneyiniz.' });
   }
 };
 
@@ -74,22 +81,37 @@ const login = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Şifre hatalı.' });
     }
 
     const token = generateToken(user._id);
 
-    res.status(201).json({ message: 'Login successful', token });
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(201).json({ message: 'Başarıyla giriş yapıldı.', token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Giriş yapılırken bir hata oluştu.' });
   }
 };
 
-module.exports = { register, login };
+const logout = async (req, res) => {
+  res.cookie('token', '', {
+    httpOnly: true,
+    expires: new Date(0),
+  });
+  res.status(200).json({ message: 'Başarı ile çıkış yaptınız' });
+};
+
+module.exports = { register, login, logout };

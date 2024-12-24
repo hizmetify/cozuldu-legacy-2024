@@ -1,0 +1,34 @@
+import InputField from '../UI/inputField';
+import SelectField from '../UI/SelectField';
+import { fetchCities } from '../../api/cityApi';
+import { useEffect, useState } from 'react';
+
+const StepTwo = () => {
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    const loadCities = async () => {
+      const cityData = await fetchCities();
+      setCities(cityData);
+    };
+    loadCities();
+  }, []);
+
+  return (
+    <>
+      <SelectField label="Şehir" name="city" options={cities} />
+      <InputField
+        label="Profil Fotoğrafı URL"
+        name="profilePic"
+        placeholder="Profil fotoğrafı linki"
+      />
+      <InputField
+        label="Portfolio Linki"
+        name="portfolioLink"
+        placeholder="Portfolio linkinizi girin"
+      />
+    </>
+  );
+};
+
+export default StepTwo;
