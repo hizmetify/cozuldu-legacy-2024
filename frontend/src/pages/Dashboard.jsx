@@ -1,16 +1,17 @@
 import { useDispatch } from 'react-redux';
 import { logout } from '../features/authSlice';
+import { memo, useCallback } from 'react';
 
 const Dashboard = () => {
   const dispatch = useDispatch();
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     try {
       await dispatch(logout());
     } catch (error) {
       console.error(error);
     }
-  };
+  }, [dispatch]);
 
   return (
     <div>
@@ -25,4 +26,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default memo(Dashboard);

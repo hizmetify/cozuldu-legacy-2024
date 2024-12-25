@@ -2,6 +2,7 @@ import InputField from '../UI/inputField';
 import SelectField from '../UI/SelectField';
 import { fetchCities } from '../../api/cityApi';
 import { useEffect, useState } from 'react';
+import { memo } from 'react';
 
 const StepTwo = () => {
   const [cities, setCities] = useState([]);
@@ -31,4 +32,4 @@ const StepTwo = () => {
   );
 };
 
-export default StepTwo;
+export default memo(StepTwo);

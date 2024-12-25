@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import InputField from '../UI/inputField';
 
 const StepThree = () => (
@@ -17,4 +18,4 @@ const StepThree = () => (
   </>
 );
 
-export default StepThree;
+export default memo(StepThree);

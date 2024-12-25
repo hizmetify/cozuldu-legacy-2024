@@ -1,60 +1,33 @@
-/* 
-
-const SelectField = ({ label, name, options, ...rest }) => {
-  return (
-    <div>
-      <label htmlFor={name} className="block mb-2 font-medium">
-        {label}
-      </label>
-
-      <select
-        id={name}
-        name={name}
-        className="border border-gray-300 outline-none rounded-md p-2 w-full"
-        {...rest}
-      >
-        <option value="">Şehir Seçin</option>
-        {options.map((option) => (
-          <option key={option._id} value={option.name}>
-            {option.name}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-};
-
-export default SelectField; */
-
 import { Field } from 'formik';
+import { IoChevronDown } from 'react-icons/io5';
 
 const SelectField = ({ label, name, options, ...rest }) => {
   return (
-    <div className="mb-4">
-      <label
-        htmlFor={name}
-        className="block text-sm text-muted-foreground mb-1"
-      >
+    <div className="mb-4 relative">
+      <label htmlFor={name} className="block text-sm text-gray-700 mb-1">
         {label}
       </label>
-      <Field
-        as="select"
-        name={name}
-        id={name}
-        className="w-full py-2 bg-transparent border-0 border-b-2 border-muted 
+      <div className="relative">
+        <Field
+          as="select"
+          name={name}
+          id={name}
+          className="w-full py-2 bg-transparent border-0 border-b-2 border-gray-300 
             focus:border-indigo-500 focus:outline-none transition-colors duration-200
-            text-base text-primary"
-        {...rest}
-      >
-        <option value="" disabled>
-          Lütfen bir şehir seçin
-        </option>
-        {options.map((option, index) => (
-          <option key={index} value={option.name}>
-            {option.name}
+            text-sm text-gray-900 lg:text-base appearance-none"
+          {...rest}
+        >
+          <option value="" disabled>
+            Lütfen bir şehir seçin
           </option>
-        ))}
-      </Field>
+          {options.map((option, index) => (
+            <option key={index} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </Field>
+        <IoChevronDown className="absolute right-3 top-3 text-gray-400 pointer-events-none" />
+      </div>
     </div>
   );
 };
