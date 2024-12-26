@@ -1,37 +1,41 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Register from '../pages/Register';
-import Home from '../pages/Home';
-import Login from '../pages/Login';
 import PrivateRoute from '../auth/PrivateRoute';
-import Dashboard from '../pages/Dashboard';
 import RedirectRoute from '../auth/RedirectRoute';
+import { Suspense, lazy } from 'react';
+import Spinner from '../components/UI/Spinner';
 
+const Home = lazy(() => import('../pages/Home'));
+const Register = lazy(() => import('../pages/Register'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
+const Login = lazy(() => import('../pages/Login'));
 const AppRoutes = () => {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/register"
-          element=<RedirectRoute>
-            <Register />
-          </RedirectRoute>
-        />
-        <Route
-          path="login"
-          element=<RedirectRoute>
-            <Login />
-          </RedirectRoute>
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-      </Routes>
+      <Suspense fallback={<Spinner />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/register"
+            element=<RedirectRoute>
+              <Register />
+            </RedirectRoute>
+          />
+          <Route
+            path="login"
+            element=<RedirectRoute>
+              <Login />
+            </RedirectRoute>
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            }
+          />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };
