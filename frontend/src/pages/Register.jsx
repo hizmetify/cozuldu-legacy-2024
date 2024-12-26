@@ -109,7 +109,7 @@ const Register = () => {
               )}
               <button
                 type="submit"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-7 rounded-sm"
               >
                 {currentStep === steps.length - 1 ? 'Kaydı Tamamla' : 'İleri'}
               </button>
