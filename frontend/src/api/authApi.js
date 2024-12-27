@@ -22,6 +22,7 @@ export const logout = async () => {
 
 export const getMe = async () => {
   const response = await instance.get('/me');
+  console.log(response.data);
   return response.data;
 };
 

@@ -9,7 +9,7 @@ import {
 export const fetchMe = createAsyncThunk('auth/fetchMe', async (_, thunkAPI) => {
   try {
     const response = await getMeApi();
-    return response.data;
+    return response;
   } catch (error) {
     return thunkAPI.rejectWithValue('Fetch me failed');
   }
@@ -111,6 +111,7 @@ const authSlice = createSlice({
         console.error(action.payload);
       })
       .addCase(fetchMe.fulfilled, (state, action) => {
+        console.log(action.payload);
         state.user = action.payload;
         state.isAuthenticated = true;
         state.status = 'succeeded';

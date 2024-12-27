@@ -125,7 +125,9 @@ const me = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log(decoded);
     const user = await User.findById(decoded.id).select('-password');
+    console.log(user)
     res.status(200).json(user);
   } catch (error) {
     console.error(error);

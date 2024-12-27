@@ -7,4 +7,5 @@ export const store = configureStore({
     toast: toastReducer,
     auth: authReducer,
   },
+  devTools: true,
 });
