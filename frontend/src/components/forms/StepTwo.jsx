@@ -16,7 +16,7 @@ const StepTwo = () => {
   }, []);
 
   return (
-    <>
+    <div className='flex flex-col gap-2'>
       <SelectField label="Şehir" name="city" options={cities} />
       <InputField
         label="Profil Fotoğrafı URL"
@@ -28,7 +28,7 @@ const StepTwo = () => {
         name="portfolioLink"
         placeholder="Portfolio linkinizi girin"
       />
-    </>
+    </div>
   );
 };
 

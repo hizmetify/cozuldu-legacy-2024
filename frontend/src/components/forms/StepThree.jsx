@@ -2,7 +2,7 @@ import { memo } from 'react';
 import InputField from '../UI/inputField';
 
 const StepThree = () => (
-  <>
+  <div className='flex flex-col gap-2'>
     <InputField
       label="Şifre"
       name="password"
@@ -15,7 +15,7 @@ const StepThree = () => (
       type="password"
       placeholder="Şifrenizi tekrar girin"
     />
-  </>
+  </div>
 );
 
 export default memo(StepThree);

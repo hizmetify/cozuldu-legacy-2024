@@ -5,7 +5,6 @@ export const fetchCities = async () => {
     const response = await axios.get('http://localhost:5000/api/cities', {
       withCredentials: true, 
     });
-    console.log('Şehirler:', response.data);
     return response.data;
   } catch (error) {
     console.error('Şehirler yüklenirken bir hata oluştu:', error);
