@@ -1,5 +1,6 @@
 import { FaCheck } from 'react-icons/fa';
 import { memo } from 'react';
+import PropTypes from 'prop-types';
 
 const Stepper = ({ steps, currentStep }) => {
   return (
@@ -31,6 +32,11 @@ const Stepper = ({ steps, currentStep }) => {
       </div>
     </div>
   );
+};
+
+Stepper.propTypes = {
+  steps: PropTypes.arrayOf(PropTypes.string).isRequired,
+  currentStep: PropTypes.number.isRequired,
 };
 
 export default memo(Stepper);
