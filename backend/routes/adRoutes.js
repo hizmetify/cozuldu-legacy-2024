@@ -12,13 +12,13 @@ const protect = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.get('/', getAllAds); // Tüm ilanlar
-router.get('/my-ads', protect, getUserAds); // Kendi ilanlarını görüntüle
-router.get('/:id', getSingleAd); // Tek ilan görüntüleme
+router.get('/', getAllAds);
+router.get('/my-ads', protect, getUserAds); 
+router.get('/:id', getSingleAd); 
 
 router.use(protect);
-router.post('/', validateAd, createAd); // Yeni ilan oluştur
-router.put('/:id', validateAd, updateAd); // İlan güncelle
-router.delete('/:id',protect, deleteAd); // İlan sil
+router.post('/', validateAd, createAd);
+router.put('/:id', validateAd, updateAd); 
+router.delete('/:id',protect, deleteAd); 
 
 module.exports = router;
