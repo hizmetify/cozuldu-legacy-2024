@@ -73,7 +73,7 @@ const getUserAds = async (req, res) => {
       data: userAds,
     });
   } catch (error) {
-    console.error('Hata Detayı:', error); // Hata detayını loglayın
+    console.error('Hata Detayı:', error);
     res.status(500).json({
       message:
         'İlan görüntülenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
