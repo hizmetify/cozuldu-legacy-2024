@@ -7,6 +7,9 @@ const cityRoutes = require('./routes/cityRoutes');
 const adRoutes = require('./routes/adRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const path = require('path');
 const compression = require('compression');
 
 dotenv.config();
@@ -14,7 +17,16 @@ dotenv.config();
 connectDB();
 
 const app = express();
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Lütfen daha sonra tekrar deneyin.',
+});
+
+app.use(helmet());
 app.use(compression());
+app.use(limiter());
 
 app.use(
   cors({
@@ -27,10 +39,21 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/cities', cityRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/categories', categoryRoutes);
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Bir şeyler ters gitti! Lütfen tekrar deneyin.',
+  });
+});
+
 app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}`);
 });

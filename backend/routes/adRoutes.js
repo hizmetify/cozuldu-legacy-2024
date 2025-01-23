@@ -1,24 +1,25 @@
 const express = require('express');
 const {
   createAd,
-  deleteAd,
+  updateAd,
   getAllAds,
   getUserAds,
   getSingleAd,
-  updateAd,
+  deleteAd,
 } = require('../controllers/adControllers');
 const validateAd = require('../middlewares/adMiddleware');
 const protect = require('../middlewares/authMiddleware');
+const upload = require('../middlewares/uploadMiddleware'); 
 
 const router = express.Router();
 
 router.get('/', getAllAds);
-router.get('/my-ads', protect, getUserAds); 
-router.get('/:id', getSingleAd); 
+router.get('/my-ads', protect, getUserAds);
+router.get('/:id', getSingleAd);
 
 router.use(protect);
-router.post('/', validateAd, createAd);
-router.put('/:id', validateAd, updateAd); 
-router.delete('/:id',protect, deleteAd); 
+router.post('/', upload.array('images', 5), validateAd, createAd);
+router.put('/:id', upload.array('images', 5), validateAd, updateAd); 
+router.delete('/:id', deleteAd);
 
 module.exports = router;

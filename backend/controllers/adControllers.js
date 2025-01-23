@@ -2,7 +2,14 @@ const Ad = require('../models/ad');
 
 const createAd = async (req, res) => {
   try {
-    const ad = new Ad({ ...req.body, user: req.user.id });
+    const imagePaths = req.files.map((file) => file.path);
+
+    const ad = new Ad({
+      ...req.body,
+      images: imagePaths,
+      user: req.user.id,
+    });
+
     await ad.save();
 
     const populatedAd = await Ad.findById(ad._id).populate(
@@ -16,8 +23,7 @@ const createAd = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message:
-        'İlan oluşturulurken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+      message: 'İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin',
     });
   }
 };
@@ -25,17 +31,13 @@ const createAd = async (req, res) => {
 const updateAd = async (req, res) => {
   const { id } = req.params;
   try {
+    const imagePaths = req.files ? req.files.map((file) => file.path) : [];
+
     const ad = await Ad.findOneAndUpdate(
+      { _id: id, user: req.user.id },
       {
-        _id: id,
-        user: req.user.id,
-      },
-      {
-        title: req.body.title,
-        description: req.body.description,
-        price: req.body.price,
-        priceType: req.body.priceType,
-        city: req.body.city,
+        ...req.body,
+        images: imagePaths.length > 0 ? imagePaths : undefined, 
         updatedAt: Date.now(),
       },
       { new: true }
@@ -45,20 +47,22 @@ const updateAd = async (req, res) => {
       return res.status(404).json({ message: 'İlan bulunamadı' });
     }
 
-    res
-      .status(200)
-      .json({ success: true, message: 'İlan başarıyla güncellendi', data: ad });
+    res.status(200).json({
+      success: true,
+      message: 'İlan başarıyla güncellendi',
+      data: ad,
+    });
   } catch (error) {
     res.status(500).json({
-      message:
-        'İlan güncellenetrken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+      message: 'İlan güncellenirken bir hata oluştu. Lütfen tekrar deneyin',
     });
   }
 };
 
+
 const getUserAds = async (req, res) => {
   try {
-    console.log('Middleware’den gelen kullanıcı ID:', req.user.id); // Debug için
+    console.log('Middleware’den gelen kullanıcı ID:', req.user.id); 
     const userAds = await Ad.find({ user: req.user.id });
 
     if (!userAds || userAds.length === 0) {
