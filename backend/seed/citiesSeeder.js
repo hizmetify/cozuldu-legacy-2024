@@ -3,7 +3,6 @@ const City = require('../models/City');
 const dotenv = require('dotenv');
 dotenv.config();
 
-console.log('Environment Variables:', process.env.MONGO_URI);
 
 const seedCities = async () => {
   const cities = [
