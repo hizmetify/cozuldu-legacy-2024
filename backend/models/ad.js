@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const adSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
-  serviceType: { type: String, required: true, enum: ['yüz yüze', 'dijital'] },
+  serviceType: { type: String, required: true, enum: ['yüz yüze'] },
   city: {
     type: String,
     required: function () {
