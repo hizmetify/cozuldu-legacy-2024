@@ -7,11 +7,11 @@ dotenv.config({path: "../.env"});
 const categorySeeder = async (req, res) => {
   const categories = [
     {
-      name: 'ÖZEL DERS',
+      name: 'Özel Ders',
       subcategories: ['Spor', 'Ders', 'Müzik', 'Danışmanlık', 'Diğer'],
     },
     {
-      name: 'BAKIM ONARIM',
+      name: 'Bakım Onarım',
       subcategories: [
         'Araç',
         'Elektronik aletler',
@@ -22,11 +22,11 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'TADİLAT',
+      name: 'Tadilat',
       subcategories: ['Ev içi tadilatı', 'Ev dışı tadilatı', 'Diğer'],
     },
     {
-      name: 'TEMİZLİK',
+      name: 'Temizlik',
       subcategories: [
         'Ev içi eşya temizliği',
         'Ev temizliği',
@@ -35,7 +35,7 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'ÜRETİM',
+      name: 'Üretim',
       subcategories: [
         'Catering',
         'Tekstilciler',
@@ -45,7 +45,7 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'ULAŞIM',
+      name: 'Ulaşım',
       subcategories: [
         'Şehir içi',
         'Yurt dışı',
@@ -55,7 +55,7 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'GÜZELLİK',
+      name: 'Güzellik',
       subcategories: [
         'Kuaför',
         'Berber',
@@ -67,7 +67,7 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'YARDIMCILAR',
+      name: 'Yardımcılar',
       subcategories: [
         'Hasta bakıcılar',
         'Çocuk bakıcılar',
@@ -77,7 +77,7 @@ const categorySeeder = async (req, res) => {
       ],
     },
     {
-      name: 'ORGANİZASYONLAR',
+      name: 'Organizasyonlar',
       subcategories: [
         'Doğum günü',
         'Kına',

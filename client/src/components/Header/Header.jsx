@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MdDashboard } from 'react-icons/md';
 import { FaBars } from 'react-icons/fa6';
+import CategoryDropdown from './CategoryDropdown';
 
 const Header = () => {
   return (
@@ -12,10 +13,7 @@ const Header = () => {
               <h1 className="text-2xl font-bold text-gray-800">Logo</h1>
             </div>
             <div className="hidden md:block ml-10">
-              <button className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out">
-                <span>Kategoriler</span>
-                <MdDashboard className="ml-2 text-blue-600 text-lg" />
-              </button>
+              <CategoryDropdown />
             </div>
           </div>
           <nav className="hidden md:block">
