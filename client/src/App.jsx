@@ -16,7 +16,6 @@ import StepThree from './components/Register/StepThree';
 const Home = lazy(() => import('./pages/Home/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
 const Login = lazy(() => import('./pages/Login/Login'));
-const Register = lazy(() => import('./pages/Register/Register'));
 
 const App = () => {
   return (
@@ -40,6 +39,7 @@ const App = () => {
               <Route path="step-2" element={<StepTwo />} />
               <Route path="step-3" element={<StepThree />} />
             </Route>
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Suspense>
       </Router>
