@@ -26,7 +26,7 @@ const limiter = rateLimit({
 
 app.use(helmet());
 app.use(compression());
-app.use(limiter());
+app.use(limiter);
 
 app.use(
   cors({

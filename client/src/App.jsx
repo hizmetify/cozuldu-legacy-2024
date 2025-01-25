@@ -1,8 +1,17 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import PrivateRoute from './guards/PrivateRoute';
 import Spinner from './components/UI/Spinner';
 import { HelmetProvider } from 'react-helmet-async';
+import RegisterLayout from './layouts/RegisterLayout';
+import StepOne from './components/Register/StepOne';
+import StepTwo from './components/Register/StepTwo';
+import StepThree from './components/Register/StepThree';
 
 const Home = lazy(() => import('./pages/Home/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
@@ -25,7 +34,12 @@ const App = () => {
               }
             />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/register" element={<RegisterLayout />}>
+              <Route index element={<Navigate to={'step-1'} />} />
+              <Route path="step-1" element={<StepOne />} />
+              <Route path="step-2" element={<StepTwo />} />
+              <Route path="step-3" element={<StepThree />} />
+            </Route>
           </Routes>
         </Suspense>
       </Router>
