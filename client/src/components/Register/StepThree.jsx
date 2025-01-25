@@ -1,25 +1,42 @@
-import React from 'react';
 import { Formik, Form, Field } from 'formik';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { useDispatch, useSelector } from 'react-redux';
 import { stepThreeValidationSchema } from '../../validations/userValidation';
+import { toast } from 'react-hot-toast';
+import { updateRegisterData } from '../../features/register/registerSlice';
+import { register } from '../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 const StepThree = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const registerData = useSelector((state) => state.register.data);
+  const { password, confirmPassword } = registerData;
 
   return (
     <Formik
       initialValues={{
-        password: '',
-        confirmPassword: '',
+        password,
+        confirmPassword,
       }}
       validationSchema={stepThreeValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      validateOnMount={false}
-      onSubmit={(values) => {
-        toast.success('Adım 3 başarıyla tamamlandı!');
-        navigate('/');
+      onSubmit={async (values) => {
+        dispatch(updateRegisterData(values));
+
+        try {
+          const finalData = {
+            ...registerData,
+            ...values,
+          };
+
+          await dispatch(register(finalData)).unwrap();
+
+          toast.success('Kayıt başarılı!');
+          navigate('/dashboard');
+        } catch (error) {
+          toast.error(error);
+        }
       }}
     >
       {({ errors, validateForm, handleSubmit }) => {
@@ -27,9 +44,7 @@ const StepThree = () => {
           e.preventDefault();
           const validationErrors = await validateForm();
           if (Object.keys(validationErrors).length > 0) {
-            Object.values(validationErrors).forEach((errorMsg) => {
-              toast.error(errorMsg);
-            });
+            Object.values(validationErrors).forEach((err) => toast.error(err));
           } else {
             handleSubmit();
           }
@@ -51,7 +66,7 @@ const StepThree = () => {
 
             <div className="mb-4">
               <label htmlFor="confirmPassword" className="block mb-2">
-                Şifre Doğrulama
+                Şifre (Tekrar)
               </label>
               <Field
                 id="confirmPassword"
@@ -62,10 +77,18 @@ const StepThree = () => {
             </div>
 
             <button
+              type="button"
+              onClick={() => navigate('/register/step-2')}
+              className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
+            >
+              Geri
+            </button>
+
+            <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded"
             >
-              Kaydı Tamamla
+              Kayıt Ol
             </button>
           </Form>
         );

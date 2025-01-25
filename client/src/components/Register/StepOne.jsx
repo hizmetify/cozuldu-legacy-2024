@@ -2,18 +2,23 @@ import { Formik, Form, Field } from 'formik';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { stepOneValidationSchema } from '../../validations/userValidation';
+import { useDispatch, useSelector } from 'react-redux';
+import { updateRegisterData } from '../../features/register/registerSlice';
 
 const StepOne = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { name, lastname, email } = useSelector((state) => state.register.data);
 
   return (
     <Formik
-      initialValues={{ name: '', lastname: '', email: '' }}
+      initialValues={{ name, lastname, email }}
       validationSchema={stepOneValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      validateOnMount={false}
       onSubmit={(values) => {
+        dispatch(updateRegisterData(values));
         toast.success('Adım 1 başarıyla tamamlandı!');
         navigate('/register/step-2');
       }}

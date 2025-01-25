@@ -1,25 +1,31 @@
-import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { stepTwoValidationSchema } from '../../validations/userValidation';
+import { updateRegisterData } from '../../features/register/registerSlice';
 
 const StepTwo = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { phone, city, profilePic, portfolioLink } = useSelector(
+    (state) => state.register.data
+  );
 
   return (
     <Formik
       initialValues={{
-        phone: '',
-        city: '',
-        profilePic: '',
-        portfolioLink: '',
+        phone,
+        city,
+        profilePic,
+        portfolioLink,
       }}
       validationSchema={stepTwoValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      validateOnMount={false}
       onSubmit={(values) => {
+        dispatch(updateRegisterData(values));
         toast.success('Adım 2 başarıyla tamamlandı!');
         navigate('/register/step-3');
       }}
