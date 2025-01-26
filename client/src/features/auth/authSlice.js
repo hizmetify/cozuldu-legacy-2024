@@ -13,11 +13,7 @@ const getErrorMessage = (error) =>
 
 export const fetchMe = createAsyncThunk(
   'auth/fetchMe',
-  async (_, { getState, rejectWithValue }) => {
-    const { auth } = getState();
-    if (auth.isAuthenticated) {
-      return rejectWithValue('Kullanıcı zaten giriş yaptı');
-    }
+  async (_, { rejectWithValue }) => {
     try {
       const response = await getMeApi();
       return response;
@@ -102,10 +98,15 @@ const authSlice = createSlice({
           state.errorMessage = null;
           if (
             action.type === 'auth/login/fulfilled' ||
-            action.type === 'auth/register/fulfilled'
+            action.type === 'auth/register/fulfilled' ||
+            action.type === 'auth/fetchMe/fulfilled'
           ) {
             state.user = action.payload;
             state.isAuthenticated = true;
+          }
+          if (action.type === 'auth/logout/fulfilled') {
+            state.user = null;
+            state.isAuthenticated = false;
           }
         }
       )
