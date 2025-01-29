@@ -16,9 +16,9 @@ import { useDispatch } from 'react-redux';
 import { fetchMe } from './features/auth/authSlice';
 import { useEffect } from 'react';
 import PublicRoute from './guards/PublicRoute';
+import DashboardLayout from './layouts/DashboardLayout';
 
 const Home = lazy(() => import('./pages/Home/Home'));
-const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
 const Login = lazy(() => import('./pages/Login/Login'));
 
 const App = () => {
@@ -37,7 +37,7 @@ const App = () => {
               path="/dashboard"
               element={
                 <PrivateRoute>
-                  <Dashboard />
+                  <DashboardLayout />
                 </PrivateRoute>
               }
             />
