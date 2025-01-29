@@ -1,4 +1,4 @@
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 
 const steps = [
   { step: 1, title: '1. Adım', path: '/register/step-1' },
@@ -8,47 +8,72 @@ const steps = [
 
 const RegisterLayout = () => {
   const location = useLocation();
-  const navigate = useNavigate();
-
   const currentStepIndex = steps.findIndex(
     (step) => step.path === location.pathname
   );
 
-  const handleNext = () => {
-    if (currentStepIndex < steps.length - 1) {
-      navigate(steps[currentStepIndex + 1].path);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStepIndex > 0) {
-      navigate(steps[currentStepIndex - 1].path);
-    }
-  };
-
   return (
-    <div className="p-4 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-center mb-4">Kayıt Ol</h1>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white rounded-md shadow-md overflow-hidden">
+        <div className="px-6 py-6">
+          <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+            Kayıt Ol
+          </h1>
 
-      <div className="flex justify-between items-center mb-4">
-        {steps.map((step, index) => (
-          <div
-            key={index}
-            className={`flex-1 text-center ${
-              index === currentStepIndex
-                ? 'font-bold text-blue-600'
-                : 'text-gray-500'
-            }`}
-          >
-            {step.title}
+          <div className="relative flex items-center justify-between mb-8">
+            <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
+              <div className="w-full border-t border-gray-200"></div>
+            </div>
+
+            {steps.map((step, index) => {
+              const isCompleted = index < currentStepIndex;
+              const isActive = index === currentStepIndex;
+
+              let circleStyles =
+                'flex items-center justify-center w-8 h-8 rounded-full border-2 ';
+              if (isCompleted) {
+                circleStyles += 'bg-blue-600 border-blue-600 text-white';
+              } else if (isActive) {
+                circleStyles += 'border-blue-600 text-blue-600';
+              } else {
+                circleStyles += 'border-gray-300 text-gray-400';
+              }
+
+              return (
+                <div
+                  key={index}
+                  className="z-10 flex flex-col items-center"
+                >
+                  <div className={circleStyles}>
+                    {isCompleted ? (
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    ) : (
+                      <span className="text-sm font-semibold">{step.step}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ))}
-      </div>
+        </div>
 
-      <div className="p-4 border rounded">
-        <Outlet />
+        <div className="px-6 py-6">
+          <Outlet />
+        </div>
       </div>
-
     </div>
   );
 };

@@ -1,13 +1,26 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { stepTwoValidationSchema } from '../../validations/userValidation';
 import { updateRegisterData } from '../../features/register/registerSlice';
+import { useEffect, useState } from 'react';
+import { fetchCities } from '../../api/cityApi';
+import InputField from '../UI/InputField';
+import SelectField from '../UI/SelectField';
 
 const StepTwo = () => {
+  const [cities, setCities] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    const loadCities = async () => {
+      const cityData = await fetchCities();
+      setCities(cityData);
+    };
+    loadCities();
+  }, []);
 
   const { phone, city, profilePic, portfolioLink } = useSelector(
     (state) => state.register.data
@@ -43,60 +56,39 @@ const StepTwo = () => {
 
         return (
           <Form onSubmit={customSubmit}>
-            <div className="mb-4">
-              <label htmlFor="phone" className="block mb-2">
-                Telefon
-              </label>
-              <Field
-                id="phone"
+            <div className="flex flex-col justify-between gap-4">
+              <InputField
                 name="phone"
-                type="text"
-                className="border p-2 rounded w-full"
+                label="Telefon"
+                placeholder={'Telefon Numarası'}
               />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="city" className="block mb-2">
-                Şehir
-              </label>
-              <Field
-                id="city"
-                name="city"
-                type="text"
-                className="border p-2 rounded w-full"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="profilePic" className="block mb-2">
-                Profil Resmi URL
-              </label>
-              <Field
-                id="profilePic"
+              <SelectField name="city" label="Şehir" options={cities} />
+              <InputField
                 name="profilePic"
-                type="text"
-                className="border p-2 rounded w-full"
+                label="Profil Resmi URL"
+                placeholder={'Profil fotoğrafı linki'}
               />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="portfolioLink" className="block mb-2">
-                Portfolio Linki
-              </label>
-              <Field
-                id="portfolioLink"
+              <InputField
                 name="portfolioLink"
-                type="text"
-                className="border p-2 rounded w-full"
+                label="Portfolio Linki"
+                placeholder={'Portfolio linkinizi girin'}
               />
+              <div className="flex items-center justify-between">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Devam Et
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  onClick={() => navigate('/register/step-1')}
+                >
+                  Geri
+                </button>
+              </div>
             </div>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Devam Et
-            </button>
           </Form>
         );
       }}

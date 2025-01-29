@@ -1,10 +1,11 @@
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { stepThreeValidationSchema } from '../../validations/userValidation';
 import { toast } from 'react-hot-toast';
 import { updateRegisterData } from '../../features/register/registerSlice';
 import { register } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import InputField from '../UI/InputField';
 
 const StepThree = () => {
   const dispatch = useDispatch();
@@ -52,44 +53,29 @@ const StepThree = () => {
 
         return (
           <Form onSubmit={customSubmit}>
-            <div className="mb-4">
-              <label htmlFor="password" className="block mb-2">
-                Şifre
-              </label>
-              <Field
-                id="password"
-                name="password"
-                type="password"
-                className="border p-2 rounded w-full"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block mb-2">
-                Şifre (Tekrar)
-              </label>
-              <Field
-                id="confirmPassword"
+            <div className="flex flex-col justify-between gap-4">
+              <InputField name="password" label="Şifre" type={'password'} />
+              <InputField
                 name="confirmPassword"
-                type="password"
-                className="border p-2 rounded w-full"
+                label="Şifre (Tekrar)"
+                type={'password'}
               />
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  onClick={() => navigate('/register/step-2')}
+                  className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
+                >
+                  Geri
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                >
+                  Kayıt Ol
+                </button>
+              </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => navigate('/register/step-2')}
-              className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
-            >
-              Geri
-            </button>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Kayıt Ol
-            </button>
           </Form>
         );
       }}

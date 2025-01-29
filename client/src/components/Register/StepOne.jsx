@@ -1,9 +1,10 @@
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form } from 'formik';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { stepOneValidationSchema } from '../../validations/userValidation';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRegisterData } from '../../features/register/registerSlice';
+import InputField from '../UI/InputField';
 
 const StepOne = () => {
   const navigate = useNavigate();
@@ -39,48 +40,29 @@ const StepOne = () => {
 
         return (
           <Form onSubmit={customSubmit}>
-            <div className="mb-4">
-              <label htmlFor="name" className="block mb-2">
-                İsim
-              </label>
-              <Field
-                id="name"
+            <div className='flex flex-col gap-3 justify-between h-full'>
+              <InputField
                 name="name"
-                type="text"
-                className="border p-2 rounded w-full"
+                label="İsim"
+                placeholder={'Adınızı girin'}
               />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="lastname" className="block mb-2">
-                Soyisim
-              </label>
-              <Field
-                id="lastname"
+              <InputField
                 name="lastname"
-                type="text"
-                className="border p-2 rounded w-full"
+                label="Soyisim"
+                placeholder={'Soyadınızı girin'}
               />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="email" className="block mb-2">
-                E-posta
-              </label>
-              <Field
-                id="email"
+              <InputField
                 name="email"
-                type="email"
-                className="border p-2 rounded w-full"
+                label="E-posta"
+                placeholder={'E-posta adresinizi girin'}
               />
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                Devam Et
+              </button>
             </div>
-
-            <button
-              type="submit"
-              className="bg-blue-500 text-white px-4 py-2 rounded"
-            >
-              Devam Et
-            </button>
           </Form>
         );
       }}
