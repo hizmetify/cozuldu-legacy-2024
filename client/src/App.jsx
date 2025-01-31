@@ -17,6 +17,12 @@ import { fetchMe } from './features/auth/authSlice';
 import { useEffect } from 'react';
 import PublicRoute from './guards/PublicRoute';
 import DashboardLayout from './layouts/DashboardLayout';
+import MyAds from './pages/MyAds/MyAds';
+import Settings from './pages/Settings/Settings';
+import MyAdsList from './pages/MyAds/MyAdsList';
+import MyAdsNew from './pages/MyAds/MyAdsNew';
+import MyAdsDetail from './pages/MyAds/MyAdsDetail';
+import MyAdsEdit from './pages/MyAds/MyAdsEdit';
 
 const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login/Login'));
@@ -40,7 +46,15 @@ const App = () => {
                   <DashboardLayout />
                 </PrivateRoute>
               }
-            />
+            >
+              <Route path="my-ads" element={<MyAds />}>
+                <Route index element={<MyAdsList />} />
+                <Route path="new" element={<MyAdsNew />} />
+                <Route path=":adId" element={<MyAdsDetail />} />
+                <Route path=":adId/edit" element={<MyAdsEdit />} />
+              </Route>
+              <Route path="settings" element={<Settings />} />
+            </Route>
             <Route
               path="/login"
               element={
