@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Formik, Form } from 'formik';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -72,4 +73,4 @@ const StepOne = () => {
   );
 };
 
-export default StepOne;
+export default memo(StepOne);

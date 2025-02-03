@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { stepThreeValidationSchema } from '../../validations/userValidation';
@@ -83,4 +84,4 @@ const StepThree = () => {
   );
 };
 
-export default StepThree;
+export default memo(StepThree);

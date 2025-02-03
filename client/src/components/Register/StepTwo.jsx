@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { useNavigate } from 'react-router-dom';
@@ -113,4 +114,4 @@ const StepTwo = () => {
   );
 };
 
-export default StepTwo;
+export default memo(StepTwo);

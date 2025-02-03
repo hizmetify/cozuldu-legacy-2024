@@ -4,31 +4,33 @@ import {
   Route,
   Navigate,
 } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
-import PrivateRoute from './guards/PrivateRoute';
-import Spinner from './components/UI/Spinner';
-import { HelmetProvider } from 'react-helmet-async';
-import RegisterLayout from './layouts/RegisterLayout';
-import StepOne from './components/Register/StepOne';
-import StepTwo from './components/Register/StepTwo';
-import StepThree from './components/Register/StepThree';
+import { Suspense, lazy, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchMe } from './features/auth/authSlice';
-import { useEffect } from 'react';
+import { HelmetProvider } from 'react-helmet-async';
+
+import PrivateRoute from './guards/PrivateRoute';
 import PublicRoute from './guards/PublicRoute';
+import Spinner from './components/UI/Spinner';
+import RegisterLayout from './layouts/RegisterLayout';
 import DashboardLayout from './layouts/DashboardLayout';
-import MyAds from './pages/MyAds/MyAds';
-import Settings from './pages/Settings/Settings';
-import MyAdsList from './pages/MyAds/MyAdsList';
-import MyAdsNew from './pages/MyAds/MyAdsNew';
-import MyAdsDetail from './pages/MyAds/MyAdsDetail';
-import MyAdsEdit from './pages/MyAds/MyAdsEdit';
+import { fetchMe } from './features/auth/authSlice';
 
 const Home = lazy(() => import('./pages/Home/Home'));
 const Login = lazy(() => import('./pages/Login/Login'));
+const MyAds = lazy(() => import('./pages/MyAds/MyAds'));
+const Settings = lazy(() => import('./pages/Settings/Settings'));
+const MyAdsList = lazy(() => import('./pages/MyAds/MyAdsList'));
+const MyAdsNew = lazy(() => import('./pages/MyAds/MyAdsNew'));
+const MyAdsDetail = lazy(() => import('./pages/MyAds/MyAdsDetail'));
+const MyAdsEdit = lazy(() => import('./pages/MyAds/MyAdsEdit'));
+
+import StepOne from './components/Register/StepOne';
+import StepTwo from './components/Register/StepTwo';
+import StepThree from './components/Register/StepThree';
 
 const App = () => {
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchMe());
   }, [dispatch]);
@@ -39,6 +41,7 @@ const App = () => {
         <Suspense fallback={<Spinner />}>
           <Routes>
             <Route path="/" element={<Home />} />
+
             <Route
               path="/dashboard"
               element={
@@ -55,6 +58,7 @@ const App = () => {
               </Route>
               <Route path="settings" element={<Settings />} />
             </Route>
+
             <Route
               path="/login"
               element={
@@ -71,7 +75,7 @@ const App = () => {
                 </PublicRoute>
               }
             >
-              <Route index element={<Navigate to={'step-1'} />} />
+              <Route index element={<Navigate to="step-1" />} />
               <Route path="step-1" element={<StepOne />} />
               <Route path="step-2" element={<StepTwo />} />
               <Route path="step-3" element={<StepThree />} />
