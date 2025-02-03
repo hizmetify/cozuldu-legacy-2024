@@ -32,7 +32,7 @@ export const getSingleAdRequest = async (adId) => {
 
 export const createAdRequest = async (adData) => {
   try {
-    const formData = FormDataEvent();
+    const formData = FormData();
     for (const key in adData) {
       if (key === 'images' && Array.isArray(adData.images)) {
         adData.images.forEach((file) => {

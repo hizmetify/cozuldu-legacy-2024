@@ -30,9 +30,10 @@ app.use(limiter);
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'DELETE', 'PUT'],
-    credentials: true,
+    origin: "http://localhost:5173",  
+    credentials: true,                
+    methods: ["GET", "POST", "DELETE", "PUT"],  
+    allowedHeaders: ["Content-Type", "Authorization"],  
   })
 );
 

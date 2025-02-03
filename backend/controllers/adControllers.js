@@ -62,25 +62,25 @@ const updateAd = async (req, res) => {
 
 const getUserAds = async (req, res) => {
   try {
-    console.log('Middleware’den gelen kullanıcı ID:', req.user.id); 
     const userAds = await Ad.find({ user: req.user.id });
 
-    if (!userAds || userAds.length === 0) {
-      return res
-        .status(404)
-        .json({ message: 'Kullanıcıya ait ilan bulunamadı' });
+    if (!userAds.length) {
+      return res.status(200).json({
+        success: true,
+        message: 'Henüz hiç ilanınız yok. Hemen bir tane ekleyin! 🚀',
+        data: [],
+      });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Kullanıcıya ait ilanlar getirildi',
+      message: 'Kullanıcıya ait ilanlar getirildi.',
       data: userAds,
     });
   } catch (error) {
-    console.error('Hata Detayı:', error);
     res.status(500).json({
-      message:
-        'İlan görüntülenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+      message: 'İlanlar getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+      error: error.message,
     });
   }
 };

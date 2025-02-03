@@ -7,7 +7,7 @@ import Spinner from '../../components/UI/Spinner';
 const MyAdsList = () => {
   const dispatch = useDispatch();
   const { userAds, status, error } = useSelector((state) => state.ads);
-
+  
   useEffect(() => {
     dispatch(fetchUserAds());
   }, [dispatch]);
@@ -61,7 +61,7 @@ const MyAdsList = () => {
           </tr>
         </thead>
         <tbody>
-          {userAds.map((ad) => (
+          {userAds.data.map((ad) => (
             <tr key={ad._id} className="border-b">
               <td className="py-2 px-4">
                 <img
