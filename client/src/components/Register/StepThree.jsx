@@ -7,6 +7,7 @@ import { updateRegisterData } from '../../features/register/registerSlice';
 import { register } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../UI/InputField';
+import ButtonGroup from '../UI/ButtonGroup';
 
 const StepThree = () => {
   const dispatch = useDispatch();
@@ -41,42 +42,41 @@ const StepThree = () => {
         }
       }}
     >
-      {({ errors, validateForm, handleSubmit }) => {
+      {({ validateForm, handleSubmit, isSubmitting, setErrors }) => {
         const customSubmit = async (e) => {
-          e.preventDefault();
+          if (e) e.preventDefault();
           const validationErrors = await validateForm();
+
           if (Object.keys(validationErrors).length > 0) {
-            Object.values(validationErrors).forEach((err) => toast.error(err));
+            Object.entries(validationErrors).forEach(([field, errorMsg]) => {
+              toast.error(errorMsg);
+            });
+            setErrors(validationErrors);
           } else {
-            handleSubmit();
+            await handleSubmit();
           }
         };
 
         return (
-          <Form onSubmit={customSubmit}>
-
-              <InputField name="password" label="Şifre" type={'password'} />
+          <Form className="flex flex-col h-full">
+            <div className="flex flex-col gap-3 flex-grow mt-7">
+              <InputField name="password" label="Şifre" type="password" />
               <InputField
                 name="confirmPassword"
                 label="Şifre (Tekrar)"
-                type={'password'}
+                type="password"
               />
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  onClick={() => navigate('/register/step-2')}
-                  className="bg-gray-300 text-black px-4 py-2 rounded mr-2"
-                >
-                  Geri
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Kayıt Ol
-                </button>
-              </div>
+            </div>
 
+            <div className="mt-auto">
+              <ButtonGroup
+                currentStep={3}
+                totalSteps={3}
+                onPrevious={() => navigate('/register/step-2')}
+                onNext={customSubmit}
+                isSubmitting={isSubmitting}
+              />
+            </div>
           </Form>
         );
       }}

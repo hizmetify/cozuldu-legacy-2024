@@ -1,14 +1,14 @@
-import { memo } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { stepTwoValidationSchema } from '../../validations/userValidation';
 import { updateRegisterData } from '../../features/register/registerSlice';
-import { useEffect, useState } from 'react';
 import { fetchCities } from '../../api/cityApi';
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
+import ButtonGroup from '../UI/ButtonGroup';
 
 const StepTwo = () => {
   const [cities, setCities] = useState([]);
@@ -38,7 +38,7 @@ const StepTwo = () => {
       validationSchema={stepTwoValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      onSubmit={async (values, { setSubmitting }) => {
+      onSubmit={async (values, { setSubmitting, setErrors }) => {
         try {
           await stepTwoValidationSchema.validate(values, { abortEarly: false });
           dispatch(updateRegisterData(values));
@@ -46,33 +46,36 @@ const StepTwo = () => {
           navigate('/register/step-3');
         } catch (error) {
           if (error.inner) {
+            let formErrors = {};
             error.inner.forEach((err) => {
+              formErrors[err.path] = err.message;
               toast.error(err.message);
             });
+            setErrors(formErrors);
           }
         }
         setSubmitting(false);
       }}
     >
-      {({ errors, validateForm, handleSubmit }) => {
+      {({ validateForm, handleSubmit, isSubmitting, setErrors }) => {
         const handleNextStep = async (e) => {
           e.preventDefault();
           const validationErrors = await validateForm();
 
-          console.log('Validation Errors:', validationErrors);
 
           if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
             Object.entries(validationErrors).forEach(([field, err]) => {
               toast.error(err);
-              console.log(`Error in ${field}: ${err}`);
             });
           } else {
-            handleSubmit()
+            await handleSubmit(); 
           }
         };
+
         return (
-          <Form>
-            <div className="flex flex-col justify-between gap-3">
+          <Form className="flex flex-col h-full">
+            <div className="flex flex-col gap-3 flex-grow">
               <InputField
                 name="phone"
                 label="Telefon"
@@ -89,23 +92,16 @@ const StepTwo = () => {
                 label="Portfolio Linki"
                 placeholder={'Portfolio linkinizi girin'}
               />
+            </div>
 
-              <div className="flex items-center justify-between">
-                <button
-                  type="button"
-                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-sm font-medium hover:bg-gray-300 transition"
-                  onClick={() => navigate('/register/step-1')}
-                >
-                  Geri
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-sm font-medium hover:bg-blue-700 transition"
-                  onClick={handleNextStep}
-                >
-                  Devam et
-                </button>
-              </div>
+            <div className="mt-auto">
+              <ButtonGroup
+                currentStep={2}
+                totalSteps={3}
+                onPrevious={() => navigate('/register/step-1')}
+                onNext={handleNextStep} // ✅ onNext bağlıyoruz.
+                isSubmitting={isSubmitting}
+              />
             </div>
           </Form>
         );
