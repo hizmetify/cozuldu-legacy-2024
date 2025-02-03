@@ -40,7 +40,7 @@ const StepOne = () => {
 
         return (
           <Form onSubmit={customSubmit}>
-            <div className='flex flex-col gap-3 justify-between h-full'>
+            <div className="flex flex-col gap-3 justify-between h-full">
               <InputField
                 name="name"
                 label="İsim"
@@ -56,12 +56,14 @@ const StepOne = () => {
                 label="E-posta"
                 placeholder={'E-posta adresinizi girin'}
               />
-              <button
-                type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded"
-              >
-                Devam Et
-              </button>
+              <div className="flex items-center justify-start my-2">
+                <button
+                  type="submit"
+                  className="bg-blue-500 text-white px-4 py-2 rounded-sm"
+                >
+                  Devam Et
+                </button>
+              </div>
             </div>
           </Form>
         );

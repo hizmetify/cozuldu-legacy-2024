@@ -37,26 +37,41 @@ const StepTwo = () => {
       validationSchema={stepTwoValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      onSubmit={(values) => {
-        dispatch(updateRegisterData(values));
-        toast.success('Adım 2 başarıyla tamamlandı!');
-        navigate('/register/step-3');
+      onSubmit={async (values, { setSubmitting }) => {
+        try {
+          await stepTwoValidationSchema.validate(values, { abortEarly: false });
+          dispatch(updateRegisterData(values));
+          toast.success('Adım 2 başarıyla tamamlandı!');
+          navigate('/register/step-3');
+        } catch (error) {
+          if (error.inner) {
+            error.inner.forEach((err) => {
+              toast.error(err.message);
+            });
+          }
+        }
+        setSubmitting(false);
       }}
     >
       {({ errors, validateForm, handleSubmit }) => {
-        const customSubmit = async (e) => {
+        const handleNextStep = async (e) => {
           e.preventDefault();
           const validationErrors = await validateForm();
+
+          console.log('Validation Errors:', validationErrors);
+
           if (Object.keys(validationErrors).length > 0) {
-            Object.values(validationErrors).forEach((err) => toast.error(err));
+            Object.entries(validationErrors).forEach(([field, err]) => {
+              toast.error(err);
+              console.log(`Error in ${field}: ${err}`);
+            });
           } else {
-            handleSubmit();
+            handleSubmit()
           }
         };
-
         return (
-          <Form onSubmit={customSubmit}>
-            <div className="flex flex-col justify-between gap-4">
+          <Form>
+            <div className="flex flex-col justify-between gap-3">
               <InputField
                 name="phone"
                 label="Telefon"
@@ -73,19 +88,21 @@ const StepTwo = () => {
                 label="Portfolio Linki"
                 placeholder={'Portfolio linkinizi girin'}
               />
+
               <div className="flex items-center justify-between">
                 <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
-                >
-                  Devam Et
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-500 text-white px-4 py-2 rounded"
+                  type="button"
+                  className="bg-gray-200 text-gray-700 px-6 py-2 rounded-sm font-medium hover:bg-gray-300 transition"
                   onClick={() => navigate('/register/step-1')}
                 >
                   Geri
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 text-white px-6 py-2 rounded-sm font-medium hover:bg-blue-700 transition"
+                  onClick={handleNextStep}
+                >
+                  Devam et
                 </button>
               </div>
             </div>

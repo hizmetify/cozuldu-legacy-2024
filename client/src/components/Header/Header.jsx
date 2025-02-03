@@ -29,7 +29,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/register"
-                  className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium transition duration-150 ease-in-out"
+                  className=" bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 px-4 py-2 rounded-sm text-sm font-medium transition duration-150 ease-in-out"
                 >
                   Hizmet Ver
                 </Link>
@@ -46,7 +46,7 @@ const Header = () => {
       </div>
       <div className="md:hidden">
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <button className="flex items-center w-full px-3 py-2 text-base font-medium text-blue-700 rounded-md hover:text-blue-600 hover:bg-blue-100">
+          <button className="flex items-center w-full px-3 py-2 text-base font-medium text-blue-700 rounded-sm hover:text-blue-600 hover:bg-blue-100">
             <span>Kategoriler</span>
             <MdDashboard className="ml-2 text-blue-600 text-lg" />
           </button>
@@ -58,7 +58,7 @@ const Header = () => {
           </Link>
           <Link
             to="/register"
-            className="block px-3 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
+            className="block px-3 py-2 text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
             Hizmet Ver
           </Link>

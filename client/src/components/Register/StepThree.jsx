@@ -53,7 +53,7 @@ const StepThree = () => {
 
         return (
           <Form onSubmit={customSubmit}>
-            <div className="flex flex-col justify-between gap-4">
+
               <InputField name="password" label="Şifre" type={'password'} />
               <InputField
                 name="confirmPassword"
@@ -75,7 +75,7 @@ const StepThree = () => {
                   Kayıt Ol
                 </button>
               </div>
-            </div>
+
           </Form>
         );
       }}
