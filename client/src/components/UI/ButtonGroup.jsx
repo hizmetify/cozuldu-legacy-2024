@@ -1,4 +1,3 @@
-// ButtonGroup.jsx
 import PropTypes from 'prop-types';
 
 const ButtonGroup = ({
@@ -9,25 +8,44 @@ const ButtonGroup = ({
   isSubmitting,
 }) => {
   return (
-    <div className="flex items-center justify-between mt-4">
+    <div className="mt-6 pt-4 flex items-center justify-between">
+
       {currentStep > 1 && (
         <button
           type="button"
           onClick={onPrevious}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-sm hover:bg-gray-400 transition"
+          className="
+            bg-gray-100 
+            text-gray-600 
+            border border-gray-300 
+            rounded-sm
+            px-4 py-2 
+            hover:bg-gray-200 
+            transition-all 
+            duration-200
+          "
         >
           Geri
         </button>
       )}
       <button
-        type="button" // submit yerine button tipi kullanalım.
-        onClick={onNext} // onNext fonksiyonunu ekliyoruz.
+        type="button"
+        onClick={onNext}
         disabled={isSubmitting}
-        className={`px-4 py-2 rounded-sm transition ${
-          isSubmitting
-            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
-            : 'bg-blue-600 text-white hover:bg-blue-700'
-        }`}
+        className={`
+          relative 
+          overflow-hidden 
+          px-5 py-2 
+          rounded-sm
+          text-white
+          transition-all 
+          duration-200 
+          ${
+            isSubmitting
+              ? 'bg-gray-400 cursor-not-allowed'
+              : 'bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:scale-105 shadow-md'
+          }
+        `}
       >
         {currentStep === totalSteps ? 'Kaydı Tamamla' : 'Devam Et'}
       </button>
@@ -39,7 +57,7 @@ ButtonGroup.propTypes = {
   currentStep: PropTypes.number.isRequired,
   totalSteps: PropTypes.number.isRequired,
   onPrevious: PropTypes.func.isRequired,
-  onNext: PropTypes.func, // onNext artık kullanılacak.
+  onNext: PropTypes.func,
   isSubmitting: PropTypes.bool,
 };
 
