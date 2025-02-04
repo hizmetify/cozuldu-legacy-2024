@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MdDashboard } from 'react-icons/md';
-import { FaBars } from 'react-icons/fa6';
 import CategoryDropdown from './CategoryDropdown';
 import { IoCloseOutline, IoMenuOutline } from 'react-icons/io5';
 
