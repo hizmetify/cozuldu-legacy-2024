@@ -1,6 +1,8 @@
 const Ad = require('../models/ad');
 
 const createAd = async (req, res) => {
+  console.log('req.body', req.body);
+
   try {
     const imagePaths = req.files.map((file) => file.path);
 
@@ -16,6 +18,7 @@ const createAd = async (req, res) => {
       'user',
       'name email'
     );
+
     res.status(201).json({
       success: true,
       message: 'İlan başarıyla oluşturuldu',
@@ -37,7 +40,7 @@ const updateAd = async (req, res) => {
       { _id: id, user: req.user.id },
       {
         ...req.body,
-        images: imagePaths.length > 0 ? imagePaths : undefined, 
+        images: imagePaths.length > 0 ? imagePaths : undefined,
         updatedAt: Date.now(),
       },
       { new: true }
@@ -59,7 +62,6 @@ const updateAd = async (req, res) => {
   }
 };
 
-
 const getUserAds = async (req, res) => {
   try {
     const userAds = await Ad.find({ user: req.user.id });
@@ -79,7 +81,8 @@ const getUserAds = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: 'İlanlar getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
+      message:
+        'İlanlar getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
       error: error.message,
     });
   }

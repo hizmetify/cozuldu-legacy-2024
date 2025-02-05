@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const DashboardHeader = () => {
   const dispatch = useDispatch();
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-blue-200">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-neutral-200">
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 justify-start">
@@ -16,7 +16,9 @@ const DashboardHeader = () => {
                 onClick={() => dispatch(toggleSidebar())}
               />
             </button>
-            <Link className="font-bold text-2xl uppercase">Logo</Link>
+            <Link className="font-bold text-3xl uppercase text-transparent bg-gradient-to-r from-blue-500 to-purple-800 bg-clip-text ">
+              Logo
+            </Link>
           </div>
         </div>
       </div>

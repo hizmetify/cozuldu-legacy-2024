@@ -14,15 +14,11 @@ const adValidationSchema = Joi.object({
   }),
 
   serviceType: Joi.string().valid('yüz yüze').required().messages({
-    'any.only': 'Hizmet türü seçimi zorunludur',
+    'any.only': 'Hizmet tipi yalnızca "yüz yüze" olabilir',
   }),
 
-  city: Joi.string().when('serviceType', {
-    is: 'yüz yüze',
-    then: Joi.required().messages({
-      'string.empty': 'Şehir seçimi yüz yüze hizmet için gereklidir',
-    }),
-    otherwise: Joi.forbidden(),
+  city: Joi.string().min(2).max(100).required().messages({
+    'string.empty': 'Şehir boş olamaz',
   }),
 
   price: Joi.number().greater(0).required().messages({
@@ -40,9 +36,8 @@ const adValidationSchema = Joi.object({
   availability: Joi.array().items(Joi.date()).optional().messages({
     'array.base': 'Uygunluk tarihleri geçerli bir tarih dizisi olmalıdır',
   }),
-
-  images: Joi.array().items(Joi.string().uri()).optional().messages({
-    'array.base': "Resim URL'leri geçerli bir dizi olmalıdır",
+  images: Joi.array().items(Joi.string()).optional().messages({
+    'array.base': 'Resimler geçerli bir dizi olmalıdır',
   }),
 });
 

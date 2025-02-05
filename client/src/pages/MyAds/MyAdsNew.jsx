@@ -13,7 +13,7 @@ const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
 
 const MyAdsNew = () => {
   const [cities, setCities] = useState([]);
-
+  const [selectedFiles, setSelectedFiles] = useState([]);
   useEffect(() => {
     const loadCities = async () => {
       const cityData = await fetchCities();
@@ -21,11 +21,10 @@ const MyAdsNew = () => {
     };
     loadCities();
   }, []);
-
+  const [images,setImages]=useState([]);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
   const { status, error } = useSelector((state) => state.ads);
-
   const initialValues = {
     title: '',
     description: '',
@@ -34,19 +33,46 @@ const MyAdsNew = () => {
     price: '',
     priceType: 'saatlik',
     availability: [''],
-    images: [''],
+  };
+
+  const handleFileChange = (e) => {
+    setSelectedFiles(Array.from(e.target.files[0]));  
+    setImages(e.target.value)
   };
 
   const handleSubmit = async (values) => {
-    const resultAction = await dispatch(createAd(values));
-    if (createAd.fulfilled.match(resultAction)) {
-      navigate('/dashboard/my-ads'); 
-    }
+    let formData = new FormData();
 
+    formData.append('title', values.title);
+    formData.append('description', values.description);
+    formData.append('serviceType', values.serviceType);
+    formData.append('city', values.city);
+    formData.append('price', values.price);
+    formData.append('priceType', values.priceType);
+
+    values.availability.forEach((dateVal) => {
+      if (dateVal) {
+        formData.append('availability', dateVal);
+      }
+    });
+
+    selectedFiles.forEach((file) => {
+      formData.append('images', file);
+    });
+    let newValues={
+      images:images,
+      ...values
+    }
+    console.log(newValues);
+    
+    const resultAction = await dispatch(createAd(values)); // orijinali => createAd(formData)
+    if (createAd.fulfilled.match(resultAction)) {
+      navigate('/dashboard/my-ads');
+    }
   };
 
   return (
-    <div className="p-4  bg-white shadow rounded-md">
+    <div className="p-4 bg-white shadow rounded-md">
       <h2 className="text-xl font-bold mb-4">Yeni İlan Ekle</h2>
 
       {status === 'loading' && (
@@ -99,6 +125,7 @@ const MyAdsNew = () => {
                 </div>
               )}
             </div>
+
             <div>
               <label htmlFor="serviceType" className="block font-medium mb-1">
                 Hizmet Tipi <span className="text-red-500">*</span>
@@ -124,10 +151,7 @@ const MyAdsNew = () => {
             </div>
             <div>
               <label htmlFor="city" className="block font-medium mb-1">
-                Şehir
-                {values.serviceType === 'yüz yüze' && (
-                  <span className="text-red-500"> *</span>
-                )}
+                Şehir <span className="text-red-500">*</span>
               </label>
               <SelectField name={'city'} label={'Şehir'} options={cities} />
               {errors.city && touched.city && (
@@ -152,6 +176,7 @@ const MyAdsNew = () => {
                   </div>
                 )}
               </div>
+
               <div className="w-1/2">
                 <label htmlFor="priceType" className="block font-medium mb-1">
                   Fiyat Tipi <span className="text-red-500">*</span>
@@ -201,7 +226,7 @@ const MyAdsNew = () => {
                     ))}
                     <button
                       type="button"
-                      className="bg-blue-600 text-white px-3 py-1 rounded"
+                      className="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-700 text-white px-6 py-1.5 rounded-sm"
                       onClick={() => push('')}
                     >
                       Tarih Ekle
@@ -215,43 +240,20 @@ const MyAdsNew = () => {
                 </div>
               )}
             </div>
-
             <div>
-              <label className="block font-medium mb-1">Resimler (URL)</label>
-              <FieldArray name="images">
-                {({ remove, push }) => (
-                  <div className="space-y-2">
-                    {values.images.map((imgVal, idx) => (
-                      <div key={idx} className="flex items-center space-x-2">
-                        <Field
-                          name={`images.${idx}`}
-                          type="text"
-                          placeholder="https://example.com/image.jpg"
-                          className="border border-gray-300 rounded p-2 w-full"
-                        />
-                        <button
-                          type="button"
-                          className="text-red-600"
-                          onClick={() => remove(idx)}
-                        >
-                          Sil
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      className="bg-blue-600 text-white px-3 py-1 rounded"
-                      onClick={() => push('')}
-                    >
-                      Yeni Resim
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-              {errors.images && (
-                <div className="text-red-500 text-sm mt-1">
-                  Geçerli resim URL’si giriniz
-                </div>
+              <label  className="block font-medium mb-1">Resimler</label>
+              <input 
+                type="file"
+                multiple
+                accept="image/png, image/jpeg, image/jpg"
+                onChange={handleFileChange}
+                className="w-full border border-gray-300 rounded p-2" 
+              />
+              {selectedFiles.length > 0 && (
+                <p className="text-sm text-gray-600 mt-1">
+                  Seçilen Dosyalar:{' '}
+                  {selectedFiles.map((f) => f.name).join(', ')}
+                </p>
               )}
             </div>
 

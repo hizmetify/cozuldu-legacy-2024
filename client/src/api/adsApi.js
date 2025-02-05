@@ -42,8 +42,9 @@ export const createAdRequest = async (adData) => {
         formData.append(key, adData[key]);
       }
     }
-
-    const response = await axiosInstance.post('/ads', formData, {
+    console.log("adddata ",adData);
+    
+    const response = await axiosInstance.post('/ads', adData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
 

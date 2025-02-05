@@ -49,14 +49,13 @@ const MyAdsList = () => {
         <h2 className="text-xl font-bold">İlanlarım</h2>
         <Link
           to="/dashboard/my-ads/new"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-gradient-to-r from-blue-800 via-blue-500 to-blue-800 text-white px-4 py-2 rounded-sm"
         >
           + Yeni İlan Ekle
         </Link>
       </div>
-
-      <table className="min-w-full bg-white shadow-md rounded-lg overflow-hidden">
-        <thead className="bg-gray-100">
+      <table className="min-w-full bg-white rounded overflow-hidden">
+        <thead className="bg-white border-b border-neutral-200">
           <tr>
             <th className="py-2 px-4 text-left">Resim</th>
             <th className="py-2 px-4 text-left">Başlık</th>
