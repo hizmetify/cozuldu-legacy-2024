@@ -6,7 +6,7 @@ const DashboardLayout = () => {
     <>
       <DashboardHeader />
       <Sidebar />
-      <main className="text-gray-500 bg-gray-100 p-4 sm:ml-64 flex flex-col-reverse lg:flex-row gap-2 transition-all duration-150 mt-14">
+      <main className="text-gray-500 bg-gray-100 pt-4 pl-2 sm:ml-64 mt-14">
         <Outlet />
       </main>
     </>

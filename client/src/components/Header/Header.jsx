@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import CategoryDropdown from './CategoryDropdown';
 import { IoCloseOutline, IoMenuOutline } from 'react-icons/io5';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectSidebar } from '../../features/sidebar/sidebarSlice';
+import { toggleSidebar } from '../../features/sidebar/sidebarSlice';
 
 const Header = () => {
-  const [openMobile, setOpenMobile] = useState(false);
+  const isOpen = useSelector(selectSidebar);
+  const dispatch = useDispatch();
 
-  const toggleNavbar = () => {
-    setOpenMobile(!openMobile);
-  };
   return (
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -43,16 +43,16 @@ const Header = () => {
           </nav>
           <div className="md:hidden">
             <button
-              onClick={toggleNavbar}
+              onClick={() => dispatch(toggleSidebar())}
               className="inline-flex items-center text-xl justify-center p-2 rounded-md text-gray-700 hover:gray-blue-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-500"
             >
               <span className="sr-only">Open main menu</span>
-              {openMobile ? <IoCloseOutline /> : <IoMenuOutline />}
+              {isOpen ? <IoCloseOutline /> : <IoMenuOutline />}
             </button>
           </div>
         </div>
       </div>
-      {openMobile && (
+      {isOpen && (
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link

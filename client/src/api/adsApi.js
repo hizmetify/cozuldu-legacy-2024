@@ -32,11 +32,11 @@ export const getSingleAdRequest = async (adId) => {
 
 export const createAdRequest = async (adData) => {
   try {
-    const formData = FormData();
+    const formData = new FormData();
     for (const key in adData) {
       if (key === 'images' && Array.isArray(adData.images)) {
         adData.images.forEach((file) => {
-          formData.append(file);
+          formData.append('images', file);
         });
       } else {
         formData.append(key, adData[key]);

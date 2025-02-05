@@ -21,7 +21,7 @@ const SidebarLink = ({ href, label, icon: Icon, isLogout }) => {
     <li className="w-full">
       {isLogout ? (
         <button
-          className="flex items-center p-2 w-full text-gray-900 rounded-lg hover:bg-gray-100"
+          className="flex items-center p-2 w-full text-gray-800 rounded-lg hover:bg-blue-100"
           onClick={handleLogout}
         >
           <Icon className="mr-2" />
@@ -30,7 +30,7 @@ const SidebarLink = ({ href, label, icon: Icon, isLogout }) => {
       ) : (
         <Link
           to={href}
-          className="flex items-center justify-between p-2 text-gray-900 rounded-lg hover:bg-gray-100"
+          className="flex items-center justify-between p-2 text-gray-800 rounded-lg hover:bg-blue-100"
         >
           <Icon className="mr-2" />
           <span className="flex-1 me-3">{label}</span>

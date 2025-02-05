@@ -7,13 +7,17 @@ import Spinner from '../../components/UI/Spinner';
 const MyAdsList = () => {
   const dispatch = useDispatch();
   const { userAds, status, error } = useSelector((state) => state.ads);
-  
+
   useEffect(() => {
     dispatch(fetchUserAds());
   }, [dispatch]);
 
   if (status === 'loading') {
-    return <Spinner />;
+    return (
+      <div className="flex items-center justify-center w-full">
+        <Spinner />
+      </div>
+    );
   }
 
   if (status === 'failed') {

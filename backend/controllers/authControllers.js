@@ -65,8 +65,8 @@ const register = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'None',
+      secure: false,
+      sameSite: "Lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -105,8 +105,8 @@ const login = async (req, res) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'None',
+      secure: false,
+      sameSite:'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -125,9 +125,7 @@ const me = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(decoded);
     const user = await User.findById(decoded.id).select('-password');
-    console.log(user)
     res.status(200).json(user);
   } catch (error) {
     console.error(error);

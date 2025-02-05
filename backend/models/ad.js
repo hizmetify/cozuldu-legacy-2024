@@ -6,9 +6,7 @@ const adSchema = new mongoose.Schema({
   serviceType: { type: String, required: true, enum: ['yüz yüze'] },
   city: {
     type: String,
-    required: function () {
-      return this.serviceType === 'yüz yüze';
-    },
+    required: true,
   },
   price: { type: Number, required: true },
   priceType: {
@@ -24,4 +22,4 @@ const adSchema = new mongoose.Schema({
 });
 
 const Ad = mongoose.model('Ad', adSchema);
-module.exports =  Ad ;
+module.exports = Ad;

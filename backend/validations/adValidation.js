@@ -13,8 +13,8 @@ const adValidationSchema = Joi.object({
     'string.max': 'Açıklama en fazla 1000 karakter olabilir',
   }),
 
-  serviceType: Joi.string().valid('yüz yüze', 'dijital').required().messages({
-    'any.only': 'Hizmet türü "yüz yüze" veya "dijital" olmalıdır',
+  serviceType: Joi.string().valid('yüz yüze').required().messages({
+    'any.only': 'Hizmet türü seçimi zorunludur',
   }),
 
   city: Joi.string().when('serviceType', {

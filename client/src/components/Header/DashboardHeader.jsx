@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const DashboardHeader = () => {
   const dispatch = useDispatch();
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200">
+    <header className="fixed top-0 left-0 w-full z-50 bg-white border-b border-blue-200">
       <div className="p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3 justify-start">
