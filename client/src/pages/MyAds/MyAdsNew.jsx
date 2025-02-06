@@ -36,36 +36,47 @@ const MyAdsNew = () => {
   };
 
   const handleFileChange = (e) => {
-    setSelectedFiles(Array.from(e.target.files[0]));  
+    setSelectedFiles([e.target.files[0]]);  
     setImages(e.target.value)
+    console.log(selectedFiles);
+    
   };
 
   const handleSubmit = async (values) => {
+    let avail=[]
+    if (!Array.isArray(values.availability)) {
+      avail = values.availability.split(',');;
+    }
     let formData = new FormData();
-
-    formData.append('title', values.title);
+    formData.append("title",values.title) 
     formData.append('description', values.description);
     formData.append('serviceType', values.serviceType);
     formData.append('city', values.city);
     formData.append('price', values.price);
     formData.append('priceType', values.priceType);
-
+    // formData.append('availability',[values.availability]) 
+    console.log("selected files",avail); 
+   
     values.availability.forEach((dateVal) => {
       if (dateVal) {
         formData.append('availability', dateVal);
       }
     });
-
+    // console.log(formData);
     selectedFiles.forEach((file) => {
       formData.append('images', file);
     });
-    let newValues={
-      images:images,
-      ...values
+    for (let pair of formData.entries()){
+      console.log(pair[0], pair[1]);
+      
     }
-    console.log(newValues);
+    // const images = document.querySelector('input[type="file"]').files;
+    // for (let i = 0; i < images.length; i++) {
+    //   formData.append('images', images[i]);
+    // }
+    Request.file=selectedFiles 
     
-    const resultAction = await dispatch(createAd(values)); // orijinali => createAd(formData)
+    const resultAction = await dispatch(createAd(formData)); // orijinali => createAd(formData)
     if (createAd.fulfilled.match(resultAction)) {
       navigate('/dashboard/my-ads');
     }

@@ -9,6 +9,8 @@ const MyAdsList = () => {
   const { userAds, status, error } = useSelector((state) => state.ads);
 
   useEffect(() => {
+    console.log(userAds);
+    
     dispatch(fetchUserAds());
   }, [dispatch]);
 
@@ -68,7 +70,7 @@ const MyAdsList = () => {
             <tr key={ad._id} className="border-b">
               <td className="py-2 px-4">
                 <img
-                  src={ad.images?.[0] || 'https://via.placeholder.com/100'}
+                  src={ad.images!=null? ad.images[0] :'https://media.istockphoto.com/id/1324356458/tr/vekt%C3%B6r/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=khO1-2i1TZ67Nak9JQWmDx7Slai72lbl6SEp2gDOaV8='}
                   alt={ad.title}
                   className="w-20 h-20 object-cover rounded"
                 />
