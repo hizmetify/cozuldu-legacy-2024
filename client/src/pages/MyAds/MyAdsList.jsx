@@ -5,15 +5,10 @@ import { fetchUserAds, deleteAd } from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 
 const MyAdsList = () => {
-
-  
   const dispatch = useDispatch();
   const { userAds, status, error } = useSelector((state) => state.ads);
-  console.log(userAds);
 
   useEffect(() => {
-    console.log(userAds);
-
     dispatch(fetchUserAds());
   }, [dispatch]);
 
