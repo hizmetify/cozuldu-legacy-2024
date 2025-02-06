@@ -12,7 +12,9 @@ const initialState = {
   allAds: [],
   userAds: [],
   selectedAd: null,
-  status: 'idle',
+  allAdsStatus: 'idle',
+  userAdsStatus: 'idle',
+  singleAdStatus: 'idle',
   error: null,
 };
 
@@ -96,88 +98,48 @@ const adsSlice = createSlice({
   reducers: {
     clearSelectedAd(state) {
       state.selectedAd = null;
+      state.singleAdStatus = 'idle';
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchAllAds.pending, (state) => {
-        state.status = 'loading';
+        state.allAdsStatus = 'loading';
       })
       .addCase(fetchAllAds.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.allAdsStatus = 'succeeded';
         state.allAds = action.payload;
       })
       .addCase(fetchAllAds.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+        state.allAdsStatus = 'failed';
+        state.error =
+          action.payload?.message || 'İlanlar yüklenirken hata oluştu.';
       })
-
       .addCase(fetchUserAds.pending, (state) => {
-        state.status = 'loading';
+        state.userAdsStatus = 'loading';
       })
       .addCase(fetchUserAds.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.userAdsStatus = 'succeeded';
         state.userAds = action.payload;
       })
       .addCase(fetchUserAds.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+        state.userAdsStatus = 'failed';
+        state.error =
+          action.payload?.message ||
+          'Kullanıcı ilanları yüklenirken hata oluştu.';
       })
 
       .addCase(fetchSingleAd.pending, (state) => {
-        state.status = 'loading';
+        state.singleAdStatus = 'loading';
       })
       .addCase(fetchSingleAd.fulfilled, (state, action) => {
-        state.status = 'succeeded';
+        state.singleAdStatus = 'succeeded';
         state.selectedAd = action.payload;
       })
       .addCase(fetchSingleAd.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-
-      .addCase(createAd.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(createAd.fulfilled, (state, action) => {
-        console.log('createAd.fulfilled - Gelen Veri:', action.payload);
-        state.status = 'succeeded';
-        if (!Array.isArray(state.userAds)) {
-          state.userAds = [];
-        }
-        state.userAds = [...state.userAds, action.payload.data];
-      })
-      .addCase(createAd.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-      .addCase(updateAd.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(updateAd.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        const updatedAd = action.payload;
-        const idx = state.userAds.findIndex((ad) => ad._id === updatedAd._id);
-        if (idx !== -1) {
-          state.userAds[idx] = updatedAd;
-        }
-      })
-      .addCase(updateAd.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
-      })
-
-      .addCase(deleteAd.pending, (state) => {
-        state.status = 'loading';
-      })
-      .addCase(deleteAd.fulfilled, (state, action) => {
-        state.status = 'succeeded';
-        const { adId } = action.payload;
-        state.userAds = state.userAds.filter((ad) => ad._id !== adId);
-      })
-      .addCase(deleteAd.rejected, (state, action) => {
-        state.status = 'failed';
-        state.error = action.payload;
+        state.singleAdStatus = 'failed';
+        state.error =
+          action.payload?.message || 'İlan detayları yüklenirken hata oluştu.';
       });
   },
 });
