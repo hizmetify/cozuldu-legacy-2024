@@ -21,10 +21,11 @@ const MyAdsNew = () => {
     };
     loadCities();
   }, []);
-  const [images,setImages]=useState([]);
+  const [images, setImages] = useState([]);
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { status, error } = useSelector((state) => state.ads);
+  
   const initialValues = {
     title: '',
     description: '',
@@ -36,47 +37,40 @@ const MyAdsNew = () => {
   };
 
   const handleFileChange = (e) => {
-    setSelectedFiles([e.target.files[0]]);  
-    setImages(e.target.value)
+    setSelectedFiles([e.target.files[0]]);
+    setImages(e.target.value);
     console.log(selectedFiles);
-    
   };
 
   const handleSubmit = async (values) => {
-    let avail=[]
+    let avail = [];
     if (!Array.isArray(values.availability)) {
-      avail = values.availability.split(',');;
+      avail = values.availability.split(',');
     }
     let formData = new FormData();
-    formData.append("title",values.title) 
+    formData.append('title', values.title);
     formData.append('description', values.description);
     formData.append('serviceType', values.serviceType);
     formData.append('city', values.city);
     formData.append('price', values.price);
     formData.append('priceType', values.priceType);
-    // formData.append('availability',[values.availability]) 
-    console.log("selected files",avail); 
-   
+    console.log('selected files', avail);
+
     values.availability.forEach((dateVal) => {
       if (dateVal) {
         formData.append('availability', dateVal);
       }
     });
-    // console.log(formData);
+
     selectedFiles.forEach((file) => {
       formData.append('images', file);
     });
-    for (let pair of formData.entries()){
+    for (let pair of formData.entries()) {
       console.log(pair[0], pair[1]);
-      
     }
-    // const images = document.querySelector('input[type="file"]').files;
-    // for (let i = 0; i < images.length; i++) {
-    //   formData.append('images', images[i]);
-    // }
-    Request.file=selectedFiles 
-    
-    const resultAction = await dispatch(createAd(formData)); // orijinali => createAd(formData)
+    Request.file = selectedFiles;
+
+    const resultAction = await dispatch(createAd(formData)); 
     if (createAd.fulfilled.match(resultAction)) {
       navigate('/dashboard/my-ads');
     }
@@ -252,13 +246,13 @@ const MyAdsNew = () => {
               )}
             </div>
             <div>
-              <label  className="block font-medium mb-1">Resimler</label>
-              <input 
+              <label className="block font-medium mb-1">Resimler</label>
+              <input
                 type="file"
                 multiple
                 accept="image/png, image/jpeg, image/jpg"
                 onChange={handleFileChange}
-                className="w-full border border-gray-300 rounded p-2" 
+                className="w-full border border-gray-300 rounded p-2"
               />
               {selectedFiles.length > 0 && (
                 <p className="text-sm text-gray-600 mt-1">

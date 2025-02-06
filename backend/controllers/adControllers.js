@@ -1,10 +1,23 @@
 const Ad = require('../models/ad');
 
-const createAd = async (req, res) => {
-  console.log('req.body', req.body);
+const BASE_URL = 'http://localhost:5000';
 
+const formatImagePath = (imgPath) => {
+  if (!imgPath) return ''; 
+  if (imgPath.startsWith('http')) return imgPath;
+
+  let cleanedPath = imgPath
+    .replace(/^.*[\\/](uploads[\\/])/, '/uploads/')
+    .replace(/\\/g, '/');
+
+  return `${BASE_URL}${cleanedPath}`;
+};
+
+const createAd = async (req, res) => {
   try {
-    const imagePaths = req.files.map((file) => file.path);
+    const imagePaths = req.files.map((file) =>
+      formatImagePath(`/uploads/${file.filename}`)
+    );
 
     const ad = new Ad({
       ...req.body,
@@ -13,7 +26,6 @@ const createAd = async (req, res) => {
     });
 
     await ad.save();
-
     const populatedAd = await Ad.findById(ad._id).populate(
       'user',
       'name email'
@@ -31,10 +43,63 @@ const createAd = async (req, res) => {
   }
 };
 
+const getUserAds = async (req, res) => {
+  try {
+    const userAds = await Ad.find({ user: req.user.id });
+
+    if (!userAds.length) {
+      return res.status(200).json({
+        success: true,
+        message: 'Henüz hiç ilanınız yok.',
+        data: [],
+      });
+    }
+
+    const updatedAds = userAds.map((ad) => ({
+      ...ad._doc,
+      images: ad.images.map(formatImagePath),
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: 'Kullanıcıya ait ilanlar getirildi.',
+      data: updatedAds,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'İlanlar getirilirken bir hata oluştu. Lütfen tekrar deneyin.',
+      error: error.message,
+    });
+  }
+};
+
+const getAllAds = async (req, res) => {
+  try {
+    const ads = await Ad.find().populate('user', 'name email');
+
+    const updatedAds = ads.map((ad) => ({
+      ...ad._doc,
+      images: ad.images.map(formatImagePath),
+    }));
+
+    res.status(200).json({
+      success: true,
+      message: 'İlanlar başarıyla getirildi',
+      data: updatedAds,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: 'İlanlar getirilirken bir hata oluştu. Lütfen tekrar deneyin',
+    });
+  }
+};
+
 const updateAd = async (req, res) => {
   const { id } = req.params;
   try {
-    const imagePaths = req.files ? req.files.map((file) => file.path) : [];
+    const imagePaths = req.files
+      ? req.files.map((file) => formatImagePath(`/uploads/${file.filename}`))
+      : [];
 
     const ad = await Ad.findOneAndUpdate(
       { _id: id, user: req.user.id },
@@ -62,48 +127,6 @@ const updateAd = async (req, res) => {
   }
 };
 
-const getUserAds = async (req, res) => {
-  try {
-    const userAds = await Ad.find({ user: req.user.id });
-
-    if (!userAds.length) {
-      return res.status(200).json({
-        success: true,
-        message: 'Henüz hiç ilanınız yok. Hemen bir tane ekleyin! 🚀',
-        data: [],
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'Kullanıcıya ait ilanlar getirildi.',
-      data: userAds,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message:
-        'İlanlar getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin.',
-      error: error.message,
-    });
-  }
-};
-
-const getAllAds = async (req, res) => {
-  try {
-    const ads = await Ad.find().populate('user', 'name email');
-    res.status(200).json({
-      success: true,
-      message: 'İlanlar başarıyla getirildi',
-      data: ads,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message:
-        'İlanlar getirilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
-    });
-  }
-};
-
 const getSingleAd = async (req, res) => {
   const { id } = req.params;
   try {
@@ -111,6 +134,9 @@ const getSingleAd = async (req, res) => {
     if (!ad) {
       return res.status(404).json({ message: 'Böyle bir ilan bulunamadı.' });
     }
+
+    ad.images = ad.images.map(formatImagePath);
+
     res.status(200).json({
       success: true,
       data: ad,
@@ -118,7 +144,7 @@ const getSingleAd = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message:
-        'İlan görüntülenirken bir hata oluştu. Lütfen daha cemcemsonra tekrar deneyin',
+        'İlan görüntülenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
     });
   }
 };

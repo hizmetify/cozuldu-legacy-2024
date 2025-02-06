@@ -5,12 +5,15 @@ import { fetchUserAds, deleteAd } from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 
 const MyAdsList = () => {
+
+  
   const dispatch = useDispatch();
   const { userAds, status, error } = useSelector((state) => state.ads);
+  console.log(userAds);
 
   useEffect(() => {
     console.log(userAds);
-    
+
     dispatch(fetchUserAds());
   }, [dispatch]);
 
@@ -66,41 +69,47 @@ const MyAdsList = () => {
           </tr>
         </thead>
         <tbody>
-          {userAds.data.map((ad) => (
-            <tr key={ad._id} className="border-b">
-              <td className="py-2 px-4">
-                <img
-                  src={ad.images!=null? ad.images[0] :'https://media.istockphoto.com/id/1324356458/tr/vekt%C3%B6r/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=khO1-2i1TZ67Nak9JQWmDx7Slai72lbl6SEp2gDOaV8='}
-                  alt={ad.title}
-                  className="w-20 h-20 object-cover rounded"
-                />
-              </td>
-              <td className="py-2 px-4">{ad.title}</td>
-              <td className="py-2 px-4">
-                {ad.price ? `${ad.price}₺` : 'Fiyat Belirtilmedi'}
-              </td>
-              <td className="py-2 px-4 text-center">
-                <Link
-                  to={`/dashboard/my-ads/${ad._id}`}
-                  className="text-blue-600 hover:underline mx-2"
-                >
-                  Görüntüle
-                </Link>
-                <Link
-                  to={`/dashboard/my-ads/${ad._id}/edit`}
-                  className="text-green-600 hover:underline mx-2"
-                >
-                  Düzenle
-                </Link>
-                <button
-                  onClick={() => handleDelete(ad._id)}
-                  className="text-red-600 hover:underline mx-2"
-                >
-                  Sil
-                </button>
-              </td>
-            </tr>
-          ))}
+          {(Array.isArray(userAds?.data) ? userAds.data : userAds || []).map(
+            (ad) => (
+              <tr key={ad._id} className="border-b">
+                <td className="py-2 px-4">
+                  <img
+                    src={
+                      ad.images?.length
+                        ? ad.images[0]
+                        : 'https://media.istockphoto.com/id/1324356458/tr/vekt%C3%B6r/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=khO1-2i1TZ67Nak9JQWmDx7Slai72lbl6SEp2gDOaV8='
+                    }
+                    alt={ad.title}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                </td>
+                <td className="py-2 px-4">{ad.title}</td>
+                <td className="py-2 px-4">
+                  {ad.price ? `${ad.price}₺` : 'Fiyat Belirtilmedi'}
+                </td>
+                <td className="py-2 px-4 text-center">
+                  <Link
+                    to={`/dashboard/my-ads/${ad._id}`}
+                    className="text-blue-600 hover:underline mx-2"
+                  >
+                    Görüntüle
+                  </Link>
+                  <Link
+                    to={`/dashboard/my-ads/${ad._id}/edit`}
+                    className="text-green-600 hover:underline mx-2"
+                  >
+                    Düzenle
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(ad._id)}
+                    className="text-red-600 hover:underline mx-2"
+                  >
+                    Sil
+                  </button>
+                </td>
+              </tr>
+            )
+          )}
         </tbody>
       </table>
     </div>

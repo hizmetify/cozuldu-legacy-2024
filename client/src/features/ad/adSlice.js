@@ -21,7 +21,7 @@ export const fetchAllAds = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const response = await getAllAdsRequest();
-      return response; 
+      return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -56,8 +56,8 @@ export const createAd = createAsyncThunk(
   'ads/createAd',
   async (adData, thunkAPI) => {
     try {
-      console.log("addSlice.js",adData);
-      
+      console.log('addSlice.js', adData);
+
       const response = await createAdRequest(adData);
       return response;
     } catch (error) {
@@ -140,14 +140,17 @@ const adsSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(createAd.fulfilled, (state, action) => {
+        console.log('createAd.fulfilled - Gelen Veri:', action.payload);
         state.status = 'succeeded';
-        state.userAds.push(action.payload);
+        if (!Array.isArray(state.userAds)) {
+          state.userAds = [];
+        }
+        state.userAds = [...state.userAds, action.payload.data];
       })
       .addCase(createAd.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
       })
-
       .addCase(updateAd.pending, (state) => {
         state.status = 'loading';
       })
