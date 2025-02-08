@@ -5,7 +5,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { Suspense, lazy, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { HelmetProvider } from 'react-helmet-async';
 
 import PrivateRoute from './guards/PrivateRoute';
@@ -27,13 +27,30 @@ const MyAdsEdit = lazy(() => import('./pages/MyAds/MyAdsEdit'));
 import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
+import { clearToast } from './features/toast/toastSlice';
+import { toast } from 'react-hot-toast';
 
 const App = () => {
   const dispatch = useDispatch();
 
+  const queue = useSelector((state) => state.toast.queue);
+
   useEffect(() => {
     dispatch(fetchMe());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (queue.length > 0) {
+      queue.forEach(({ message, type }) => {
+        toast[type](message);
+      });
+
+      dispatch(clearToast()); 
+    }
+  }, [queue, dispatch]);
+
+
+
 
   return (
     <HelmetProvider>

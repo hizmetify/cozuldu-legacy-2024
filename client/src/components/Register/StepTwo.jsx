@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-hot-toast';
+import { showToast } from '../../features/toast/toastSlice';
 import { stepTwoValidationSchema } from '../../validations/userValidation';
 import { updateRegisterData } from '../../features/register/registerSlice';
 import { fetchCities } from '../../api/cityApi';
@@ -42,14 +42,19 @@ const StepTwo = () => {
         try {
           await stepTwoValidationSchema.validate(values, { abortEarly: false });
           dispatch(updateRegisterData(values));
-          toast.success('Adım 2 başarıyla tamamlandı!');
+          dispatch(
+            showToast({
+              message: 'Adım 2 başarıyla tamamlandı!',
+              type: 'success',
+            })
+          );
           navigate('/register/step-3');
         } catch (error) {
           if (error.inner) {
             let formErrors = {};
             error.inner.forEach((err) => {
               formErrors[err.path] = err.message;
-              toast.error(err.message);
+              dispatch(showToast({ message: err.message, type: 'error' }));
             });
             setErrors(formErrors);
           }
@@ -62,14 +67,13 @@ const StepTwo = () => {
           e.preventDefault();
           const validationErrors = await validateForm();
 
-
           if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
-            Object.entries(validationErrors).forEach(([field, err]) => {
-              toast.error(err);
+            Object.entries(validationErrors).forEach(([_, err]) => {
+              dispatch(showToast({ message: err, type: 'error' }))
             });
           } else {
-            await handleSubmit(); 
+            await handleSubmit();
           }
         };
 
@@ -79,18 +83,18 @@ const StepTwo = () => {
               <InputField
                 name="phone"
                 label="Telefon"
-                placeholder={'Telefon Numarası'}
+                placeholder="Telefon Numarası"
               />
               <SelectField name="city" label="Şehir" options={cities} />
               <InputField
                 name="profilePic"
                 label="Profil Resmi URL"
-                placeholder={'Profil fotoğrafı linki'}
+                placeholder="Profil fotoğrafı linki"
               />
               <InputField
                 name="portfolioLink"
                 label="Portfolio Linki"
-                placeholder={'Portfolio linkinizi girin'}
+                placeholder="Portfolio linkinizi girin"
               />
             </div>
 
@@ -99,7 +103,7 @@ const StepTwo = () => {
                 currentStep={2}
                 totalSteps={3}
                 onPrevious={() => navigate('/register/step-1')}
-                onNext={handleNextStep} // ✅ onNext bağlıyoruz.
+                onNext={handleNextStep}
                 isSubmitting={isSubmitting}
               />
             </div>

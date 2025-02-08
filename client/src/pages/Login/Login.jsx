@@ -1,28 +1,34 @@
-
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form } from 'formik';
-import * as Yup from 'yup';
+import { useNavigate } from 'react-router-dom';
+import { loginValidation } from '../../validations/userValidation';
 import { login } from '../../features/auth/authSlice';
 import InputField from '../../components/UI/InputField';
+import { showToast } from '../../features/toast/toastSlice';
+
 const LoginPage = () => {
   const dispatch = useDispatch();
-  const { isLoading, isError, errorMessage } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const { isLoading } = useSelector((state) => state.auth);
 
   const initialValues = {
     email: '',
     password: '',
   };
 
-  const validationSchema = Yup.object({
-    email: Yup.string()
-      .email('Geçerli bir e-posta adresi giriniz.')
-      .required('E-posta alanı zorunludur.'),
-    password: Yup.string()
-      .required('Şifre alanı zorunludur.'),
-  });
+  const handleSubmit = async (values, { setErrors }) => {
+    try {
+      const response = await dispatch(login(values)).unwrap();
 
-  const handleSubmit = async (values) => {
-    dispatch(login(values));
+      dispatch(showToast({ message: 'Giriş başarılı!', type: 'success' }));
+      navigate('/dashboard');
+    } catch (error) {
+      dispatch(showToast({ message: error, type: 'error' }));
+
+      if (typeof error === 'object' && error.errors) {
+        setErrors(error.errors);
+      }
+    }
   };
 
   return (
@@ -32,48 +38,57 @@ const LoginPage = () => {
 
         <Formik
           initialValues={initialValues}
-          validationSchema={validationSchema}
+          validationSchema={loginValidation}
+          validateOnChange={false}
+          validateOnBlur={false}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
-            <Form>
-              <InputField
-                label="E-posta"
-                name="email"
-                type="email"
-                placeholder="ornek@email.com"
-              />
-              <div className="mt-4">
+          {({ validateForm, handleSubmit, setErrors, isSubmitting }) => {
+            const customSubmit = async (e) => {
+              if (e) e.preventDefault();
+              const validationErrors = await validateForm();
+
+              if (Object.keys(validationErrors).length > 0) {
+                setErrors(validationErrors);
+                Object.values(validationErrors).forEach((errorMsg) => {
+                  dispatch(showToast({ message: errorMsg, type: 'error' }));
+                });
+              } else {
+                await handleSubmit();
+              }
+            };
+
+            return (
+              <Form>
                 <InputField
-                  label="Şifre"
-                  name="password"
-                  type="password"
-                  placeholder="Şifrenizi giriniz"
+                  label="E-posta"
+                  name="email"
+                  type="email"
+                  placeholder="ornek@email.com"
                 />
-              </div>
-              {isError && (
-                <div className="mt-2 text-red-600 text-sm">
-                  {errorMessage}
+                <div className="mt-4">
+                  <InputField
+                    label="Şifre"
+                    name="password"
+                    type="password"
+                    placeholder="Şifrenizi giriniz"
+                  />
                 </div>
-              )}
-              <button
-                type="submit"
-                disabled={isLoading || isSubmitting}
-                className={`
-                  mt-6 w-full 
-                  bg-blue-600 text-white 
-                  py-2 px-4 rounded 
-                  hover:bg-blue-700 
-                  transition-colors 
-                  duration-200 
-                  disabled:bg-gray-400 
-                  disabled:cursor-not-allowed
-                `}
-              >
-                {isLoading || isSubmitting ? 'Giriş Yapılıyor...' : 'Giriş Yap'}
-              </button>
-            </Form>
-          )}
+
+                <button
+                  type="submit"
+                  onClick={customSubmit}
+                  disabled={isLoading || isSubmitting}
+                  className={`mt-6 w-full bg-blue-600 text-white py-2 px-4 rounded 
+                    hover:bg-blue-700 transition-colors duration-200 
+                    disabled:bg-gray-400 disabled:cursor-not-allowed
+                  `}
+                >
+                  Giriş yap
+                </button>
+              </Form>
+            );
+          }}
         </Formik>
       </div>
     </div>

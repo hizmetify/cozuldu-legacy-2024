@@ -1,17 +1,16 @@
 import { memo } from 'react';
 import { Formik, Form } from 'formik';
-import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { stepOneValidationSchema } from '../../validations/userValidation';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateRegisterData } from '../../features/register/registerSlice';
+import { showToast } from '../../features/toast/toastSlice';
 import InputField from '../UI/InputField';
 import ButtonGroup from '../UI/ButtonGroup';
 
 const StepOne = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
   const { name, lastname, email } = useSelector((state) => state.register.data);
 
   return (
@@ -22,7 +21,7 @@ const StepOne = () => {
       validateOnBlur={false}
       onSubmit={(values) => {
         dispatch(updateRegisterData(values));
-        toast.success('Adım 1 başarıyla tamamlandı!');
+        dispatch(showToast({ message: 'Adım 1 başarıyla tamamlandı!', type: 'success' }));
         navigate('/register/step-2');
       }}
     >
@@ -32,10 +31,10 @@ const StepOne = () => {
           const validationErrors = await validateForm();
 
           if (Object.keys(validationErrors).length > 0) {
-            Object.entries(validationErrors).forEach(([field, errorMsg]) => {
-              toast.error(errorMsg);
-            });
             setErrors(validationErrors);
+            Object.entries(validationErrors).forEach(([_, errorMsg]) => {
+              dispatch(showToast({ message: errorMsg, type: 'error' }));
+            });
           } else {
             await handleSubmit();
           }
@@ -44,21 +43,9 @@ const StepOne = () => {
         return (
           <Form onSubmit={customSubmit} className="flex flex-col h-full">
             <div className="flex flex-col gap-3 flex-grow">
-              <InputField
-                name="name"
-                label="İsim"
-                placeholder="Adınızı girin"
-              />
-              <InputField
-                name="lastname"
-                label="Soyisim"
-                placeholder="Soyadınızı girin"
-              />
-              <InputField
-                name="email"
-                label="E-posta"
-                placeholder="E-posta adresinizi girin"
-              />
+              <InputField name="name" label="İsim" placeholder="Adınızı girin" />
+              <InputField name="lastname" label="Soyisim" placeholder="Soyadınızı girin" />
+              <InputField name="email" label="E-posta" placeholder="E-posta adresinizi girin" />
             </div>
 
             <div className="mt-auto">

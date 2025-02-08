@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { stepThreeValidationSchema } from '../../validations/userValidation';
-import { toast } from 'react-hot-toast';
+import { showToast } from '../../features/toast/toastSlice';
 import { updateRegisterData } from '../../features/register/registerSlice';
 import { register } from '../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
@@ -24,7 +24,7 @@ const StepThree = () => {
       validationSchema={stepThreeValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
-      onSubmit={async (values) => {
+      onSubmit={async (values, { setSubmitting, setErrors }) => {
         dispatch(updateRegisterData(values));
 
         try {
@@ -34,12 +34,13 @@ const StepThree = () => {
           };
 
           await dispatch(register(finalData)).unwrap();
-
-          toast.success('Kayıt başarılı!');
+          dispatch(showToast({ message: 'Kayıt başarılı!', type: 'success' })); 
           navigate('/dashboard');
         } catch (error) {
-          toast.error(error);
+          dispatch(showToast({ message: error, type: 'error' })); 
         }
+
+        setSubmitting(false);
       }}
     >
       {({ validateForm, handleSubmit, isSubmitting, setErrors }) => {
@@ -48,10 +49,10 @@ const StepThree = () => {
           const validationErrors = await validateForm();
 
           if (Object.keys(validationErrors).length > 0) {
-            Object.entries(validationErrors).forEach(([field, errorMsg]) => {
-              toast.error(errorMsg);
-            });
             setErrors(validationErrors);
+            Object.entries(validationErrors).forEach(([_, errorMsg]) => {
+              dispatch(showToast({ message: errorMsg, type: 'error' }));
+            });
           } else {
             await handleSubmit();
           }
