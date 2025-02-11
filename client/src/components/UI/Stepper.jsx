@@ -1,5 +1,5 @@
 import { FaCheck } from 'react-icons/fa6';
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import PropTypes from 'prop-types';
 
 const steps = [
@@ -12,35 +12,35 @@ const StepIndicator = ({ step, index, currentStepIndex }) => {
   const isCompleted = index < currentStepIndex;
   const isActive = index === currentStepIndex;
 
-  const circleStyles = useMemo(() => {
-    let styles =
-      'flex items-center justify-center w-12 h-12 rounded-full text-lg font-bold transition-all duration-300 ';
-    if (isCompleted) {
-      styles += 'bg-blue-600 text-white border-4 border-blue-600';
-    } else if (isActive) {
-      styles += 'bg-white text-blue-600 border-4 border-blue-600';
-    } else {
-      styles += 'bg-gray-200 text-gray-500 border-4 border-gray-300';
+  const circleStyles = `
+    flex items-center justify-center w-12 h-12 rounded-full text-lg font-medium 
+    shadow-md transition-all duration-300
+    ${
+      isCompleted
+        ? 'bg-teal-500 text-white border-4 border-teal-500'
+        : isActive
+        ? 'bg-white text-indigo-600 border-4 border-white'
+        : 'bg-white/20 text-white border-4 border-white/40'
     }
-    return styles;
-  }, [isCompleted, isActive]);
+  `;
 
   return (
-    <div className="flex flex-col items-center space-y-2">
+    <div className="flex items-center gap-4">
       <div className={circleStyles}>
-        {isCompleted ? (
-          <FaCheck className="text-white text-xl" />
-        ) : (
-          <span>{step.step}</span>
-        )}
+        {isCompleted ? <FaCheck className="text-xl" /> : step.step}
       </div>
-      <span
-        className={`text-sm font-medium ${
-          isActive ? 'text-blue-600 font-semibold' : 'text-gray-500'
-        }`}
-      >
-        {step.title}
-      </span>
+      <div className="flex flex-col">
+        <span className="text-xs font-semibold text-white/50 tracking-wider">
+          ADIM {step.step}
+        </span>
+        <span
+          className={`text-sm font-bold tracking-wide ${
+            isActive ? 'text-white drop-shadow-md' : 'text-white/80'
+          }`}
+        >
+          {step.title}
+        </span>
+      </div>
     </div>
   );
 };
@@ -57,15 +57,58 @@ StepIndicator.propTypes = {
 
 const Stepper = ({ currentStepIndex }) => {
   return (
-    <div className="px-6 py-4 flex items-center justify-between">
-      {steps.map((step, index) => (
-        <StepIndicator
-          key={index}
-          step={step}
-          index={index}
-          currentStepIndex={currentStepIndex}
-        />
-      ))}
+    <div className="relative w-full h-full bg-gradient-to-b from-gray-900 via-indigo-900 to-black text-white overflow-hidden">
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 rounded-full blur-3xl" />
+      <div className="flex md:hidden px-4 py-4 w-full relative">
+        <div className="flex items-center justify-between w-full">
+          {steps.map((step, index) => {
+            const isCompleted = index < currentStepIndex;
+            const isActive = index === currentStepIndex;
+            const circleClasses = `
+              flex items-center justify-center w-10 h-10 rounded-full 
+              text-sm font-medium transition-colors 
+              ${
+                isCompleted
+                  ? 'bg-teal-500 text-white'
+                  : isActive
+                  ? 'bg-white text-indigo-600'
+                  : 'bg-white/20 text-white border border-white/40'
+              }
+            `;
+            return (
+              <div
+                key={index}
+                className="relative flex flex-col items-center flex-1"
+              >
+                {index < steps.length - 1 && (
+                  <div
+                    className="absolute top-1/2 right-0 h-0.5 bg-white/30"
+                    style={{ width: '100%', zIndex: '-1' }}
+                  />
+                )}
+
+                <div className={circleClasses}>
+                  {isCompleted ? <FaCheck /> : step.step}
+                </div>
+                <span className="mt-1 text-[10px] text-white/80">
+                  {step.title}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="hidden md:flex flex-col gap-8 p-8 relative z-10">
+        {steps.map((step, index) => (
+          <StepIndicator
+            key={index}
+            step={step}
+            index={index}
+            currentStepIndex={currentStepIndex}
+          />
+        ))}
+      </div>
     </div>
   );
 };
