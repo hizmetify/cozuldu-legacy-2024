@@ -34,7 +34,4 @@ export const AdSchema = Yup.object().shape({
     )
     .required('Fiyat tipi zorunludur'),
 
-  availability: Yup.array().of(
-    Yup.date().typeError('Geçerli bir tarih giriniz')
-  ),
 });

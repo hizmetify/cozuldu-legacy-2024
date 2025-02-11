@@ -6,9 +6,20 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   (error) => {
-    console.error('Bir hata oluştu:', error);
+    if (!error.response) {
+      console.error('Network veya Sunucuya erişilemedi:', error.message);
+    } else {
+      const { status, data } = error.response;
+      const errorMessage = data?.message || error.message;
+      console.error('İstek hata aldı:');
+      console.error('Status Kodu:', status);
+      console.error('Hata Mesajı:', errorMessage);
+      console.error('Hata Detayı (data):', data);
+    }
     return Promise.reject(error);
   }
 );

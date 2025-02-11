@@ -6,9 +6,12 @@ const validateAd = (req, res, next) => {
   });
   if (error) {
     const validationErrors = error.details.map((err) => err.message);
-    return res.status(401).json({ message: validationErrors });
-  } 
-  
+
+    return res.status(400).json({
+      errors: validationErrors,
+    });
+  }
+
   next();
 };
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Formik, Form, Field, FieldArray } from 'formik';
+import { Formik, Form, Field} from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { createAd } from '../../features/ad/adSlice';
 import { useNavigate } from 'react-router-dom';
@@ -15,7 +15,6 @@ const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
 const MyAdsNew = () => {
   const [cities, setCities] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
-
   useEffect(() => {
     const loadCities = async () => {
       const cityData = await fetchCities();
@@ -35,7 +34,6 @@ const MyAdsNew = () => {
     city: '',
     price: '',
     priceType: 'saatlik',
-    availability: [''],
   };
 
   const handleFileChange = (e) => {
@@ -44,7 +42,7 @@ const MyAdsNew = () => {
 
   const handleSubmit = async (values, { setErrors }) => {
     try {
-      let formData = new FormData();
+      const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
         if (Array.isArray(value)) {
           value.forEach((item) => formData.append(key, item));
@@ -52,12 +50,11 @@ const MyAdsNew = () => {
           formData.append(key, value);
         }
       });
-
       selectedFiles.forEach((file) => {
         formData.append('images', file);
       });
 
-      const resultAction = await dispatch(createAd(formData)).unwrap();
+      await dispatch(createAd(formData)).unwrap();
 
       dispatch(
         showToast({ message: 'İlan başarıyla eklendi!', type: 'success' })
@@ -75,13 +72,11 @@ const MyAdsNew = () => {
   return (
     <div className="p-4 bg-white shadow rounded-md">
       <h2 className="text-xl font-bold mb-4">Yeni İlan Ekle</h2>
-
       {status === 'loading' && (
         <div className="mb-4">
           <Spinner />
         </div>
       )}
-
       <Formik
         initialValues={initialValues}
         validationSchema={AdSchema}
@@ -110,7 +105,6 @@ const MyAdsNew = () => {
               await handleSubmit();
             }
           };
-
           return (
             <Form className="space-y-4">
               <div>
@@ -127,7 +121,6 @@ const MyAdsNew = () => {
                   </div>
                 )}
               </div>
-
               <div>
                 <label htmlFor="description" className="block font-medium mb-1">
                   Açıklama <span className="text-red-500">*</span>
@@ -144,7 +137,6 @@ const MyAdsNew = () => {
                   </div>
                 )}
               </div>
-
               <div>
                 <label htmlFor="serviceType" className="block font-medium mb-1">
                   Hizmet Tipi <span className="text-red-500">*</span>
@@ -166,7 +158,6 @@ const MyAdsNew = () => {
                   </div>
                 )}
               </div>
-
               <div>
                 <label htmlFor="city" className="block font-medium mb-1">
                   Şehir <span className="text-red-500">*</span>
@@ -176,47 +167,43 @@ const MyAdsNew = () => {
                   <div className="text-red-500 text-sm mt-1">{errors.city}</div>
                 )}
               </div>
-
               <div>
-                <label className="block font-medium mb-1">
-                  Müsaitlik Tarihleri
+                <label htmlFor="price" className="block font-medium mb-1">
+                  Fiyat <span className="text-red-500">*</span>
                 </label>
-                <FieldArray name="availability">
-                  {({ remove, push }) => (
-                    <div className="space-y-2">
-                      {values.availability.map((dateVal, idx) => (
-                        <div key={idx} className="flex items-center space-x-2">
-                          <Field
-                            name={`availability.${idx}`}
-                            type="date"
-                            className="border border-gray-300 rounded p-2"
-                          />
-                          <button
-                            type="button"
-                            className="text-red-600"
-                            onClick={() => remove(idx)}
-                          >
-                            Sil
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        className="bg-blue-600 text-white px-4 py-1.5 rounded"
-                        onClick={() => push('')}
-                      >
-                        Tarih Ekle
-                      </button>
-                    </div>
-                  )}
-                </FieldArray>
-                {errors.availability && (
+                <Field
+                  name="price"
+                  id="price"
+                  type="number"
+                  className="w-full border border-gray-300 rounded p-2"
+                />
+                {errors.price && touched.price && (
                   <div className="text-red-500 text-sm mt-1">
-                    Tarih formatında değer girin
+                    {errors.price}
                   </div>
                 )}
               </div>
-
+              <div>
+                <label htmlFor="priceType" className="block font-medium mb-1">
+                  Fiyat Tipi <span className="text-red-500">*</span>
+                </label>
+                <Field
+                  as="select"
+                  name="priceType"
+                  className="w-full border border-gray-300 rounded p-2"
+                >
+                  {priceTypeOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </Field>
+                {errors.priceType && touched.priceType && (
+                  <div className="text-red-500 text-sm mt-1">
+                    {errors.priceType}
+                  </div>
+                )}
+              </div>
               <div>
                 <label className="block font-medium mb-1">Resimler</label>
                 <input
@@ -233,12 +220,10 @@ const MyAdsNew = () => {
                   </p>
                 )}
               </div>
-
               <div className="pt-4">
                 <button
                   type="submit"
                   onClick={customSubmit}
-                  disabled={status === 'loading'}
                   className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition disabled:bg-gray-400"
                 >
                   {status === 'loading' ? 'Kaydediliyor...' : 'Kaydet'}

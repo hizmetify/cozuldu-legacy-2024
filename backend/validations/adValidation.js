@@ -33,9 +33,6 @@ const adValidationSchema = Joi.object({
       'any.only': 'Geçerli bir fiyat türü seçin (saatlik, günlük, iş başı)',
     }),
 
-  availability: Joi.array().items(Joi.date()).optional().messages({
-    'array.base': 'Uygunluk tarihleri geçerli bir tarih dizisi olmalıdır',
-  }),
   images: Joi.array().items(Joi.string()).optional().messages({
     'array.base': 'Resimler geçerli bir dizi olmalıdır',
   }),

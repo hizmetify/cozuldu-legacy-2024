@@ -58,8 +58,6 @@ export const createAd = createAsyncThunk(
   'ads/createAd',
   async (adData, thunkAPI) => {
     try {
-      console.log('addSlice.js', adData);
-
       const response = await createAdRequest(adData);
       return response;
     } catch (error) {
