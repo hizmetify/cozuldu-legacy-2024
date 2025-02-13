@@ -138,6 +138,13 @@ const adsSlice = createSlice({
         state.singleAdStatus = 'failed';
         state.error =
           action.payload?.message || 'İlan detayları yüklenirken hata oluştu.';
+      })
+      .addCase(deleteAd.fulfilled, (state, action) => {
+        if (Array.isArray(state.userAds.data)) {
+          state.userAds.data = state.userAds.data.filter(
+            (ad) => ad._id !== action.payload.adId
+          );
+        }
       });
   },
 });

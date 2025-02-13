@@ -38,11 +38,15 @@ const MyAdsList = () => {
     );
   }
 
-  const handleDelete = (adId) => {
+  const handleDelete = async (adId) => {
     if (window.confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-      dispatch(deleteAd(adId));
+      await dispatch(deleteAd(adId));
+      setTimeout(() => {
+        dispatch(fetchUserAds());
+      }, 200);
     }
   };
+
   return (
     <div className="p-4">
       <div className="flex justify-between items-center mb-4">
