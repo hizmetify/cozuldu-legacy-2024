@@ -17,10 +17,10 @@ const StepIndicator = ({ step, index, currentStepIndex }) => {
     shadow-md transition-all duration-300
     ${
       isCompleted
-        ? 'bg-teal-500 text-white border-4 border-teal-500'
+        ? 'bg-blue-700 text-white border-4 border-blue-700'
         : isActive
-        ? 'bg-white text-indigo-600 border-4 border-white'
-        : 'bg-white/20 text-white border-4 border-white/40'
+        ? 'bg-white text-blue-700 border-4 border-blue-700'
+        : 'bg-blue-100 text-blue-500 border-4 border-blue-300'
     }
   `;
 
@@ -30,12 +30,12 @@ const StepIndicator = ({ step, index, currentStepIndex }) => {
         {isCompleted ? <FaCheck className="text-xl" /> : step.step}
       </div>
       <div className="flex flex-col">
-        <span className="text-xs font-semibold text-white/50 tracking-wider">
+        <span className="text-xs font-semibold text-blue-700/60 tracking-wider">
           ADIM {step.step}
         </span>
         <span
           className={`text-sm font-bold tracking-wide ${
-            isActive ? 'text-white drop-shadow-md' : 'text-white/80'
+            isActive ? 'text-blue-700 drop-shadow-md' : 'text-blue-500'
           }`}
         >
           {step.title}
@@ -57,23 +57,33 @@ StepIndicator.propTypes = {
 
 const Stepper = ({ currentStepIndex }) => {
   return (
-    <div className="relative w-full h-full bg-gradient-to-b from-gray-900 via-indigo-900 to-black text-white overflow-hidden">
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-400/20 rounded-full blur-3xl" />
-      <div className="absolute top-0 right-0 w-64 h-64 bg-teal-400/20 rounded-full blur-3xl" />
+    <div className="relative w-full h-full text-blue-800 overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-200 via-blue-100 to-blue-200" />
+      <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-700/20 rounded-full blur-3xl" />
+      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl" />
+      <svg
+        className="absolute bottom-0 left-0 w-full h-auto text-blue-300"
+        viewBox="0 0 1440 320"
+      >
+        <path
+          fill="currentColor"
+          fillOpacity="1"
+          d="M0,256L48,256C96,256,192,256,288,245.3C384,235,480,213,576,192C672,171,768,149,864,160C960,171,1056,213,1152,208C1248,203,1344,149,1392,122.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
+        />
+      </svg>
       <div className="flex md:hidden px-4 py-4 w-full relative">
         <div className="flex items-center justify-between w-full">
           {steps.map((step, index) => {
             const isCompleted = index < currentStepIndex;
             const isActive = index === currentStepIndex;
             const circleClasses = `
-              flex items-center justify-center w-10 h-10 rounded-full 
-              text-sm font-medium transition-colors 
+              flex items-center justify-center w-10 h-10 rounded-full text-sm font-medium transition-colors 
               ${
                 isCompleted
-                  ? 'bg-teal-500 text-white'
+                  ? 'bg-blue-700 text-white'
                   : isActive
-                  ? 'bg-white text-indigo-600'
-                  : 'bg-white/20 text-white border border-white/40'
+                  ? 'bg-white text-blue-700 border border-blue-700'
+                  : 'bg-blue-100 text-blue-500 border border-blue-300'
               }
             `;
             return (
@@ -83,15 +93,14 @@ const Stepper = ({ currentStepIndex }) => {
               >
                 {index < steps.length - 1 && (
                   <div
-                    className="absolute top-1/2 right-0 h-0.5 bg-white/30"
+                    className="absolute top-1/2 right-0 h-0.5 bg-blue-500/30"
                     style={{ width: '100%', zIndex: '-1' }}
                   />
                 )}
-
                 <div className={circleClasses}>
                   {isCompleted ? <FaCheck /> : step.step}
                 </div>
-                <span className="mt-1 text-[10px] text-white/80">
+                <span className="mt-1 text-[10px] text-blue-700">
                   {step.title}
                 </span>
               </div>

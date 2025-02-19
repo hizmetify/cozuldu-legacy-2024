@@ -45,12 +45,9 @@ const App = () => {
         toast[type](message);
       });
 
-      dispatch(clearToast()); 
+      dispatch(clearToast());
     }
   }, [queue, dispatch]);
-
-
-
 
   return (
     <HelmetProvider>
@@ -67,6 +64,7 @@ const App = () => {
                 </PrivateRoute>
               }
             >
+              <Route index element={<Navigate to="my-ads" replace />} />
               <Route path="my-ads" element={<MyAds />}>
                 <Route index element={<MyAdsList />} />
                 <Route path="new" element={<MyAdsNew />} />

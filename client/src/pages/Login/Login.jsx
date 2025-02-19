@@ -6,7 +6,7 @@ import { login } from '../../features/auth/authSlice';
 import { showToast } from '../../features/toast/toastSlice';
 import InputField from '../../components/UI/InputField';
 
-const LoginPage = () => {
+const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
@@ -30,26 +30,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="absolute top-0 left-0 w-full overflow-hidden h-[200px] lg:h-[300px]">
-        <svg
-          className="absolute top-0 left-0 w-full h-full text-indigo-600 fill-current"
-          viewBox="0 0 1440 320"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#4f46e5" />
-              <stop offset="100%" stopColor="#8b5cf6" />
-            </linearGradient>
-          </defs>
-          <path
-            fill="url(#waveGradient)"
-            d="M0,224L40,202.7C80,181,160,139,240,154.7C320,171,400,245,480,256C560,267,640,213,720,181.3C800,149,880,139,960,154.7C1040,171,1120,213,1200,224C1280,235,1360,213,1400,202.7L1440,192L1440,0L1400,0C1360,0,1280,0,1200,0C1120,0,1040,0,960,0C880,0,800,0,720,0C640,0,560,0,480,0C400,0,320,0,240,0C160,0,80,0,40,0L0,0Z"
-          ></path>
-        </svg>
-      </div>
-      <div className="z-10 w-full max-w-md mx-auto px-4">
+    <div className="min-h-screen flex items-center justify-center bg-white p-4">
+      <div className="w-full max-w-md">
         <Formik
           initialValues={initialValues}
           validationSchema={loginValidation}
@@ -73,40 +55,73 @@ const LoginPage = () => {
             };
 
             return (
-              <Form
-                onSubmit={customSubmit}
-                className="mt-32 rounded-xl shadow-lg bg-white/60 
-                           backdrop-blur-md p-6 flex flex-col gap-6"
-              >
-                <h2 className="text-2xl font-bold text-indigo-700 text-center mb-2">
-                  Giriş Yap
-                </h2>
+              <Form onSubmit={customSubmit} className="space-y-6">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-blue-600">
+                    Giriş Yap
+                  </h2>
+                  <p className="mt-2 text-sm text-gray-600">
+                    Hesabınıza erişmek için giriş yapın
+                  </p>
+                </div>
 
-                <InputField
-                  label="E-posta"
-                  name="email"
-                  type="email"
-                  placeholder="ornek@email.com"
-                />
+                <div className="space-y-4">
+                  <InputField
+                    label="E-posta"
+                    name="email"
+                    type="email"
+                    placeholder="E-posta adresinizi girin"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
 
-                <InputField
-                  label="Şifre"
-                  name="password"
-                  type="password"
-                  placeholder="Şifrenizi giriniz"
-                />
+                  <InputField
+                    label="Şifre"
+                    name="password"
+                    type="password"
+                    placeholder="Şifrenizi girin"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <span className="ml-2 text-sm text-gray-600">
+                      Beni hatırla
+                    </span>
+                  </label>
+                  <a
+                    href="/forgot-password"
+                    className="text-sm text-blue-600 hover:text-blue-500"
+                  >
+                    Şifremi unuttum
+                  </a>
+                </div>
 
                 <button
                   type="submit"
                   disabled={isLoading || isSubmitting}
-                  className="w-full mt-4 py-2 rounded
-                             bg-indigo-500 hover:bg-indigo-600 
-                             text-white font-medium 
-                             transition-colors duration-200
-                             disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="w-full py-3 px-4 rounded-lg bg-blue-600 text-white font-medium 
+                           hover:bg-blue-700 focus:outline-none focus:ring-2 
+                           focus:ring-offset-2 focus:ring-blue-500 
+                           disabled:bg-gray-400 disabled:cursor-not-allowed 
+                           transition-colors duration-200"
                 >
-                  {isLoading || isSubmitting ? 'Yükleniyor...' : 'Giriş Yap'}
+                  {isLoading || isSubmitting ? 'Yükleniyor...' : 'Devam Et'}
                 </button>
+
+                <p className="text-center text-sm text-gray-600">
+                  Hesabınız yok mu?{' '}
+                  <a
+                    href="/register"
+                    className="font-medium text-blue-600 hover:text-blue-500"
+                  >
+                    Kayıt ol
+                  </a>
+                </p>
               </Form>
             );
           }}
@@ -116,4 +131,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default Login;
