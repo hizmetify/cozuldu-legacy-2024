@@ -1,5 +1,6 @@
 import Header from '../../components/Header/Header';
 import { Helmet } from 'react-helmet-async';
+import Hero from '../../components/Hero/Hero.';
 const Home = () => {
   return (
     <>
@@ -19,6 +20,7 @@ const Home = () => {
         <meta property="og:url" content="https://xn--zld-1la9esbc.com/" />
       </Helmet>
       <Header />
+      <Hero />
     </>
   );
 };

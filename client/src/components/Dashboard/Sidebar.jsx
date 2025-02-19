@@ -33,12 +33,12 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`fixed top-0 left-0 z-30 w-64 h-screen pt-24 bg-white border-r border-neutral-200 sm:translate-x-0 transition-transform ${
+      className={`fixed top-0 left-0 z-30 w-64 h-screen pt-24 bg-white border-r border-neutral-200 transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
-      }`}
+      } sm:translate-x-0`}
     >
       <div className="h-full px-3 py-5">
-        <ul className="font-medium flex items-start gap-2 flex-col">
+        <ul className="space-y-1.5">
           {sidebarLinks.map((link) => (
             <SidebarLink key={link.id} {...link} />
           ))}

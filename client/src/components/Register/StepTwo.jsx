@@ -27,21 +27,26 @@ const StepTwo = () => {
   );
   const initialValues = { phone, city, profilePic, portfolioLink };
 
-  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+  const handleSubmit = async (
+    values,
+    { setSubmitting, setErrors, validateForm }
+  ) => {
+    const errors = await validateForm(); 
+    if (Object.keys(errors).length) {
+      Object.keys(errors).forEach((key) => {
+        dispatch(showToast({ message: errors[key], type: 'error' }));
+      });
+      setErrors(errors);
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      await stepTwoValidationSchema.validate(values, { abortEarly: false });
       dispatch(updateRegisterData(values));
-      dispatch(showToast({ message: 'Adım 2 başarıyla tamamlandı!', type: 'success' }));
+      dispatch(
+        showToast({ message: 'Adım 2 başarıyla tamamlandı!', type: 'success' })
+      );
       navigate('/register/step-3');
-    } catch (error) {
-      if (error.inner) {
-        const formErrors = {};
-        error.inner.forEach((err) => {
-          formErrors[err.path] = err.message;
-          dispatch(showToast({ message: err.message, type: 'error' }));
-        });
-        setErrors(formErrors);
-      }
     } finally {
       setSubmitting(false);
     }
@@ -51,6 +56,7 @@ const StepTwo = () => {
     <Formik
       initialValues={initialValues}
       validationSchema={stepTwoValidationSchema}
+      validateOnMount={true}
       validateOnChange={false}
       validateOnBlur={false}
       onSubmit={handleSubmit}
@@ -63,11 +69,7 @@ const StepTwo = () => {
               label="Telefon"
               placeholder="Telefon Numarası"
             />
-            <SelectField
-              name="city"
-              label="Şehir"
-              options={cities}
-            />
+            <SelectField name="city" label="Şehir" options={cities} />
             <InputField
               name="profilePic"
               label="Profil Resmi URL"
@@ -86,4 +88,3 @@ const StepTwo = () => {
 };
 
 export default memo(StepTwo);
-  

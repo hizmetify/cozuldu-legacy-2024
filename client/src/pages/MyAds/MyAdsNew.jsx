@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Formik, Form, Field} from 'formik';
+import { useState, useEffect, useRef } from 'react';
+import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { createAd } from '../../features/ad/adSlice';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,11 @@ import Spinner from '../../components/UI/Spinner';
 import { AdSchema } from '../../validations/adValidation';
 import { fetchCities } from '../../api/cityApi';
 import SelectField from '../../components/UI/SelectField';
+import InputField from '../../components/UI/InputField';
 import { showToast } from '../../features/toast/toastSlice';
+import { FiUpload, FiX } from 'react-icons/fi';
+
+const MAX_FILES = 5;
 
 const serviceTypeOptions = ['yüz yüze'];
 const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
@@ -15,6 +19,8 @@ const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
 const MyAdsNew = () => {
   const [cities, setCities] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const fileInputRef = useRef(null);
+
   useEffect(() => {
     const loadCities = async () => {
       const cityData = await fetchCities();
@@ -37,7 +43,42 @@ const MyAdsNew = () => {
   };
 
   const handleFileChange = (e) => {
-    setSelectedFiles([...e.target.files]);
+    const files = Array.from(e.target.files);
+    if (selectedFiles.length + files.length > MAX_FILES) {
+      dispatch(
+        showToast({
+          message: `En fazla ${MAX_FILES} görsel yükleyebilirsiniz.`,
+          type: 'error',
+        })
+      );
+      return;
+    }
+    setSelectedFiles((prev) => [...prev, ...files]);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = Array.from(e.dataTransfer.files);
+    if (selectedFiles.length + files.length > MAX_FILES) {
+      dispatch(
+        showToast({
+          message: `En fazla ${MAX_FILES} görsel yükleyebilirsiniz.`,
+          type: 'error',
+        })
+      );
+      return;
+    }
+    setSelectedFiles((prev) => [...prev, ...files]);
+  };
+
+  const removeFile = (index) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (values, { setErrors }) => {
@@ -50,19 +91,17 @@ const MyAdsNew = () => {
           formData.append(key, value);
         }
       });
-      selectedFiles.forEach((file) => {
+      selectedFiles.slice(0, MAX_FILES).forEach((file) => {
         formData.append('images', file);
       });
 
       await dispatch(createAd(formData)).unwrap();
-
       dispatch(
         showToast({ message: 'İlan başarıyla eklendi!', type: 'success' })
       );
       navigate('/dashboard/my-ads');
     } catch (error) {
       dispatch(showToast({ message: error, type: 'error' }));
-
       if (typeof error === 'object' && error.errors) {
         setErrors(error.errors);
       }
@@ -72,11 +111,7 @@ const MyAdsNew = () => {
   return (
     <div className="p-4 bg-white shadow rounded-md">
       <h2 className="text-xl font-bold mb-4">Yeni İlan Ekle</h2>
-      {status === 'loading' && (
-        <div className="mb-4">
-          <Spinner />
-        </div>
-      )}
+      {status === 'loading' && <Spinner className="mb-4" />}
       <Formik
         initialValues={initialValues}
         validationSchema={AdSchema}
@@ -84,18 +119,10 @@ const MyAdsNew = () => {
         validateOnBlur={false}
         onSubmit={handleSubmit}
       >
-        {({
-          validateForm,
-          handleSubmit,
-          setErrors,
-          values,
-          errors,
-          touched,
-        }) => {
+        {({ validateForm, handleSubmit, setErrors, errors, touched }) => {
           const customSubmit = async (e) => {
             if (e) e.preventDefault();
             const validationErrors = await validateForm();
-
             if (Object.keys(validationErrors).length > 0) {
               setErrors(validationErrors);
               Object.values(validationErrors).forEach((errorMsg) => {
@@ -105,126 +132,78 @@ const MyAdsNew = () => {
               await handleSubmit();
             }
           };
+
           return (
             <Form className="space-y-4">
+              <InputField label="Başlık *" name="title" />
+              <InputField
+                label="Açıklama *"
+                name="description"
+                type="textarea"
+              />
+              <SelectField
+                label="Hizmet Tipi *"
+                name="serviceType"
+                options={serviceTypeOptions.map((opt) => ({ name: opt }))}
+              />
+              <SelectField label="Şehir *" name="city" options={cities} />
+              <InputField label="Fiyat *" name="price" type="number" />
+              <SelectField
+                label="Fiyat Tipi *"
+                name="priceType"
+                options={priceTypeOptions.map((opt) => ({ name: opt }))}
+              />
               <div>
-                <label htmlFor="title" className="block font-medium mb-1">
-                  Başlık <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  name="title"
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                {errors.title && touched.title && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.title}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="description" className="block font-medium mb-1">
-                  Açıklama <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  as="textarea"
-                  name="description"
-                  rows={3}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                {errors.description && touched.description && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.description}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="serviceType" className="block font-medium mb-1">
-                  Hizmet Tipi <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  as="select"
-                  name="serviceType"
-                  className="w-full border border-gray-300 rounded p-2"
+                <label className="block font-medium mb-2">Resimler</label>
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition duration-300 ease-in-out"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                  onClick={() => fileInputRef.current.click()}
                 >
-                  {serviceTypeOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </Field>
-                {errors.serviceType && touched.serviceType && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.serviceType}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="city" className="block font-medium mb-1">
-                  Şehir <span className="text-red-500">*</span>
-                </label>
-                <SelectField name="city" label="Şehir" options={cities} />
-                {errors.city && touched.city && (
-                  <div className="text-red-500 text-sm mt-1">{errors.city}</div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="price" className="block font-medium mb-1">
-                  Fiyat <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  name="price"
-                  id="price"
-                  type="number"
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                {errors.price && touched.price && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.price}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label htmlFor="priceType" className="block font-medium mb-1">
-                  Fiyat Tipi <span className="text-red-500">*</span>
-                </label>
-                <Field
-                  as="select"
-                  name="priceType"
-                  className="w-full border border-gray-300 rounded p-2"
-                >
-                  {priceTypeOptions.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </Field>
-                {errors.priceType && touched.priceType && (
-                  <div className="text-red-500 text-sm mt-1">
-                    {errors.priceType}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="block font-medium mb-1">Resimler</label>
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="w-full border border-gray-300 rounded p-2"
-                />
-                {selectedFiles.length > 0 && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    Seçilen Dosyalar:{' '}
-                    {selectedFiles.map((f) => f.name).join(', ')}
+                  <FiUpload className="mx-auto text-4xl text-gray-400 mb-2" />
+                  <p className="text-gray-600">
+                    Dosyaları buraya sürükleyin veya seçmek için tıklayın
                   </p>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </div>
+                {selectedFiles.length > 0 && (
+                  <div className="mt-4">
+                    <p className="font-medium mb-2">
+                      Seçilen Dosyalar ({selectedFiles.length} / {MAX_FILES}):
+                    </p>
+                    <ul className="space-y-2">
+                      {selectedFiles.map((file, index) => (
+                        <li
+                          key={index}
+                          className="flex items-center justify-between bg-gray-100 p-2 rounded"
+                        >
+                          <span className="truncate">{file.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeFile(index)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <FiX />
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 )}
               </div>
               <div className="pt-4">
                 <button
                   type="submit"
                   onClick={customSubmit}
-                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition disabled:bg-gray-400"
+                  className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                   {status === 'loading' ? 'Kaydediliyor...' : 'Kaydet'}
                 </button>
