@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Formik, Form } from 'formik';
+import { Formik, Form, Field } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import { loginValidation } from '../../validations/userValidation';
 import { login } from '../../features/auth/authSlice';
@@ -11,14 +12,25 @@ const Login = () => {
   const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
 
-  const initialValues = {
-    email: '',
-    password: '',
-  };
+  const [initialValues, setInitialValues] = useState(null);
 
+  useEffect(() => {
+    const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
+    setInitialValues({
+      email: '',
+      password: '',
+      rememberMe: storedRememberMe,
+    });
+  }, []);
   const handleSubmit = async (values, { setErrors }) => {
     try {
       await dispatch(login(values)).unwrap();
+      if (values.rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      } else {
+        localStorage.removeItem('rememberMe');
+      }
+
       dispatch(showToast({ message: 'Giriş başarılı!', type: 'success' }));
       navigate('/dashboard');
     } catch (error) {
@@ -85,14 +97,16 @@ const Login = () => {
 
                 <div className="flex items-center justify-between">
                   <label className="flex items-center">
-                    <input
+                    <Field
                       type="checkbox"
+                      name="rememberMe"
                       className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                     />
                     <span className="ml-2 text-sm text-gray-600">
                       Beni hatırla
                     </span>
                   </label>
+
                   <a
                     href="/forgot-password"
                     className="text-sm text-blue-600 hover:text-blue-500"

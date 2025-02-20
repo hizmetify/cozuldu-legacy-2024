@@ -66,7 +66,7 @@ const register = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: false,
-      sameSite: "Lax",
+      sameSite: 'Lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -83,7 +83,7 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, rememberMe } = req.body;
 
     const { error } = loginSchema.validate({ email, password });
     if (error) {
@@ -106,10 +106,10 @@ const login = async (req, res) => {
     res.cookie('token', token, {
       httpOnly: true,
       secure: false,
-      sameSite:'Lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    }); 
-    
+      sameSite: 'Lax',
+      maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
+    });
+
     res.status(201).json({ message: 'Başarıyla giriş yapıldı.', token });
   } catch (error) {
     console.error(error);
@@ -118,16 +118,16 @@ const login = async (req, res) => {
 };
 
 const me = async (req, res) => {
-  const token = req.cookies.token; 
-  
+  const token = req.cookies.token;
+
   if (!token) {
     return res.status(401).json({ message: 'Yetkisiz erişim' });
-  } 
-  
+  }
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id).select('-password');
-     
+
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
