@@ -1,14 +1,31 @@
 const mongoose = require('mongoose');
 const Category = require('../models/category');
 const dotenv = require('dotenv');
-dotenv.config({path: "../.env"});
-
+dotenv.config({ path: '../.env' });
 
 const categorySeeder = async (req, res) => {
   const categories = [
     {
       name: 'Özel Ders',
       subcategories: ['Spor', 'Ders', 'Müzik', 'Danışmanlık', 'Diğer'],
+    },
+    {
+      name: 'Spor',
+      subcategories: [
+        'Bisiklet',
+        'Fitness & Kondisyon',
+        'Vücut Geliştirme',
+        'Pilates, Yoga & Jimnastik',
+        'Takım Sporları',
+        'Atletizm',
+        'Doğa Sporları',
+        'Dövüş Sporları',
+        'Raket Sporları',
+        'Salon Oyunları',
+        'Sıra Dışı Sporlar',
+        'Su Sporları',
+        'Diğer',
+      ],
     },
     {
       name: 'Bakım Onarım',
@@ -18,12 +35,20 @@ const categorySeeder = async (req, res) => {
         'Elektronik olmayan aletler',
         'Ev elektroniği',
         'Ev bakım onarım',
-        'Diğer ',
+        'Diğer',
       ],
     },
     {
       name: 'Tadilat',
-      subcategories: ['Ev içi tadilatı', 'Ev dışı tadilatı', 'Diğer'],
+      subcategories: [
+        'Ev içi tadilatı',
+        'Ev dışı tadilatı',
+        'İş yeri tadilatı',
+        'Boya-badana',
+        'Su tesisatı',
+        'Elektrik tesisatı',
+        'Diğer',
+      ],
     },
     {
       name: 'Temizlik',
@@ -31,6 +56,9 @@ const categorySeeder = async (req, res) => {
         'Ev içi eşya temizliği',
         'Ev temizliği',
         'Kuru temizleme',
+        'Halı ve Koltuk Temizliği',
+        'İnşaat sonrası temizlik',
+        'Ofis temizliği',
         'Diğer',
       ],
     },
@@ -41,6 +69,9 @@ const categorySeeder = async (req, res) => {
         'Tekstilciler',
         'Toptancılar',
         'Ham maddeler',
+        'Mobilya üretimi',
+        'Gıda üretimi',
+        'Kimyasal üretim',
         'Diğer',
       ],
     },
@@ -51,6 +82,8 @@ const categorySeeder = async (req, res) => {
         'Yurt dışı',
         'Yurt içi',
         'Transfer hizmetleri',
+        'Lojistik & Nakliye',
+        'Kargo & Kurye',
         'Diğer',
       ],
     },
@@ -60,9 +93,11 @@ const categorySeeder = async (req, res) => {
         'Kuaför',
         'Berber',
         'Güzellik merkezi',
-        'Nail artist ',
+        'Nail artist',
         'Dövme sanatçıları – piercing',
         'Epilasyon',
+        'Cilt bakımı',
+        'Spa & Masaj',
         'Diğer',
       ],
     },
@@ -73,6 +108,8 @@ const categorySeeder = async (req, res) => {
         'Çocuk bakıcılar',
         'Ev içi yardımcılar',
         'Güvenlik görevlileri',
+        'Özel şoförler',
+        'Yaşlı bakım hizmetleri',
         'Diğer',
       ],
     },
@@ -84,6 +121,9 @@ const categorySeeder = async (req, res) => {
         'Düğün',
         'Sünnet',
         'Baby Shower',
+        'Mezuniyet',
+        'Kurumsal Etkinlikler',
+        'Açılış organizasyonu',
         'Diğer',
       ],
     },
