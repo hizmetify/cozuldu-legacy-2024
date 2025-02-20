@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 const Category = require('../models/category');
+const SubCategory = require('../models/subCategory');
 const dotenv = require('dotenv');
 dotenv.config({ path: '../.env' });
 
-const categorySeeder = async (req, res) => {
+const categorySeeder = async () => {
   const categories = [
     {
       name: 'Özel Ders',
@@ -132,7 +133,16 @@ const categorySeeder = async (req, res) => {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     await Category.deleteMany();
-    await Category.insertMany(categories);
+    await SubCategory.deleteMany();
+    for (const cat of categories) {
+      const newCategory = await Category.create({ name: cat.name });
+      for (const subCatName of cat.subcategories) {
+        const newSubCategory = await SubCategory.create({
+          name: subCatName,
+          category: newCategory._id,
+        });
+      }
+    }
   } catch (error) {
     console.error(error);
   } finally {
