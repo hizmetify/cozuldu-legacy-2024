@@ -11,9 +11,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.auth);
-
   const [initialValues, setInitialValues] = useState(null);
-
   useEffect(() => {
     const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
     setInitialValues({
@@ -22,9 +20,11 @@ const Login = () => {
       rememberMe: storedRememberMe,
     });
   }, []);
+
   const handleSubmit = async (values, { setErrors }) => {
     try {
       await dispatch(login(values)).unwrap();
+
       if (values.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       } else {
@@ -40,6 +40,14 @@ const Login = () => {
       }
     }
   };
+
+  if (initialValues === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Yükleniyor...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white p-4">
