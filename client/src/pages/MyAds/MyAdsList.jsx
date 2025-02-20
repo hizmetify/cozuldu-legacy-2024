@@ -1,19 +1,43 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { fetchUserAds, deleteAd } from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
-import { FaEdit } from 'react-icons/fa';
-import { FaEye } from 'react-icons/fa';
+import { FaEdit, FaEye } from 'react-icons/fa';
+import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 
 const MyAdsList = () => {
   const dispatch = useDispatch();
-  const { userAds, status, error } = useSelector((state) => state.ads);
+  const {
+    userAds,
+    userAdsStatus: status,
+    error,
+  } = useSelector((state) => state.ads);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [adToDelete, setAdToDelete] = useState(null);
 
   useEffect(() => {
     dispatch(fetchUserAds());
   }, [dispatch]);
+
+  const handleDeleteClick = (adId) => {
+    setAdToDelete(adId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (adToDelete) {
+      await dispatch(deleteAd(adToDelete));
+      setIsDeleteModalOpen(false);
+      setAdToDelete(null);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsDeleteModalOpen(false);
+    setAdToDelete(null);
+  };
 
   if (status === 'loading') {
     return (
@@ -48,15 +72,6 @@ const MyAdsList = () => {
       </div>
     );
   }
-
-  const handleDelete = async (adId) => {
-    if (window.confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-      await dispatch(deleteAd(adId));
-      setTimeout(() => {
-        dispatch(fetchUserAds());
-      }, 200);
-    }
-  };
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen">
@@ -127,12 +142,12 @@ const MyAdsList = () => {
                     <Link
                       to={`/dashboard/my-ads/${ad._id}/edit`}
                       className="text-green-600 hover:text-green-800 inline-block mx-2 transition duration-150 ease-in-out"
-                      title="Düzenle" 
+                      title="Düzenle"
                     >
                       <FaEdit className="text-xl" />
                     </Link>
                     <button
-                      onClick={() => handleDelete(ad._id)}
+                      onClick={() => handleDeleteClick(ad._id)}
                       className="text-red-600 hover:text-red-800 mx-2 transition duration-150 ease-in-out"
                       title="Sil"
                     >
@@ -145,6 +160,12 @@ const MyAdsList = () => {
           </table>
         </div>
       </div>
+      <DeleteConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        title="Bu ilanı silmek istediğinize emin misiniz?"
+      />
     </div>
   );
 };
