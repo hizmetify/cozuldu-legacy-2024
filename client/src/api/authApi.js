@@ -21,6 +21,35 @@ export const logout = async () => {
   return response.data;
 };
 
+export const emailSend=async()=>{ 
+  
+  const response=await axiosInstance.post('/auth/emailSend',{},{
+    withCredentials:true,
+  })
+  return response.data
+}
+
+export const emailVerify=async(credentials)=>{
+  const response= await axiosInstance.post('/auth/emailVerify',credentials,{
+    withCredentials:true,
+  })
+  return response.data
+}
+
+export  const passwordSend=async(credentials)=>{
+  const response=await axiosInstance.post('/auth/sendPass',credentials,{
+    withCredentials:true
+  })
+  return response.data
+}
+
+export  const passwordChange=async(credentials)=>{
+  const response=await axiosInstance.post('/auth/changePass',credentials,{
+    withCredentials:true
+  })
+  return response.data
+}
+
 export const getMe = async () => {
   const response = await axiosInstance.get('/auth/me', {
     withCredentials: true,

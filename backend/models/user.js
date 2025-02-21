@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema(
       match: [/.+@.+\..+/, 'Please enter a valid email address'],
       trim: true,
     },
+    isVerification:{
+      type:Boolean,
+      default:false
+    },
     password: {
       type: String,
       required: [true, 'Password is required'],

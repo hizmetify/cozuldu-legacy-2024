@@ -6,12 +6,27 @@ import { loginValidation } from '../../validations/userValidation';
 import { login } from '../../features/auth/authSlice';
 import { showToast } from '../../features/toast/toastSlice';
 import InputField from '../../components/UI/InputField';
+import { passwordSend } from '../../api/authApi';
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
+  
+  const [resetPass,setResetPass]=useState(false)
+  const [email, setEmail] = useState('');
   const { isLoading } = useSelector((state) => state.auth);
   const [initialValues, setInitialValues] = useState(null);
+  const resetPassword = async (e) => {
+    e.preventDefault();
+    try { 
+      let response=await passwordSend({email})
+      if(response.status==false)
+        return alert(response?.message) 
+      setResetPass(false);   
+    } catch (error) {
+      console.error('Hata:', error);
+    }
+  };
   useEffect(() => {
     const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
     setInitialValues({
@@ -115,12 +130,12 @@ const Login = () => {
                     </span>
                   </label>
 
-                  <a
-                    href="/forgot-password"
-                    className="text-sm text-blue-600 hover:text-blue-500"
+                  <p
+                    onClick={()=>setResetPass(true)}
+                    className="cursor-pointer text-sm text-blue-600 hover:text-blue-500"
                   >
                     Şifremi unuttum
-                  </a>
+                  </p>
                 </div>
 
                 <button
@@ -149,6 +164,40 @@ const Login = () => {
           }}
         </Formik>
       </div>
+      {resetPass && (
+        <div className='absolute flex justify-center items-center w-full h-full bg-black bg-opacity-50'>
+          <div className='bg-white p-8 rounded-md shadow-lg w-1/2'>
+            <h3 className='text-center text-xl font-semibold mb-4'>
+              Lütfen E-Mail Bilgisini Giriniz
+            </h3>
+            <form onSubmit={resetPassword}>
+              <input
+                label="E-posta"
+                name="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // E-posta değişimini kontrol et
+                placeholder="E-posta adresinizi girin"
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+              />
+              <div className='flex justify-between'>
+                <button
+                  type="submit"
+                  className="w-1/2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
+                >
+                  Gönder
+                </button>
+                <p
+                  className='text-red-500 cursor-pointer self-center'
+                  onClick={() => setResetPass(false)}  // Kapatmak için
+                >
+                  Kapat
+                </p>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
