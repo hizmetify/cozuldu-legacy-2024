@@ -20,7 +20,7 @@ export const stepOneValidationSchema = Yup.object({
     phone: Yup.string()
       .matches(/^\d{10,15}$/, 'Telefon numarası sadece rakamlardan oluşmalı ve 10-15 hane arasında olmalıdır')
       .notRequired(),
-    city: Yup.string().nullable().required('Şehir alanı zorunludur'), // Güncellendi
+    city: Yup.string().nullable().required('Şehir alanı zorunludur'),
     profilePic: Yup.string().url('Profil resmi için geçerli bir URL girin').notRequired(),
     portfolioLink: Yup.string().url('Portfolio linki geçerli bir URL olmalıdır').notRequired(),
   });
