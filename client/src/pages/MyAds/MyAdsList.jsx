@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchUserAds, deleteAd } from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { FaEdit, FaEye } from 'react-icons/fa';
-import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
+import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal'; 
+import { emailSend } from '../../api/authApi';
 
 const MyAdsList = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     userAds,
@@ -38,7 +40,13 @@ const MyAdsList = () => {
     setIsDeleteModalOpen(false);
     setAdToDelete(null);
   };
-
+  const sendMailVerification=async()=>{
+    let response=await emailSend()
+    if(response?.status=='success')
+      navigate("/emailverify")
+    else if (response?.status=='continue')
+      navigate("/dashboard/my-ads/new")
+  }
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center w-full h-screen bg-gray-50">
@@ -81,7 +89,7 @@ const MyAdsList = () => {
             İlanlarım
           </h2>
           <Link
-            to="/dashboard/my-ads/new"
+            onClick={sendMailVerification}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md transition duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg"
           >
             + Yeni İlan Ekle

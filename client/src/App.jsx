@@ -29,8 +29,9 @@ import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
-import { toast } from 'react-hot-toast';
-
+import { toast } from 'react-hot-toast'; 
+import EmailVerify from './pages/EmailVerify/EmailVerify';
+import ResetPassword from './pages/ResetPassword/ResetPassword';
 const App = () => {
   const dispatch = useDispatch();
 
@@ -85,6 +86,11 @@ const App = () => {
                 </PublicRoute>
               }
             />
+             <Route
+              path='/emailverify' 
+              element={<EmailVerify/>}
+            />
+            <Route path="/resetPassword/:email" element={<ResetPassword />} />
             <Route
               path="/register"
               element={
