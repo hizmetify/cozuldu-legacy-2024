@@ -13,7 +13,7 @@ import { showToast } from '../../features/toast/toastSlice';
 import { FiUpload, FiX } from 'react-icons/fi';
 
 const MAX_FILES = 5;
-const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const serviceTypeOptions = ['yüz yüze'];
 const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
@@ -152,9 +152,6 @@ const MyAdsNew = () => {
         return;
       }
 
-      console.log('Form değerleri:', values);
-      console.log('Seçilen dosyalar:', selectedFiles);
-
       const formData = new FormData();
 
       Object.entries(values).forEach(([key, value]) => {
@@ -162,17 +159,11 @@ const MyAdsNew = () => {
       });
 
       selectedFiles.forEach((file, index) => {
-        console.log(`Dosya ${index + 1}:`, file.name, file.type, file.size);
         formData.append('images', file);
       });
       for (const pair of formData.entries()) {
-        console.log('FormData içeriği:', pair[0], pair[1]);
       }
-      console.log('API çağrısı yapılıyor...');
-
       const response = await dispatch(createAd(formData)).unwrap();
-      console.log('API yanıtı:', response);
-
       dispatch(
         showToast({
           message: 'İlan başarıyla eklendi!',
@@ -195,7 +186,6 @@ const MyAdsNew = () => {
         })
       );
       if (error.errors) {
-        console.log('Validasyon hataları:', error.errors);
         setErrors(error.errors);
       }
     }
