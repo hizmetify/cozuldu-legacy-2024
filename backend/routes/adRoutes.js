@@ -6,6 +6,7 @@ const {
   getUserAds,
   getSingleAd,
   deleteAd,
+  getAdsByCategory,
 } = require('../controllers/adControllers');
 const validateAd = require('../middlewares/adMiddleware');
 const protect = require('../middlewares/authMiddleware');
@@ -14,6 +15,7 @@ const upload = require('../middlewares/uploadMiddleware');
 const router = express.Router();
 
 router.get('/', getAllAds);
+router.get('/category/:categoryId', getAdsByCategory);
 router.get('/my-ads', protect, getUserAds);
 router.get('/:id', getSingleAd);
 

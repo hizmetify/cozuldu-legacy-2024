@@ -19,10 +19,10 @@ const SelectField = ({ label, name, options, ...rest }) => {
           {...rest}
         >
           <option value="" disabled>
-            Lütfen bir şehir seçin
+            Lütfen bir kategori seçin
           </option>
           {options.map((option, index) => (
-            <option key={index} value={option.name}>
+            <option key={index} value={option.value}>
               {option.name}
             </option>
           ))}

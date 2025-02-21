@@ -4,6 +4,16 @@ const adSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   serviceType: { type: String, required: true, enum: ['yüz yüze'] },
+  category: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'Category', 
+    required: true 
+  },
+  subCategory: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'SubCategory', 
+    required: true 
+  },
   city: {
     type: String,
     required: true,

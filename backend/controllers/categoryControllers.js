@@ -1,5 +1,6 @@
 const Category = require('../models/category');
 const SubCategory = require('../models/subCategory');
+const mongoose = require('mongoose');
 
 const getCategories = async (req, res) => {
   try {
@@ -14,10 +15,19 @@ const getCategories = async (req, res) => {
 const getSubCategoriesByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const subCategories = await SubCategory.find({ category: categoryId }).sort({ name: 1 });
+
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res.status(400).json({ message: 'Geçersiz kategori ID' });
+    }
+
+    const subCategories = await SubCategory.find({ category: categoryId }).sort(
+      { name: 1 }
+    );
 
     if (!subCategories.length) {
-      return res.status(404).json({ message: 'Bu kategoriye ait alt kategori bulunamadı' });
+      return res
+        .status(404)
+        .json({ message: 'Bu kategoriye ait alt kategori bulunamadı' });
     }
 
     res.status(200).json(subCategories);

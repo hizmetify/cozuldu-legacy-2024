@@ -3,6 +3,8 @@ import * as Yup from 'yup';
 const serviceTypeOptions = ['yüz yüze'];
 const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
 
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+
 export const AdSchema = Yup.object().shape({
   title: Yup.string()
     .min(5, 'En az 5 karakter')
@@ -34,4 +36,12 @@ export const AdSchema = Yup.object().shape({
     )
     .required('Fiyat tipi zorunludur'),
 
+  category: Yup.string()
+    .matches(objectIdRegex, 'Geçersiz kategori ID')
+    .required('Kategori zorunludur'),
+
+  subCategory: Yup.string()
+    .matches(objectIdRegex, 'Geçersiz alt kategori ID')
+    .required('Alt kategori zorunludur'),
 });
+  

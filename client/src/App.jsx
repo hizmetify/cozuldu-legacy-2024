@@ -23,6 +23,7 @@ const MyAdsList = lazy(() => import('./pages/MyAds/MyAdsList'));
 const MyAdsNew = lazy(() => import('./pages/MyAds/MyAdsNew'));
 const MyAdsDetail = lazy(() => import('./pages/MyAds/MyAdsDetail'));
 const MyAdsEdit = lazy(() => import('./pages/MyAds/MyAdsEdit'));
+const CategoryAds = lazy(() => import('./pages/CategoryAds'));
 
 import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
@@ -73,6 +74,8 @@ const App = () => {
               </Route>
               <Route path="settings" element={<Settings />} />
             </Route>
+
+            <Route path="/category/:categoryId" element={<CategoryAds />} />
 
             <Route
               path="/login"

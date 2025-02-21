@@ -1,5 +1,7 @@
 const Joi = require('joi');
 
+const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+
 const adValidationSchema = Joi.object({
   title: Joi.string().min(5).max(100).required().messages({
     'string.empty': 'İlan başlığı boş olamaz',
@@ -32,6 +34,15 @@ const adValidationSchema = Joi.object({
     .messages({
       'any.only': 'Geçerli bir fiyat türü seçin (saatlik, günlük, iş başı)',
     }),
+  category: Joi.string().pattern(objectIdRegex).required().messages({
+    'string.empty': 'Kategori seçilmelidir',
+    'string.pattern.base': 'Geçersiz kategori ID',
+  }),
+
+  subCategory: Joi.string().pattern(objectIdRegex).required().messages({
+    'string.empty': 'Alt kategori seçilmelidir',
+    'string.pattern.base': 'Geçersiz alt kategori ID',
+  }),
 
   images: Joi.array().items(Joi.string()).optional().messages({
     'array.base': 'Resimler geçerli bir dizi olmalıdır',
