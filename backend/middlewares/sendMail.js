@@ -1,7 +1,8 @@
-const nodemailer = require("nodemailer");
-const sendMail=(toMail,privateCode)=> {
-   
-    let htmlTemplate=`
+const nodemailer = require('nodemailer');
+const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const sendMail = (toMail, privateCode) => {
+  let htmlTemplate = `
     <!DOCTYPE html>
     <html lang="tr">
     <head>
@@ -125,117 +126,111 @@ const sendMail=(toMail,privateCode)=> {
     </body>
     </html>
     
-    ` 
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER, // Kendi mail adresin
-        pass: process.env.EMAIL_CODE, // Google'dan aldığın Uygulama Şifresi
-      },
-    });
-     
-    let mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: toMail,
-        subject: 'Hesap Doğrulama',
-        html: `<html>...${htmlTemplate}...</html>` 
-    };
-      
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-          console.log(error);
-        } else {
-          console.log('E-posta gönderildi: ' + info.response);
-        }
-      });
-      return
-}
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-function generateRandomCode() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let code = '';
+    `;
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USER, // Kendi mail adresin
+      pass: process.env.EMAIL_CODE, // Google'dan aldığın Uygulama Şifresi
+    },
+  });
 
-    for (let i = 0; i < 4; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
+  let mailOptions = {
+    from: process.env.EMAIL_USER,
+    to: toMail,
+    subject: 'Hesap Doğrulama',
+    html: `<html>...${htmlTemplate}...</html>`,
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('E-posta gönderildi: ' + info.response);
     }
+  });
+  return;
+};
 
-    code += '-';
+const generateRandomCode = () => {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
 
-    for (let i = 0; i < 4; i++) {
-        code += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
 
-    return code;
-}
+  code += '-';
+
+  for (let i = 0; i < 4; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  return code;
+};
+
 let pageOpenTime = Date.now(); // Sayfa açılma zamanı (milisaniye cinsinden)
 let isTimerActive = true;
-let code=""
-const sendEmail=async (req,res)=>{
-    code=generateRandomCode() 
-    
-    pageOpenTime = Date.now(); // Sayfa açılma zamanı (milisaniye cinsinden)
-    token=req.cookies.token 
-    console.log(token);
-    
-    if (!token) { 
-        return res
-          .status(401)
-          .json({ message: 'Yetkisiz erişim! Token bulunamadı.' });
-      }
-    
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-        const user = await User.findById(decoded.id).select('-password'); 
-        console.log(user);
-        if (!user) {
-          return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
-        }
-        if(user.isVerification==false){
-            sendMail(user?.email,code)
-            return res.json({status:'success'})  
-        }
-        return res.json({status:'continue'})
-      } catch (err) {
-        res.status(401).json({ message: 'Geçersiz token!' });
-      }
-    
-    
-}
-const EmailVerify=async(req,res)=>{
-    
+let code = '';
+const sendEmail = async (req, res) => {
+  code = generateRandomCode();
+
+  pageOpenTime = Date.now(); // Sayfa açılma zamanı (milisaniye cinsinden)
+  token = req.cookies.token;
+  console.log(token);
+
+  if (!token) {
+    return res
+      .status(401)
+      .json({ message: 'Yetkisiz erişim! Token bulunamadı.' });
+  }
+
   try {
-    const currentTime = Date.now();  
-      const elapsedTime = currentTime - pageOpenTime; 
-      let timeLeft = Math.max(180000 - elapsedTime, 0);  
-      if (timeLeft === 0 && isTimerActive) {
-        isTimerActive = false;  
-        code=''
-      }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
-    const userVerify = await User.findById(decoded.id).select('-password'); 
-    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+    console.log(user);
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+    if (user.isVerification == false) {
+      sendMail(user?.email, code);
+      return res.json({ status: 'success' });
+    }
+    return res.json({ status: 'continue' });
+  } catch (err) {
+    res.status(401).json({ message: 'Geçersiz token!' });
+  }
+};
+const EmailVerify = async (req, res) => {
+  try {
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - pageOpenTime;
+    let timeLeft = Math.max(180000 - elapsedTime, 0);
+    if (timeLeft === 0 && isTimerActive) {
+      isTimerActive = false;
+      code = '';
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userVerify = await User.findById(decoded.id).select('-password');
+
     if (!userVerify) {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
     }
-    
-    let inputCode=req.body.code 
-    if(inputCode==code) {
-        const user=await User.findOneAndUpdate(
-        { email: userVerify?.email },  
-        { isVerification: true },  
-        { new: true }  
-      ); 
-     
-      
-      return res.json({status:'success'})
-    }
-    else{
-        return res.json({status:false})
+
+    let inputCode = req.body.code;
+    if (inputCode == code) {
+      const user = await User.findOneAndUpdate(
+        { email: userVerify?.email },
+        { isVerification: true },
+        { new: true }
+      );
+
+      return res.json({ status: 'success' });
+    } else {
+      return res.json({ status: false });
     }
   } catch (err) {
     res.status(401).json({ message: 'Geçersiz token!' });
   }
-    
-}
-module.exports={sendEmail,EmailVerify}
+};
+module.exports = { sendEmail, EmailVerify };
