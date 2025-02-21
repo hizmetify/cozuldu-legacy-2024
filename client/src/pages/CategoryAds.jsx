@@ -48,7 +48,7 @@ const CategorySelector = ({ onCategoryChange, onSubCategoryChange }) => {
         >
           <option value="">Kategori Seç</option>
           {categories.map((category) => (
-            <option key={category._id} value={category._id}> {/* 📌 ID kullanılıyor */}
+            <option key={category._id} value={category._id}> 
               {category.name}
             </option>
           ))}
