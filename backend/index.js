@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const cityRoutes = require('./routes/cityRoutes');
 const adRoutes = require('./routes/adRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
+const userRoutes = require('./routes/userRoutes')
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -54,6 +55,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/cities', cityRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/user',userRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
