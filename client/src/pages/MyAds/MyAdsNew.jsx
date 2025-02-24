@@ -29,6 +29,9 @@ const MyAdsNew = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { status } = useSelector((state) => state.ads);
+  const { user } = useSelector((state) => state.auth);
+
+  const isNotVerified = user && !user.isVerified;
 
   useEffect(() => {
     const loadInitialData = async () => {
@@ -193,6 +196,18 @@ const MyAdsNew = () => {
 
   return (
     <div className="p-4 bg-white shadow rounded-md">
+      {isNotVerified && (
+        <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md">
+          <p className="font-bold mb-2">E-posta doğrulaması gerekli!</p>
+          <p>
+            İlan açmak için lütfen e-posta adresinizi doğrulayın.
+            <a href="/emailverify" className="underline font-semibold ml-2">
+              Buraya tıklayarak doğrulama sayfasına gidebilirsiniz.
+            </a>
+          </p>
+        </div>
+      )}
+
       <h2 className="text-xl font-bold mb-4">Yeni İlan Ekle</h2>
       {status === 'loading' && <Spinner className="mb-4" />}
       <Formik

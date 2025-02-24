@@ -63,6 +63,16 @@ const register = async (req, res) => {
 
     const token = generateToken(savedUser._id);
 
+    const userData = {
+      _id: savedUser._id,
+      name: savedUser.name,
+      lastname: savedUser.lastname,
+      email: savedUser.email,
+      isVerified: savedUser.isVerification,
+      phone: savedUser.phone,
+      city: savedUser.city,
+    };
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: false,
@@ -70,7 +80,9 @@ const register = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.status(201).json({ message: 'Başarıyla kayıt oldunuz.', token });
+    res
+      .status(201)
+      .json({ message: 'Başarıyla kayıt oldunuz.', token, user: userData });
   } catch (error) {
     console.log(error);
 
@@ -102,6 +114,10 @@ const login = async (req, res) => {
     }
 
     const token = generateToken(user._id);
+
+    const userData = {
+      isVerified: user.isVerification,
+    };
 
     res.cookie('token', token, {
       httpOnly: true,

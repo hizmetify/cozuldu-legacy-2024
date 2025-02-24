@@ -23,9 +23,9 @@ const userSchema = new mongoose.Schema(
       match: [/.+@.+\..+/, 'Please enter a valid email address'],
       trim: true,
     },
-    isVerification:{
-      type:Boolean,
-      default:false
+    isVerification: {
+      type: Boolean,
+      default: false,
     },
     password: {
       type: String,
@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      match: [/^\d{10,15}$/, 'Phone number must be 10-15 digits'], 
+      match: [/^\d{10,15}$/, 'Phone number must be 10-15 digits'],
     },
     city: {
       type: String,
@@ -43,11 +43,11 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Profile picture must be a valid URL'], 
+      match: [/^https?:\/\/.+/, 'Profile picture must be a valid URL'],
     },
     portfolioLink: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Portfolio link must be a valid URL'], 
+      match: [/^https?:\/\/.+/, 'Portfolio link must be a valid URL'],
     },
     createdAt: {
       type: Date,
