@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
-import { emailVerify } from '../../api/authApi';
 import { useNavigate } from 'react-router-dom';
+import {
+  MdEmail,
+  MdTimer,
+  MdArrowForward,
+  MdError,
+  MdRefresh,
+} from 'react-icons/md';
+import { emailVerify, resendVerificationCode } from '../../api/authApi';
 import { showToast } from '../../features/toast/toastSlice';
 
 const EmailVerify = () => {
   const [code, setCode] = useState('');
   const [message, setMessage] = useState('');
   const [timeLeft, setTimeLeft] = useState(180);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCountdown, setResendCountdown] = useState(0);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,6 +28,7 @@ const EmailVerify = () => {
       setCode(value);
     }
   };
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
@@ -32,6 +43,15 @@ const EmailVerify = () => {
     return () => clearInterval(timer);
   }, [navigate]);
 
+  useEffect(() => {
+    if (resendCountdown > 0) {
+      const timer = setInterval(() => {
+        setResendCountdown((prevCount) => prevCount - 1);
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [resendCountdown]);
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
@@ -41,73 +61,141 @@ const EmailVerify = () => {
       return;
     }
 
-    const response = await emailVerify({ code });
-
-    if (response?.status === 'success') {
-      navigate('/dashboard/my-ads/new');
-    } else if (response?.status === 'false') {
-      setMessage('Girilen kod hatalı');
+    setIsLoading(true);
+    try {
+      const response = await emailVerify({ code });
+      if (response?.status === 'success') {
+        showToast({ message: 'E-posta başarıyla doğrulandı', type: 'success' });
+        navigate('/dashboard/my-ads/new');
+      } else {
+        setMessage('Girilen kod hatalı');
+        showToast({ message: 'Doğrulama başarısız', type: 'error' });
+      }
+    } catch (error) {
+      setMessage('Bir hata oluştu. Lütfen tekrar deneyin.');
+      showToast({ message: 'Bir hata oluştu', type: 'error' });
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const handleResend = async () => {
+    if (resendCountdown > 0 || isResending) return;
+
+    setIsResending(true);
+    try {
+      const response = await resendVerificationCode();
+      if (response?.status === 'success') {
+        showToast({
+          message: 'Yeni doğrulama kodu gönderildi',
+          type: 'success',
+        });
+        setResendCountdown(60); 
+        setTimeLeft(180);
+      } else {
+        showToast({
+          message: response?.message || 'Kod gönderilemedi',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      showToast({ message: 'Bir hata oluştu', type: 'error' });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
+  const progressPercentage = (timeLeft / 180) * 100;
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-blue-500 to-purple-500 px-4">
-      <div className="bg-white shadow-xl rounded-xl p-8 w-full max-w-md">
-        <div className="flex justify-center mb-6">
-          <svg
-            className="w-16 h-16 text-indigo-600"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={1.5}
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M12 11c.667-2 .667-2.6 0-3.2-.667-.6-1.333-.6-2 0-.667.6-.667 1.2 0 3.2.667 2 1.333 2.6 2 3.2.667.6 1.333.6 2 0 .667-.6.667-1.2 0-3.2zm0 0v3"
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-md">
+        <div className="bg-white rounded-2xl shadow-xl p-8 space-y-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gray-100">
+            <div
+              className="h-full bg-indigo-600 transition-all duration-1000 ease-linear"
+              style={{ width: `${progressPercentage}%` }}
             />
-          </svg>
-        </div>
-        <h2 className="text-center text-2xl font-bold text-gray-800 mb-1">
-          Kodu Doğrula
-        </h2>
-        <p className="text-center text-gray-500 mb-6">
-          Lütfen gelen e-postadaki kodu giriniz
-        </p>
-        <div className="flex justify-center mb-4">
-          <input
-            type="text"
-            name="code"
-            placeholder="XXXX-XXXX"
-            maxLength="9"
-            value={code}
-            onChange={handleChange}
-            className="text-center text-xl font-bold tracking-widest bg-gray-100 border border-gray-300 rounded-lg px-4 py-3 
-              focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition"
-          />
-        </div>
+          </div>
 
-        <button
-          onClick={handleSubmit}
-          className="w-full py-3 text-white font-semibold rounded-lg
-            bg-gradient-to-r from-indigo-600 to-indigo-500 hover:to-indigo-700
-            transition shadow-md hover:shadow-lg focus:outline-none"
-        >
-          Doğrula
-        </button>
+          <div className="text-center space-y-2">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 mb-4">
+              <MdEmail className="h-7 w-7" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+              E-posta Doğrulama
+            </h1>
+            <p className="text-gray-500">
+              Lütfen e-postanıza gönderilen doğrulama kodunu giriniz
+            </p>
+          </div>
 
-        <div className="mt-5 text-center text-gray-600">
-          <h1 className="text-sm">
-            Kodu girmek için kalan süre:
-            <span className="font-medium text-gray-800">
-              {' '}
-              {minutes} dakika {seconds < 10 ? `0${seconds}` : seconds} saniye
-            </span>
-          </h1>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <input
+                type="text"
+                placeholder="XXXX-XXXX"
+                maxLength="9"
+                value={code}
+                onChange={handleChange}
+                className="w-full text-center text-2xl font-mono tracking-[0.5em] rounded-lg border 
+                  bg-gray-50 py-4 px-3 placeholder:text-gray-300 placeholder:tracking-[0.2em] 
+                  placeholder:font-normal focus:outline-none focus:ring-2 
+                  focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-200"
+              />
+            </div>
+
+            <button
+              onClick={handleSubmit}
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-lg text-white font-medium bg-indigo-600 
+                hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                transition-all duration-200 flex items-center justify-center gap-2
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <div className="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              ) : (
+                <>
+                  Doğrula
+                  <MdArrowForward className="w-4 h-4" />
+                </>
+              )}
+            </button>
+
+            <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+              <MdTimer className="w-4 h-4" />
+              <span>
+                {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+              </span>
+            </div>
+
+            {message && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                <MdError className="w-4 h-4" />
+                <p>{message}</p>
+              </div>
+            )}
+          </div>
         </div>
-        {message && (
-          <p className="mt-5 text-center text-red-500 font-medium">{message}</p>
-        )}
+        <div className="text-center mt-4">
+          <button
+            onClick={handleResend}
+            disabled={resendCountdown > 0 || isResending}
+            className="text-indigo-600 hover:text-indigo-700 font-medium text-sm 
+              inline-flex items-center gap-1 transition-all duration-200
+              disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isResending ? (
+              <div className="h-4 w-4 border-2 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+            ) : (
+              <MdRefresh className="w-4 h-4" />
+            )}
+            {resendCountdown > 0
+              ? `Tekrar gönder (${resendCountdown}s)`
+              : 'Kodu tekrar gönder'}
+          </button>
+        </div>
       </div>
     </div>
   );

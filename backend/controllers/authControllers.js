@@ -126,7 +126,7 @@ const login = async (req, res) => {
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
     });
 
-    res.status(201).json({ message: 'Başarıyla giriş yapıldı.', token });
+    res.status(201).json({ message: 'Başarıyla giriş yapıldı.', token, user: userData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Giriş yapılırken bir hata oluştu.' });

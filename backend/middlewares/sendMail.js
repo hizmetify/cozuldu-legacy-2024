@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const getEmailTemplate = require('../utils/mailUI');
 
+const userVerificationData = new Map();
+
 const sendMail = (toMail, privateCode) => {
   const htmlTemplate = getEmailTemplate(privateCode);
 
@@ -21,15 +23,19 @@ const sendMail = (toMail, privateCode) => {
     html: htmlTemplate,
   };
 
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log('E-posta gönderme hatası:', error);
-    } else {
-      console.log('E-posta başarıyla gönderildi:', info.response);
-    }
+  return new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.log('E-posta gönderme hatası:', error);
+        reject(error);
+      } else {
+        console.log('E-posta başarıyla gönderildi:', info.response);
+        resolve(info);
+      }
+    });
   });
-  return;
 };
+
 const generateRandomCode = () => {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = '';
@@ -45,14 +51,8 @@ const generateRandomCode = () => {
   return code;
 };
 
-let pageOpenTime = Date.now();
-let isTimerActive = true;
-let code = '';
-let token = '';
 const sendEmail = async (req, res) => {
-  code = generateRandomCode();
-  pageOpenTime = Date.now();
-  token = req.cookies.token;
+  const token = req.cookies.token;
 
   if (!token) {
     return res
@@ -67,49 +67,146 @@ const sendEmail = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
     }
+
     if (!user.isVerification) {
-      sendMail(user.email, code);
+      const code = generateRandomCode();
+
+      userVerificationData.set(user._id.toString(), {
+        code,
+        pageOpenTime: Date.now(),
+        isTimerActive: true,
+        resendAttempts: 0,
+        lastResendTime: Date.now(),
+      });
+
+      await sendMail(user.email, code);
       return res.json({ status: 'success' });
     }
 
     return res.json({ status: 'continue' });
   } catch (err) {
+    console.error('Send email error:', err);
     res.status(401).json({ message: 'Geçersiz token!' });
   }
 };
 
 const EmailVerify = async (req, res) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Yetkisiz erişim!' });
+  }
+
   try {
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - pageOpenTime;
-    let timeLeft = Math.max(180000 - elapsedTime, 0);
-
-    if (timeLeft === 0 && isTimerActive) {
-      isTimerActive = false;
-      code = '';
-    }
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userVerify = await User.findById(decoded.id).select('-password');
+    const userId = decoded.id;
+    const userVerify = await User.findById(userId).select('-password');
 
     if (!userVerify) {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
     }
 
+    const userData = userVerificationData.get(userId);
+    if (!userData) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Doğrulama kodu bulunamadı. Lütfen yeni kod talep edin.',
+      });
+    }
+
+    const currentTime = Date.now();
+    const elapsedTime = currentTime - userData.pageOpenTime;
+    const timeLeft = Math.max(180000 - elapsedTime, 0);
+
+    if (timeLeft === 0 && userData.isTimerActive) {
+      userData.isTimerActive = false;
+      userData.code = '';
+      return res.status(400).json({
+        status: 'error',
+        message: 'Doğrulama kodunun süresi dolmuş. Lütfen yeni kod talep edin.',
+      });
+    }
+
     const inputCode = req.body.code;
-    if (inputCode === code) {
+    if (inputCode === userData.code) {
       await User.findOneAndUpdate(
         { email: userVerify.email },
         { isVerification: true },
         { new: true }
       );
+      userVerificationData.delete(userId);
       return res.json({ status: 'success' });
     } else {
-      return res.json({ status: false });
+      return res.json({
+        status: 'error',
+        message: 'Geçersiz doğrulama kodu.',
+      });
     }
   } catch (err) {
+    console.error('Email verify error:', err);
+    res.status(401).json({ message: 'Geçersiz token!' });
+  }
+};
+const resendVerificationCode = async (req, res) => {
+  const token = req.cookies.token;
+
+  if (!token) {
+    return res.status(401).json({ message: 'Yetkisiz erişim!' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    const user = await User.findById(userId).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+
+    let userData = userVerificationData.get(userId);
+    if (!userData) {
+      userData = {
+        code: '',
+        pageOpenTime: Date.now(),
+        isTimerActive: true,
+        resendAttempts: 0,
+        lastResendTime: Date.now(),
+      };
+    }
+    const currentTime = Date.now();
+    if (userData.resendAttempts >= 3) {
+      return res.status(429).json({
+        status: 'error',
+        message: 'Çok fazla kod talebi. Lütfen daha sonra tekrar deneyin.',
+      });
+    }
+
+    if (currentTime - userData.lastResendTime < 60000) {
+      return res.status(429).json({
+        status: 'error',
+        message: 'Lütfen yeni kod talep etmeden önce biraz bekleyin.',
+      });
+    }
+
+    const newCode = generateRandomCode();
+    userData.code = newCode;
+    userData.pageOpenTime = currentTime;
+    userData.isTimerActive = true;
+    userData.resendAttempts += 1;
+    userData.lastResendTime = currentTime;
+
+    userVerificationData.set(userId, userData);
+
+    await sendMail(user.email, newCode);
+
+    return res.json({
+      status: 'success',
+      message: 'Yeni doğrulama kodu gönderildi.',
+    });
+  } catch (err) {
+    console.error('Resend verification code error:', err);
     res.status(401).json({ message: 'Geçersiz token!' });
   }
 };
 
-module.exports = { sendEmail, EmailVerify };
+module.exports = { sendEmail, EmailVerify, resendVerificationCode };
