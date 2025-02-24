@@ -164,8 +164,6 @@ const MyAdsNew = () => {
       selectedFiles.forEach((file, index) => {
         formData.append('images', file);
       });
-      for (const pair of formData.entries()) {
-      }
       const response = await dispatch(createAd(formData)).unwrap();
       dispatch(
         showToast({
