@@ -46,7 +46,7 @@ const CategoryDropdown = () => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div className="relative z-50" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-700 text-white text-sm font-semibold rounded shadow-md hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 transition duration-300"
@@ -61,11 +61,10 @@ const CategoryDropdown = () => {
             {categories.map((category) => (
               <li
                 key={category._id}
-                onClick={() => handleNavigateToCategory(category._id)} 
+             //   onClick={() => handleNavigateToCategory(category._id)} 
                 className="px-4 py-3 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-700 cursor-pointer rounded-lg flex justify-between items-center transition duration-200 ease-in-out"
               >
                 {category.name}
-                <MdKeyboardArrowRight className="text-gray-500" />
               </li>
             ))}
           </ul>

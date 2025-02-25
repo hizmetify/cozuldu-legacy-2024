@@ -20,9 +20,9 @@ const Home = () => {
         <meta property="og:url" content="https://xn--zld-1la9esbc.com/" />
       </Helmet>
       <Header />
-{/*       <Hero /> */}
+      <Hero />
     </>
   );
 };
 
-export default Home;
+export default Home;  

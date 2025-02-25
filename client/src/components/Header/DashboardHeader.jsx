@@ -16,8 +16,8 @@ const DashboardHeader = () => {
                 onClick={() => dispatch(toggleSidebar())}
               />
             </button>
-            <Link className="font-bold text-3xl uppercase text-transparent bg-gradient-to-r from-blue-500 to-purple-800 bg-clip-text ">
-              Logo
+            <Link className="font-bold text-3xl uppercase text-transparent bg-gradient-to-r from-teal-500 to-green-800 bg-clip-text ">
+              Çözüldü
             </Link>
           </div>
         </div>
