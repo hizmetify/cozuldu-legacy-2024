@@ -25,14 +25,14 @@ const MyAdsEdit = () => {
 
   useEffect(() => {
     const fetchAdData = async () => {
-      await dispatch(fetchSingleAd(adId));
+      dispatch(fetchSingleAd(adId));
       const cityData = await fetchCities();
       setCities(cityData);
     };
     fetchAdData();
   }, [dispatch, adId]);
 
-  if (singleAdStatus === 'loading' || !selectedAd.data) return <Spinner />;
+  if (singleAdStatus === 'loading' || !selectedAd) return <Spinner />;
 
   const ad = selectedAd.data;
 

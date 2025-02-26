@@ -1,13 +1,14 @@
-const express = require('express'); 
+const express = require('express');
 
 const router = express.Router();
 const {
-    userInfoUpdate,
-userPasswordUpdate
-}=require('../controllers/userControllers');
-const validateAd = require('../middlewares/adMiddleware');
+  deleteAccount,
+  nameInfoUpdate,
+  emailUpdate,
+} = require('../controllers/userControllers');
 
+router.put('/emailUpdate', emailUpdate);
+router.put('/nameInfoUpdate', nameInfoUpdate);
+router.delete('/deleteAccount', deleteAccount);
 
-router.post('/userUpdate', userInfoUpdate);
-router.post('/passwordUpdate',userPasswordUpdate);
 module.exports = router;

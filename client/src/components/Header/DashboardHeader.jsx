@@ -16,7 +16,10 @@ const DashboardHeader = () => {
                 onClick={() => dispatch(toggleSidebar())}
               />
             </button>
-            <Link className="font-bold text-3xl uppercase text-transparent bg-gradient-to-r from-teal-500 to-green-800 bg-clip-text ">
+            <Link
+              to={'/home'}
+              className="font-bold text-3xl uppercase text-transparent bg-gradient-to-r from-teal-500 to-green-800 bg-clip-text "
+            >
               Çözüldü
             </Link>
           </div>

@@ -15,7 +15,9 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <div className="flex-shrink-0">
-              <h1 className="text-2xl font-bold text-gray-800">Çözüldü</h1>
+              <Link to={'/home'} className="text-2xl font-bold text-gray-800">
+                Çözüldü
+              </Link>
             </div>
             <div className="hidden md:block ml-10">
               <CategoryDropdown />

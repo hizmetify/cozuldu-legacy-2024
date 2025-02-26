@@ -3,10 +3,15 @@ import PropTypes from 'prop-types';
 
 const InputField = ({ label, name, type, placeholder }) => {
   return (
-    <div>
-      <label htmlFor={name} className="block text-sm text-gray-700 mb-1">
-        {label}
-      </label>
+    <div className="space-y-2">
+      {label && (
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium text-gray-700"
+        >
+          {label}
+        </label>
+      )}
       <div className="relative">
         <Field
           id={name}
@@ -14,9 +19,10 @@ const InputField = ({ label, name, type, placeholder }) => {
           type={type}
           name={name}
           autoComplete="off"
-          className="w-full py-2 bg-transparent border-0 border-b-2 border-gray-300 
-            focus:border-blue-700 focus:outline-none transition-colors duration-200 
-            text-sm text-gray-900 lg:text-base"
+          className="w-full py-2.5 bg-transparent border-0 border-b-2 border-gray-200 
+            focus:border-blue-600 outline-none focus:outline-none
+            transition-all duration-300
+            text-gray-800 placeholder-gray-400"
         />
       </div>
     </div>
@@ -24,7 +30,7 @@ const InputField = ({ label, name, type, placeholder }) => {
 };
 
 InputField.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.string,
   name: PropTypes.string.isRequired,
   type: PropTypes.string,
   placeholder: PropTypes.string,
@@ -33,6 +39,7 @@ InputField.propTypes = {
 InputField.defaultProps = {
   type: 'text',
   placeholder: '',
+  label: '',
 };
 
 export default InputField;
