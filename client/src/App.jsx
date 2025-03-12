@@ -15,23 +15,32 @@ import RegisterLayout from './layouts/RegisterLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import { fetchMe } from './features/auth/authSlice';
 
-const Home = lazy(() => import('./pages/Home/Home'));
-const Login = lazy(() => import('./pages/Login/Login'));
-const MyAds = lazy(() => import('./pages/MyAds/MyAds'));
-const Settings = lazy(() => import('./pages/Settings/Settings'));
-const MyAdsList = lazy(() => import('./pages/MyAds/MyAdsList'));
-const MyAdsNew = lazy(() => import('./pages/MyAds/MyAdsNew'));
-const MyAdsDetail = lazy(() => import('./pages/MyAds/MyAdsDetail'));
-const MyAdsEdit = lazy(() => import('./pages/MyAds/MyAdsEdit'));
-const CategoryAds = lazy(() => import('./pages/CategoryAds'));
+const lazyLoad = (importFunc) => {
+  const Component = lazy(importFunc);
+  Component.preload = importFunc;
+  return Component;
+};
+
+const Home = lazyLoad(() => import('./pages/Home/Home'));
+const Login = lazyLoad(() => import('./pages/Login/Login'));
+const MyAds = lazyLoad(() => import('./pages/MyAds/MyAds'));
+const Settings = lazyLoad(() => import('./pages/Settings/Settings'));
+const MyAdsList = lazyLoad(() => import('./pages/MyAds/MyAdsList'));
+const MyAdsNew = lazyLoad(() => import('./pages/MyAds/MyAdsNew'));
+const MyAdsDetail = lazyLoad(() => import('./pages/MyAds/MyAdsDetail'));
+const MyAdsEdit = lazyLoad(() => import('./pages/MyAds/MyAdsEdit'));
+const CategoryAds = lazyLoad(() => import('./pages/CategoryAds'));
+const EmailVerify = lazyLoad(() => import('./pages/EmailVerify/EmailVerify'));
+const ResetPassword = lazyLoad(() =>
+  import('./pages/ResetPassword/ResetPassword')
+);
 
 import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
-import EmailVerify from './pages/EmailVerify/EmailVerify';
-import ResetPassword from './pages/ResetPassword/ResetPassword';
+
 const App = () => {
   const dispatch = useDispatch();
 
@@ -54,7 +63,13 @@ const App = () => {
   return (
     <HelmetProvider>
       <Router>
-        <Suspense fallback={<Spinner />}>
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center h-screen">
+              <Spinner />
+            </div>
+          }
+        >
           <Routes>
             <Route path="/" element={<Home />} />
 
