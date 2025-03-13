@@ -1,5 +1,9 @@
-import { useSelector } from 'react-redux';
-import { selectSidebar } from '../../features/sidebar/sidebarSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect, useRef } from 'react';
+import {
+  selectSidebar,
+  toggleSidebar,
+} from '../../features/sidebar/sidebarSlice';
 import { FaBullhorn } from 'react-icons/fa6';
 import { IoMdSettings } from 'react-icons/io';
 import { FaSignOutAlt } from 'react-icons/fa';
@@ -29,10 +33,31 @@ const sidebarLinks = [
 ];
 
 const Sidebar = () => {
+  const dispatch = useDispatch();
   const isOpen = useSelector(selectSidebar);
+
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        isOpen
+      ) {
+        dispatch(toggleSidebar());
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [dispatch, isOpen]);
 
   return (
     <aside
+      ref={sidebarRef}
       className={`fixed top-0 left-0 z-30 w-64 h-screen pt-24 bg-white border-r border-neutral-200 transition-transform duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       } sm:translate-x-0`}
