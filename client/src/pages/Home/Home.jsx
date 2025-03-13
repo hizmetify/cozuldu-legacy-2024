@@ -1,6 +1,9 @@
 import Header from '../../components/Header/Header';
 import { Helmet } from 'react-helmet-async';
-import Hero from '../../components/Hero/Hero.';
+import Hero from '../../components/Hero/Hero';
+import CallToAction from '../../components/Hero/CTA';
+import HowItWorks from '../../components/Hero/HowItWorks';
+
 const Home = () => {
   return (
     <>
@@ -21,8 +24,10 @@ const Home = () => {
       </Helmet>
       <Header />
       <Hero />
+      <HowItWorks />
+      <CallToAction />
     </>
   );
 };
 
-export default Home;  
+export default Home;

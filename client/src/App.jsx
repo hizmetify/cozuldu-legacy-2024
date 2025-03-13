@@ -40,6 +40,7 @@ import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
+import Contact from './pages/Contact';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -92,6 +93,7 @@ const App = () => {
             </Route>
 
             <Route path="/category/:categoryId" element={<CategoryAds />} />
+            <Route path="/contact" element={<Contact />} />
 
             <Route
               path="/login"

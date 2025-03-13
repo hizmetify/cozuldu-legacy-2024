@@ -7,6 +7,7 @@ const cityRoutes = require('./routes/cityRoutes');
 const adRoutes = require('./routes/adRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const userRoutes = require('./routes/userRoutes');
+const statsRoute = require('./routes/statsRoutes');
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
@@ -40,7 +41,7 @@ app.use(
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 2000,
   message: 'Çok fazla istek gönderdiniz. Lütfen daha sonra tekrar deneyin.',
 });
 app.use(limiter);
@@ -56,6 +57,7 @@ app.use('/api/cities', cityRoutes);
 app.use('/api/ads', adRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/stats', statsRoute);
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
