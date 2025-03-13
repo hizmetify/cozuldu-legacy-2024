@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import { useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { loginValidation } from '../../validations/userValidation';
 import { login } from '../../features/auth/authSlice';
 import { showToast } from '../../features/toast/toastSlice';
@@ -10,23 +11,26 @@ import { passwordSend } from '../../api/authApi';
 
 const Login = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); 
-  
-  const [resetPass,setResetPass]=useState(false)
+  const navigate = useNavigate();
+
+  const [resetPass, setResetPass] = useState(false);
   const [email, setEmail] = useState('');
   const { isLoading } = useSelector((state) => state.auth);
   const [initialValues, setInitialValues] = useState(null);
+
+  const [showPassword, setShowPassword] = useState(false);
+
   const resetPassword = async (e) => {
     e.preventDefault();
-    try { 
-      let response=await passwordSend({email})
-      if(response.status==false)
-        return alert(response?.message) 
-      setResetPass(false);   
+    try {
+      const response = await passwordSend({ email });
+      if (response.status === false) return alert(response?.message);
+      setResetPass(false);
     } catch (error) {
       console.error('Hata:', error);
     }
   };
+
   useEffect(() => {
     const storedRememberMe = localStorage.getItem('rememberMe') === 'true';
     setInitialValues({
@@ -109,13 +113,22 @@ const Login = () => {
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
 
-                  <InputField
-                    label="Şifre"
-                    name="password"
-                    type="password"
-                    placeholder="Şifrenizi girin"
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  />
+                  <div className="relative">
+                    <InputField
+                      label="Şifre"
+                      name="password"
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Şifrenizi girin"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      {showPassword ? <FaEye /> : <FaEyeSlash />}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -131,7 +144,7 @@ const Login = () => {
                   </label>
 
                   <p
-                    onClick={()=>setResetPass(true)}
+                    onClick={() => setResetPass(true)}
                     className="cursor-pointer text-sm text-blue-600 hover:text-blue-500"
                   >
                     Şifremi unuttum
@@ -142,10 +155,10 @@ const Login = () => {
                   type="submit"
                   disabled={isLoading || isSubmitting}
                   className="w-full py-3 px-4 rounded-lg bg-blue-600 text-white font-medium 
-                           hover:bg-blue-700 focus:outline-none focus:ring-2 
-                           focus:ring-offset-2 focus:ring-blue-500 
-                           disabled:bg-gray-400 disabled:cursor-not-allowed 
-                           transition-colors duration-200"
+                             hover:bg-blue-700 focus:outline-none focus:ring-2 
+                             focus:ring-offset-2 focus:ring-blue-500 
+                             disabled:bg-gray-400 disabled:cursor-not-allowed 
+                             transition-colors duration-200"
                 >
                   {isLoading || isSubmitting ? 'Yükleniyor...' : 'Devam Et'}
                 </button>
@@ -164,37 +177,120 @@ const Login = () => {
           }}
         </Formik>
       </div>
+
       {resetPass && (
-        <div className='absolute flex justify-center items-center w-full h-full bg-black bg-opacity-50'>
-          <div className='bg-white p-8 rounded-md shadow-lg w-1/2'>
-            <h3 className='text-center text-xl font-semibold mb-4'>
-              Lütfen E-Mail Bilgisini Giriniz
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
+          <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl mx-4 p-8 transform transition-all duration-300 ease-in-out">
+            <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-blue-600 rounded-full p-4 shadow-lg">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                />
+              </svg>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setResetPass(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors duration-200"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+
+            <h3 className="text-2xl font-bold text-center text-gray-800 mt-6 mb-2">
+              Şifre Sıfırlama
             </h3>
-            <form onSubmit={resetPassword}>
-              <input
-                label="E-posta"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)} // E-posta değişimini kontrol et
-                placeholder="E-posta adresinizi girin"
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
-              />
-              <div className='flex justify-between'>
+            <p className="text-center text-gray-600 mb-6">
+              Şifre sıfırlama bağlantısı için e-posta adresinizi girin
+            </p>
+
+            <form onSubmit={resetPassword} className="space-y-5">
+              <div className="relative">
+                <label
+                  htmlFor="email"
+                  className="block mb-2 text-sm font-medium text-gray-700"
+                >
+                  E-posta Adresi
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg
+                      className="w-5 h-5 text-gray-500"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="ornek@email.com"
+                    className="w-full pl-10 p-3.5 border border-gray-300 rounded-lg focus:ring-2 
+                              focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-3 pt-2">
                 <button
                   type="submit"
-                  className="w-1/2 p-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3.5 rounded-lg bg-blue-600 text-white font-medium
+                            hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500
+                            transform transition-all duration-200 hover:shadow-lg"
                 >
-                  Gönder
+                  Sıfırlama Bağlantısı Gönder
                 </button>
-                <p
-                  className='text-red-500 cursor-pointer self-center'
-                  onClick={() => setResetPass(false)}  // Kapatmak için
+                <button
+                  type="button"
+                  onClick={() => setResetPass(false)}
+                  className="w-full px-4 py-3.5 rounded-lg border border-gray-300 text-gray-700
+                            hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-200
+                            transition-all duration-200"
                 >
-                  Kapat
-                </p>
+                  Vazgeç
+                </button>
               </div>
             </form>
+
+            <div className="mt-6 text-center text-sm text-gray-500">
+              Yardıma mı ihtiyacınız var?{' '}
+              <a href="#" className="text-blue-600 hover:underline">
+                Destek ekibimizle iletişime geçin
+              </a>
+            </div>
           </div>
         </div>
       )}

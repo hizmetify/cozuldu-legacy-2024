@@ -1,8 +1,9 @@
 // StepThree.jsx
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 import { updateRegisterData } from '../../features/register/registerSlice';
 import { register } from '../../features/auth/authSlice';
@@ -18,6 +19,10 @@ const StepThree = () => {
 
   const { password, confirmPassword } = registerData;
   const initialValues = { password, confirmPassword };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       dispatch(updateRegisterData(values));
@@ -52,15 +57,45 @@ const StepThree = () => {
             });
           } else {
             setSubmitting(true);
-            await handleSubmit(); 
+            await handleSubmit();
           }
         };
 
         return (
-          <Form id="stepForm-2" onSubmit={customSubmit} className="flex flex-col h-full">
+          <Form
+            id="stepForm-2"
+            onSubmit={customSubmit}
+            className="flex flex-col h-full"
+          >
             <div className="flex flex-col gap-3 flex-grow mt-7">
-              <InputField name="password" label="Şifre" type="password" />
-              <InputField name="confirmPassword" label="Şifre (Tekrar)" type="password" />
+              <div className="relative">
+                <InputField
+                  name="password"
+                  label="Şifre"
+                  type={showPassword ? 'text' : 'password'}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
+              <div className="relative">
+                <InputField
+                  name="confirmPassword"
+                  label="Şifre (Tekrar)"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                >
+                  {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
+                </button>
+              </div>
             </div>
           </Form>
         );
