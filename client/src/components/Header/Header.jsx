@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import CategoryDropdown from './CategoryDropdown';
+import MobileCategoryAccordion from './MobileCategoryAccordion';
 import { IoCloseOutline, IoMenuOutline } from 'react-icons/io5';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectSidebar } from '../../features/sidebar/sidebarSlice';
@@ -36,7 +37,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/register"
-                  className=" bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 px-4 py-2.5 rounded text-sm font-medium transition duration-150 ease-in-out"
+                  className="bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 px-4 py-2.5 rounded text-sm font-medium transition duration-150 ease-in-out"
                 >
                   Hizmet Ver
                 </Link>
@@ -56,7 +57,11 @@ const Header = () => {
       </div>
       {isOpen && (
         <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+          <div className="px-2 pt-2 pb-3 space-y-3 sm:px-3">
+            <MobileCategoryAccordion />
+
+            <div className="border-t border-gray-200 my-2"></div>
+
             <Link
               to="/login"
               className="block px-3 py-2 rounded-md text-base font-medium text-blue-700 hover:text-blue-600"
@@ -65,7 +70,7 @@ const Header = () => {
             </Link>
             <Link
               to="/register"
-              className="block px-3 py-2 text-base font-medium text-whit text-blue-700 hover:text-blue-600"
+              className="block px-3 py-2 text-base font-medium text-blue-700 hover:text-blue-600"
             >
               Hizmet Ver
             </Link>
