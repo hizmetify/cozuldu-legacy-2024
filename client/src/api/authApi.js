@@ -97,3 +97,9 @@ export const getMe = async () => {
   });
   return response.data;
 };
+
+export const logs = async (category,adId) => {
+  const response = await axiosInstance.post('/auth/logs', { category, adId
+  });
+  return response.data;
+};
