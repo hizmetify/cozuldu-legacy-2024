@@ -21,7 +21,7 @@ const customTooltip = ({ active, payload }) => {
   return null;
 };
 
-const Statistika = () => {
+const Statistics = () => {
   const [stats, setStats] = useState({ userCount: 0 });
   const [counts, setCounts] = useState({ userCount: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -160,4 +160,4 @@ const Statistika = () => {
   );
 };
 
-export default Statistika;
+export default Statistics;

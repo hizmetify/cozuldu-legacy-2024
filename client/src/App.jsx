@@ -34,16 +34,16 @@ const EmailVerify = lazyLoad(() => import('./pages/EmailVerify/EmailVerify'));
 const ResetPassword = lazyLoad(() =>
   import('./pages/ResetPassword/ResetPassword')
 );
+const Statistics = lazyLoad(() => import('./pages/Statistics/Statistics'));
+const Favorites = lazyLoad(() => import('./pages/Favorites/Favorites'));
+const Contact = lazyLoad(() => import('./pages/Contact'));
 
 import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
-import Contact from './pages/Contact';
-import Statistika from './pages/Statistika/Statistics';
 import IlanListesi from './pages/TestPage/test';
-import Favories from './pages/Favories/Favories';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -76,7 +76,7 @@ const App = () => {
         >
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path='/test' element={<IlanListesi/>}/>
+            <Route path="/test" element={<IlanListesi />} />
             <Route
               path="/dashboard"
               element={
@@ -93,10 +93,10 @@ const App = () => {
                 <Route path=":adId/edit" element={<MyAdsEdit />} />
               </Route>
               <Route path="settings" element={<Settings />} />
-              <Route path='statistika' element={<Statistika/>} />
-              <Route path='favories' element={<Favories/>} />
+              <Route path="statistics" element={<Statistics />} />
+              <Route path="favorites" element={<Favorites />} />
             </Route>
-            
+
             <Route path="/category/:categoryId" element={<CategoryAds />} />
             <Route path="/contact" element={<Contact />} />
 
