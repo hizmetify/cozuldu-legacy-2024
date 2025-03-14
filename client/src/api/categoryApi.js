@@ -15,3 +15,8 @@ export const fetchSubCategories = async (categoryId) => {
   );
   return response.data;
 };
+
+export const fetchAddSubcategoryByCategory=async(validate)=>{
+  const response=await axiosInstance.post('/categories/addSubcategoryByCategory',validate);
+  return response.data
+}

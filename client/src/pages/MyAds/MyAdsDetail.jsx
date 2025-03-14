@@ -18,6 +18,8 @@ import {
   FaChevronRight,
   FaExpand,
 } from 'react-icons/fa';
+import { contactTeacher, countFav, favoriAction, favoriGet, favoriIs, viewingIs } from '../../api/userApi';
+import { logs } from '../../api/authApi';
 const LoadingSpinner = () => (
   <div className="flex h-screen items-center justify-center">
     <div className="h-32 w-32 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
@@ -173,28 +175,79 @@ const PriceCard = memo(function PriceCard({ price, priceType }) {
 });
 
 const ContactOptions = memo(function ContactOptions() {
+  const [phon, setPhon] = useState("");
+  const [em, setEm] = useState("");
+  const fetchTeacherContact = async () => {
+    try { 
+      const pathname = window.location.pathname;
+      const pathSegments = pathname.split("/");
+      const adId = pathSegments[pathSegments.length - 1]; 
+      const getData = await contactTeacher(adId);
+      if (getData?.data) {
+        let phone = '';
+        if (getData?.data.phone) {
+          if (getData?.data.phone.startsWith("+90")) {
+            phone = getData?.data.phone; 
+          } else if (getData?.data.phone.startsWith("+9")) {
+            phone = "+90" + getData?.data.phone.slice(2); 
+          } else if (getData?.data.phone.startsWith("9")) {
+            phone = "+90" + getData?.data.phone.slice(1); 
+          } else {
+            phone = "+90" + getData?.data.phone; 
+          }
+          setPhon(phone || "Telefon bulunamadı");
+          setEm(getData.data.mail || "E-posta bulunamadı");
+        } else {
+          console.error("Telefon bilgisi mevcut değil.");
+        }
+      } else {
+        console.error("Geçersiz veri yapısı:", getData);
+      }
+    } catch (error) {
+      console.error("Hata oluştu:", error); 
+    }
+  };
+  useEffect(() => {
+    fetchTeacherContact();
+  }, []);
+  
+  const handleContact = async (type, ) => {
+    const pathname = window.location.pathname;
+    const pathSegments = pathname.split("/");
+    const adId = pathSegments[pathSegments.length - 1];
+    
+    try {
+      await logs(type, adId); 
+    } catch (error) {
+      console.error("Error during contact action:", error);
+    }
+  };
   return (
     <div className="rounded-xl bg-white p-6 shadow-lg">
       <h3 className="mb-4 text-lg font-semibold text-gray-800">
         İletişim Seçenekleri
       </h3>
       <div className="space-y-3">
-        <button className="group flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 p-4 text-white transition-all duration-300 hover:bg-green-600">
+        <a  onClick={() => handleContact('whatsapp', )}  href={`https://wa.me/${phon}`} // WhatsApp için URL
+  className="group flex w-full items-center justify-center gap-2 rounded-lg bg-green-500 p-4 text-white transition-all duration-300 hover:bg-green-600">
           <FaWhatsapp className="h-5 w-5 transition-transform group-hover:scale-110" />
           <span className="font-medium">WhatsApp ile İlet</span>
-        </button>
-        <button className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500 p-4 text-white transition-all duration-300 hover:bg-blue-600">
+        </a>
+        <a onClick={() => handleContact('phone', )}  href={`tel:${phon}`} // Telefon numarasına yönlendirme için URL
+   className="group flex w-full items-center justify-center gap-2 rounded-lg bg-blue-500 p-4 text-white transition-all duration-300 hover:bg-blue-600">
           <FaPhone className="h-5 w-5 transition-transform group-hover:scale-110" />
           <span className="font-medium">Telefon ile Ara</span>
-        </button>
-        <button className="group flex w-full items-center justify-center gap-2 rounded-lg bg-gray-500 p-4 text-white transition-all duration-300 hover:bg-gray-600">
+        </a>
+        <a onClick={() => handleContact('email', )}   href={`mailto:${em}`} // Mailto linki
+   className="group flex w-full items-center justify-center gap-2 rounded-lg bg-gray-500 p-4 text-white transition-all duration-300 hover:bg-gray-600">
           <FaEnvelope className="h-5 w-5 transition-transform group-hover:scale-110" />
           <span className="font-medium">E-posta Gönder</span>
-        </button>
+        </a>
       </div>
     </div>
   );
 });
+
 const ImageModal = memo(function ImageModal({
   images,
   currentImageIndex,
@@ -249,19 +302,46 @@ const MyAdsDetail = () => {
   const { adId } = useParams();
   const dispatch = useDispatch();
   const { selectedAd, singleAdStatus } = useSelector((state) => state.ads);
-
+  const [favoriBg,setFavoriBg]=useState('bg-gray-100')
+  const [favoriTxt,setFavoriTxt]=useState('text-gray-600')
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isImageModalOpen, setIsImageModalOpen] = useState(false);
   const [isSidebarSticky, setIsSidebarSticky] = useState(false);
-
-  useEffect(() => {
+  const [viewingCount,setViewingCount]=useState(0)
+  const [favCounts,setFavCount]=useState(0) 
+  const favIs=async()=>{
+    
+    const isFavori= await favoriIs(adId)
+    
+    setFavoriBg(isFavori.data.success) 
+    if(isFavori.data.success=='bg-red-500')
+      setFavoriTxt('text-white')
+    else{
+      setFavoriTxt('text-gray-600')
+    }
+    const result=await countFav(adId) 
+    setFavCount(result.data.data)
+  }
+  const viewIs=async()=>{
+    const isView=await viewingIs(adId)
+    
+    setViewingCount(isView.data.data)
+    const result=await countFav(adId) 
+    setFavCount(result.data.data) 
+    return
+  }
+  useEffect(() => { 
+   
+     
+    favIs()
     dispatch(fetchSingleAd(adId));
     const handleScroll = () => {
       setIsSidebarSticky(window.scrollY > 200);
     };
-
+    viewIs()
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+    
   }, [dispatch, adId]);
 
   if (singleAdStatus === 'loading') {
@@ -271,16 +351,24 @@ const MyAdsDetail = () => {
   if (!selectedAd || !selectedAd.data) {
     return <NotFound />;
   }
-
+  
   const ad = selectedAd.data;
-
+ 
   const formatDate = (dateString) =>
     new Date(dateString).toLocaleDateString('tr-TR', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
     });
-
+    const favoriActions=async()=>{
+      
+      const resul=await favoriAction(adId) 
+      // await favoriGet()
+      
+      await favIs() 
+      return
+    }
+    
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-6">
       <div className="mx-auto max-w-7xl">
@@ -291,8 +379,11 @@ const MyAdsDetail = () => {
                 {ad.title || 'Başlık bulunamadı'}
               </h1>
               <div className="flex flex-wrap items-center gap-4">
+              <span className="flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700">
+                  <FaHeart className="mr-2" /> {favCounts}
+                </span>
                 <span className="flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700">
-                  <FaEye className="mr-2" /> 245 Görüntülenme
+                  <FaEye className="mr-2" /> {viewingCount}
                 </span>
                 <span className="flex items-center text-sm text-gray-500">
                   <FaClock className="mr-2" />
@@ -301,10 +392,10 @@ const MyAdsDetail = () => {
               </div>
             </div>
             <div className="flex gap-2">
-              <button className="group rounded-lg bg-gray-100 p-3 text-gray-600 transition-all duration-300 hover:bg-red-500 hover:text-white">
-                <FaHeart className="h-5 w-5 transition-transform group-hover:scale-110" />
+              <button className={`group rounded-lg ${favoriBg} ${favoriTxt} p-3 text-gray-600 transition-all duration-300 hover:bg-red-500 hover:text-white`}>
+                <FaHeart  onClick={()=>favoriActions()}  className="h-5 w-5 transition-transform group-hover:scale-110" />
               </button>
-              <button className="group rounded-lg bg-gray-100 p-3 text-gray-600 transition-all duration-300 hover:bg-blue-500 hover:text-white">
+              <button className={`group rounded-lg  p-3 text-gray-600 transition-all duration-300 hover:bg-blue-500 hover:text-white`}>
                 <FaShare className="h-5 w-5 transition-transform group-hover:scale-110" />
               </button>
             </div>
@@ -364,7 +455,7 @@ const MyAdsDetail = () => {
           >
             <PriceCard price={ad.price} priceType={ad.priceType} />
 
-            <ContactOptions />
+            <ContactOptions/>
 
             <div className="rounded-xl bg-white p-6 shadow-lg">
               <h3 className="mb-4 text-lg font-semibold text-gray-800">

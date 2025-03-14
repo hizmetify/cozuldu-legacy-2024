@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const Favori = require('../models/favori');
+const Ad = require('../models/ad');
+const { default: mongoose } = require('mongoose');
 
 const decodedId = async (req) => {
   const token = req.cookies.token;
@@ -55,8 +58,153 @@ const deleteAccount = async (req, res) => {
   }
 };
 
+const favoriPostAndDelete=async(req,res)=>{
+  try{
+    let decoded = await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Favorilere eklemek için giriş yapmalısınız.' });
+    }
+    let {adId}=req.body;
+    const value={
+      adId:adId,
+      userId:user?._id
+    }
+    const search=await Favori.find(value)
+    if(search.length>0){
+      const result = await Favori.deleteMany(value); 
+      return res.json({message:"Favorilerden Silindi.",success:true})
+
+    }
+    else{ 
+      const adAds = await Ad.findOne({ _id:adId })
+         .populate('user', '_id') 
+   if(adAds){
+     if(user?._id==adAds.user._id){
+       return res.json({message:"Kendi ilanını favorileyemezsin.",success:false})
+     }
+   }
+   const result= await Favori.create(value)
+   return res.json({message:'Favorilere Eklendi.',success:true})
+    } 
+  }catch(error){
+    console.error('Hata:', error);
+  }
+  
+} 
+const isFavori=async(req,res)=>{
+  try{
+    const {adId}=req.body
+    let decoded = await decodedId(req);
+    
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+    const ret = await Favori.find({userId:user?._id,adId:adId})
+    
+    if(ret.length>0){
+      return res.json({success:'bg-red-500'})
+    } 
+    return res.json({success:'text-gray-600'})
+  }catch(error){
+    console.log(error);
+    
+  }
+}
+const favoriGet=async(req,res)=>{
+  try{
+    let decoded = await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+    const ret = await Favori.find({userId:user?._id})
+    if(!ret){
+      return res.send('Bir hata oluştu')
+    }
+    return res.send(ret)
+  }catch(error){
+    console.log(error);
+    
+  }
+}
+const favoriCount=async(req,res)=>{
+  try{
+    let decoded = await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+    let {adId}=req.body
+    const result = await Favori.countDocuments({ adId:adId }); 
+    
+    return res.json({data:result}); 
+  }catch(error){
+    console.log(error);
+    
+  }
+}
+const isViewing=async(req,res)=>{
+  try{
+    let {adId}=req.body
+    
+    let decoded = await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    }
+    const ad = await Ad.findById(adId)
+    if(ad?.user?._id==user?.id || ad?.viewing?.includes(user?._id)){
+      return res.json({success:false, data:ad?.viewing?.length>0?ad?.viewing.length:0})
+    }
+    else{
+      await Ad.findByIdAndUpdate(
+        ad?._id,
+        { $addToSet: { viewing: user?._id } }, // Eğer zaten varsa ekleme
+        { new: true }
+      );
+      return res.json({success:true, data:ad?.viewing?.length>0?ad?.viewing.length:0})
+    } 
+  }catch(error){
+    console.log(error);
+    
+  }
+}
+const contactInfo=async(req,res)=>{
+  try{
+    let {adId}=req.body
+    let decoded = await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'Bu işlem için üye olmanız gerekiyor.' });
+    }
+    const adids=await Ad.findById(adId)
+    if(!adids){
+      return res.json({message:'Sonuç bulunamadı'})
+    }
+    const userids=await User.findById(adids?.user?._id)
+    if(!userids)
+      return res.json({message:'sonuç bulunamadı'})
+
+    //loglama kodları yazacak
+    return res.json({
+      phone:userids?.phone,
+      mail:userids?.email
+    })
+  }catch(error){
+    console.log(error);
+    
+  }
+}
 module.exports = {
   emailUpdate,
   nameInfoUpdate,
   deleteAccount,
+  favoriPostAndDelete,
+  favoriGet,
+  isFavori,
+  isViewing,
+  contactInfo,
+  favoriCount
 };

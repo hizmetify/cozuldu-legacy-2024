@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Spinner from '../../components/UI/Spinner';
 import { AdSchema } from '../../validations/adValidation';
 import { fetchCities } from '../../api/cityApi';
-import { fetchCategories, fetchSubCategories } from '../../api/categoryApi';
+import { fetchAddSubcategoryByCategory, fetchCategories, fetchSubCategories } from '../../api/categoryApi';
 import SelectField from '../../components/UI/SelectField';
 import InputField from '../../components/UI/InputField';
 import { showToast } from '../../features/toast/toastSlice';
@@ -24,6 +24,7 @@ const MyAdsNew = () => {
   const [subCategories, setSubCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [selectedSubCategory,setSelectedSubCategory]=useState("")
   const fileInputRef = useRef(null);
 
   const dispatch = useDispatch();
@@ -74,7 +75,15 @@ const MyAdsNew = () => {
       setSubCategories([]);
     }
   };
-
+  const otherSubCategoryId=(value)=>{
+    let other=subCategories.find(item => item.name == "Diğer"); 
+    if(other._id==value){
+      setSelectedSubCategory('Diğer')
+    }else{
+      setSelectedSubCategory('Other')
+    }
+    
+  }
   const validateFile = (file) => {
     if (!ALLOWED_TYPES.includes(file.type)) {
       throw new Error('Sadece JPG, PNG ve WEBP formatları desteklenir');
@@ -134,7 +143,8 @@ const MyAdsNew = () => {
     description: '',
     serviceType: 'yüz yüze',
     category: '',
-    subCategory: '',
+    subCategory: '', 
+    customSubCategory:'',
     city: '',
     price: '',
     priceType: 'saatlik',
@@ -153,8 +163,18 @@ const MyAdsNew = () => {
       }
 
       const formData = new FormData();
-
-      Object.entries(values).forEach(([key, value]) => {
+      console.log(values); 
+      if(selectedSubCategory=='Diğer'){
+      const addSubCategoryByCategoryClient=await fetchAddSubcategoryByCategory({subCategory:values['subCategory'],category:values['category'],name:values['customSubCategory']})
+      console.log(addSubCategoryByCategoryClient.data);
+      Object.assign(values,{subCategory:addSubCategoryByCategoryClient.data})
+      
+      }
+      delete values.customSubCategory; 
+      console.log(values);
+      
+      Object.entries(values).forEach(([key, value]) => { 
+        
         formData.append(key, value);
       });
 
@@ -234,7 +254,7 @@ const MyAdsNew = () => {
                   handleCategoryChange(e.target.value, setFieldValue)
                 }
               />
-
+             
               <SelectField
                 label="Alt Kategori *"
                 name="subCategory"
@@ -250,10 +270,18 @@ const MyAdsNew = () => {
                           value: '',
                         },
                       ]
-                }
-                disabled={!selectedCategory}
+                } 
+                
+                onClick={(e)=>otherSubCategoryId(e.target.value)}
+                // disabled={!selectedCategory}
               />
-
+               {selectedSubCategory=='Diğer' ? (
+               <InputField
+                  label="CustomSub *"
+                  name="customSubCategory"
+                  type="textarea"
+                />
+               ):null} 
               <SelectField
                 label="Hizmet Tipi *"
                 name="serviceType"

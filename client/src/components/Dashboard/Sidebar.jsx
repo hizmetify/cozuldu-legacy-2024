@@ -7,6 +7,8 @@ import {
 import { FaBullhorn } from 'react-icons/fa6';
 import { IoMdSettings } from 'react-icons/io';
 import { FaSignOutAlt } from 'react-icons/fa';
+import { DiGoogleAnalytics } from "react-icons/di";
+import { MdFavoriteBorder,MdFavorite } from "react-icons/md"; 
 import SidebarLink from './SidebarLink';
 
 const sidebarLinks = [
@@ -18,14 +20,28 @@ const sidebarLinks = [
     isLogout: false,
   },
   {
-    id: 2,
+    id:2,
+    href:'/dashboard/statistika',
+    label:'İstatistikler',
+    icon: DiGoogleAnalytics,
+    isLogout:false
+  },
+  {
+    id:3,
+    href:'/dashboard/favories',
+    label:'Favoriler',
+    icon: MdFavorite,
+    isLogout:false
+  },
+  {
+    id: 4,
     href: '/dashboard/settings',
     label: 'Ayarlar',
     icon: IoMdSettings,
     isLogout: false,
   },
   {
-    id: 3,
+    id: 5,
     label: 'Çıkış yap',
     icon: FaSignOutAlt,
     isLogout: true,

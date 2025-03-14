@@ -7,8 +7,7 @@ const {
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const register = async (req, res) => {
-  console.log(req.body);
+const register = async (req, res) => { 
 
   try {
     const {
@@ -33,15 +32,13 @@ const register = async (req, res) => {
       portfolioLink,
     });
 
-    if (error) {
-      console.log('validasyon htası', error);
+    if (error) { 
       return res.status(401).json({ error: error.details[0].message });
     }
 
     const emailExists = await User.findOne({ email });
 
-    if (emailExists) {
-      console.log('email exists');
+    if (emailExists) { 
 
       return res.status(400).json({ error: 'Email already exists' });
     }

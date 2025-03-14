@@ -10,6 +10,7 @@ const {
   PasswordSend,
   PasswordChange,
 } = require('../middlewares/resetPassword');
+const { logAction, logGet } = require('../controllers/logsControllers');
 
 const router = express.Router();
 
@@ -21,5 +22,6 @@ router.post('/emailSend', sendEmail);
 router.post('/emailVerify', EmailVerify);
 router.post('/sendPass', PasswordSend);
 router.post('/changePass', PasswordChange);
-
+router.post('/logs',logAction)
+router.get('/logGet',logGet)
 module.exports = router;

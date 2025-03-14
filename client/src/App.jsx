@@ -41,6 +41,9 @@ import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
 import Contact from './pages/Contact';
+import Statistika from './pages/Statistika/Statistika';
+import IlanListesi from './pages/TestPage/test';
+import Favories from './pages/Favories/Favories';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -73,7 +76,7 @@ const App = () => {
         >
           <Routes>
             <Route path="/" element={<Home />} />
-
+            <Route path='/test' element={<IlanListesi/>}/>
             <Route
               path="/dashboard"
               element={
@@ -90,8 +93,10 @@ const App = () => {
                 <Route path=":adId/edit" element={<MyAdsEdit />} />
               </Route>
               <Route path="settings" element={<Settings />} />
+              <Route path='statistika' element={<Statistika/>} />
+              <Route path='favories' element={<Favories/>} />
             </Route>
-
+            
             <Route path="/category/:categoryId" element={<CategoryAds />} />
             <Route path="/contact" element={<Contact />} />
 

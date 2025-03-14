@@ -147,11 +147,7 @@ const getSingleAd = async (req, res) => {
 
     ad.images = ad.images.map(formatImagePath);
 
-    console.log('Populated Ad:', {
-      ...ad.toObject(),
-      category: ad.category,
-      subCategory: ad.subCategory
-    });
+  
 
     res.status(200).json({
       success: true,

@@ -36,5 +36,10 @@ const getSubCategoriesByCategory = async (req, res) => {
     res.status(500).json({ message: 'Sunucu hatası' });
   }
 };
-
-module.exports = { getCategories, getSubCategoriesByCategory };
+const addSubcategoryByCategory=async(req,res)=>{
+  const {subCategory, category,name}=req.body
+  const subs=await SubCategory.findById(subCategory) 
+    let newSubCategory=await SubCategory.create({category,name})
+    return res.json({data:newSubCategory._id}) 
+}
+module.exports = { getCategories, getSubCategoriesByCategory, addSubcategoryByCategory };
