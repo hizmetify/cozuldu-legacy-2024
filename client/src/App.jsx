@@ -41,7 +41,7 @@ import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
 import Contact from './pages/Contact';
-import Statistika from './pages/Statistika/Statistika';
+import Statistika from './pages/Statistika/Statistics';
 import IlanListesi from './pages/TestPage/test';
 import Favories from './pages/Favories/Favories';
 
