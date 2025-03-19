@@ -36,6 +36,11 @@ const adSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
+  status:{
+    type:String,
+    default:'active',
+    enum:['active','pending','pasif']
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
