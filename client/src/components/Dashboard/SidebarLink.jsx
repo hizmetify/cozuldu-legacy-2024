@@ -21,17 +21,28 @@ const SidebarLink = ({ href, label, icon: Icon, isLogout }) => {
   };
 
   const baseClasses =
-    'flex items-center w-full px-4 py-2.5 rounded-lg transition-all duration-200 group';
-  const activeClasses = 'bg-blue-50 text-blue-600';
-  const inactiveClasses = 'text-gray-700 hover:bg-gray-50';
-  const logoutClasses = 'text-gray-700 hover:bg-red-50 hover:text-red-600';
+    'flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 group';
+  const activeClasses =
+    'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-md shadow-blue-200';
+  const inactiveClasses = 'text-blue-900 hover:bg-blue-100/50';
+  const logoutClasses = 'text-blue-900 hover:bg-red-100 hover:text-red-600';
 
   const linkClasses = `${baseClasses} ${
     isActive ? activeClasses : inactiveClasses
   }`;
-  const iconClasses = `w-5 h-5 mr-3 transition-transform duration-200 ${
-    isActive ? 'text-blue-600' : 'text-gray-500'
-  } group-hover:scale-110`;
+
+  const iconActiveClasses =
+    'w-5 h-5 mr-3 text-white transition-transform duration-200 group-hover:scale-110';
+  const iconInactiveClasses =
+    'w-5 h-5 mr-3 text-blue-600 transition-transform duration-200 group-hover:scale-110';
+  const iconLogoutClasses =
+    'w-5 h-5 mr-3 text-blue-600 transition-transform duration-200 group-hover:text-red-600 group-hover:scale-110';
+
+  const iconClasses = isLogout
+    ? iconLogoutClasses
+    : isActive
+    ? iconActiveClasses
+    : iconInactiveClasses;
 
   return (
     <li>
@@ -40,9 +51,7 @@ const SidebarLink = ({ href, label, icon: Icon, isLogout }) => {
           className={`${baseClasses} ${logoutClasses}`}
           onClick={handleLogout}
         >
-          <Icon
-            className={`w-5 h-5 mr-3 transition-transform duration-200 text-gray-500 group-hover:text-red-600 group-hover:scale-110`}
-          />
+          <Icon className={iconClasses} />
           <span className="font-medium">{label}</span>
         </button>
       ) : (
