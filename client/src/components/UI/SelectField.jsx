@@ -1,25 +1,36 @@
+import PropTypes from 'prop-types';
 import { Field } from 'formik';
 import { IoChevronDown } from 'react-icons/io5';
-import PropTypes from 'prop-types';
 
-const SelectField = ({ label, name, options, ...rest }) => {
+const SelectField = ({
+  label,
+  name,
+  options,
+  placeholder = 'Lütfen bir seçim yapın',
+  ...rest
+}) => {
   return (
     <div className="mb-4 relative">
       <label htmlFor={name} className="block text-sm text-gray-700 mb-1">
         {label}
       </label>
+
       <div className="relative">
         <Field
           as="select"
           name={name}
           id={name}
-          className="w-full py-2 bg-transparent border-0 border-b-2 border-gray-300 
-            focus:border-indigo-500 focus:outline-none transition-colors duration-200
-            text-sm text-gray-900 lg:text-base appearance-none cursor-pointer"
+          className={`
+            w-full py-2 bg-transparent border-0 border-b-2 border-gray-300
+            focus:border-indigo-500 focus:outline-none
+            transition-colors duration-200
+            text-sm text-gray-900 lg:text-base
+            appearance-none cursor-pointer
+          `}
           {...rest}
         >
           <option value="" disabled>
-            Lütfen bir kategori seçin
+            {placeholder}
           </option>
           {options.map((option, index) => (
             <option key={index} value={option.value}>
@@ -34,9 +45,16 @@ const SelectField = ({ label, name, options, ...rest }) => {
 };
 
 SelectField.propTypes = {
-  label: PropTypes.string.isRequired,
+  label: PropTypes.node.isRequired,
   name: PropTypes.string.isRequired,
-  options: PropTypes.array.isRequired,
+  options: PropTypes.arrayOf(
+    PropTypes.shape({
+      name: PropTypes.string.isRequired,
+      value: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+        .isRequired,
+    })
+  ).isRequired,
+  placeholder: PropTypes.string,
 };
 
 export default SelectField;

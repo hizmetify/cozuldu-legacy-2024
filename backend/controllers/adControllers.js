@@ -1,185 +1,235 @@
+const mongoose = require('mongoose');
 const Ad = require('../models/ad');
+const Category = require('../models/category');
 
 const BASE_URL = 'http://localhost:5000';
 
 const formatImagePath = (imgPath) => {
   if (!imgPath) return '';
   if (imgPath.startsWith('http')) return imgPath;
-
-  let cleanedPath = imgPath
+  const cleanedPath = imgPath
     .replace(/^.*[\\/](uploads[\\/])/, '/uploads/')
     .replace(/\\/g, '/');
-
   return `${BASE_URL}${cleanedPath}`;
 };
 
 const createAd = async (req, res) => {
   try {
-    const imagePaths = req.files.map((file) =>
-      formatImagePath(`/uploads/${file.filename}`)
-    );
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Kullanıcı girişi gerekli. createAd başarısız.',
+      });
+    }
+    const {
+      title,
+      description,
+      serviceType,
+      category,
+      subCategory,
+      city,
+      price,
+      priceType,
+    } = req.body;
+
+    const images = req.files ? req.files.map((file) => file.path) : [];
 
     const ad = new Ad({
-      ...req.body,
-      images: imagePaths,
-      user: req.user.id,
+      user: userId,
+      title,
+      description,
+      serviceType,
+      category,
+      subCategory,
+      city,
+      price,
+      priceType,
+      images,
     });
 
     await ad.save();
-    const populatedAd = await Ad.findById(ad._id).populate(
-      'user',
-      'name email'
-    );
 
-    res.status(201).json({
-      success: true,
+    return res.status(201).json({
       message: 'İlan başarıyla oluşturuldu',
-      data: populatedAd,
+      data: {
+        ...ad._doc,
+      },
     });
   } catch (error) {
-    res.status(500).json({
-      message: 'İlan oluşturulurken bir hata oluştu. Lütfen tekrar deneyin',
+    console.error('createAd error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. createAd başarısız.',
+      error: error.message,
     });
   }
 };
 
+module.exports = { createAd };
+
+const updateAd = async (req, res) => {
+  try {
+    const adId = req.params.id;
+    const userId = req.user._id;
+    if (!mongoose.Types.ObjectId.isValid(adId)) {
+      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+    }
+
+    const { title, description, category, subCategory, price } = req.body;
+
+    const newImages = req.files ? req.files.map((file) => file.path) : [];
+
+    const existingAd = await Ad.findById(adId);
+    if (!existingAd) {
+      return res.status(404).json({ message: 'İlan bulunamadı' });
+    }
+    if (existingAd.user.toString() !== userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
+    }
+
+    const updatedImages = [...existingAd.images, ...newImages];
+
+    existingAd.title = title || existingAd.title;
+    existingAd.description = description || existingAd.description;
+    existingAd.category = category || existingAd.category;
+    existingAd.subCategory = subCategory || existingAd.subCategory;
+    existingAd.price = price || existingAd.price;
+    existingAd.images = updatedImages;
+
+    await existingAd.save();
+
+    return res.status(200).json({
+      message: 'İlan başarıyla güncellendi',
+      data: {
+        ...existingAd._doc,
+        images: existingAd.images.map(formatImagePath),
+      },
+    });
+  } catch (error) {
+    console.error('updateAd error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. updateAd başarısız.',
+      error: error.message,
+    });
+  }
+};
 const getAllAds = async (req, res) => {
   try {
-    const ads = await Ad.find()
-      .populate('user', 'name email')
+    const ads = await Ad.find
+      .populate('user', 'name avatar')
       .populate('category', 'name')
-      .populate('subCategory', 'name');
+      .populate('subCategory', 'name')
+      .sort({ createdAt: -1 });
 
-    const updatedAds = ads.map((ad) => ({
+    const formattedAds = ads.map((ad) => ({
       ...ad._doc,
       images: ad.images.map(formatImagePath),
     }));
 
-    res.status(200).json({
-      success: true,
-      message: 'İlanlar başarıyla getirildi',
-      data: updatedAds,
+    return res.status(200).json({
+      message: 'Tüm aktif ilanlar başarıyla getirildi',
+      data: formattedAds,
     });
   } catch (error) {
-    res.status(500).json({
-      message: 'İlanlar getirilirken bir hata oluştu. Lütfen tekrar deneyin',
+    console.error('getAllAds error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. getAllAds başarısız.',
+      error: error.message,
     });
   }
 };
 
 const getUserAds = async (req, res) => {
   try {
-    const userAds = await Ad.find({ user: req.user.id })
-      .populate('category', 'name')
-      .populate('subCategory', 'name');
-
-    if (!userAds.length) {
-      return res.status(200).json({
-        success: true,
-        message: 'Henüz hiç ilanınız yok.',
-        data: [],
-      });
+    const userId = req.user._id;
+    if (!userId) {
+      return res.status(401).json({ message: 'Kullanıcı girişi gerekli' });
     }
+    const ads = await Ad.find({ user: userId })
+      .populate('category', 'name')
+      .populate('subCategory', 'name')
+      .sort({ createdAt: -1 });
 
-    const updatedAds = userAds.map((ad) => ({
+    const formattedAds = ads.map((ad) => ({
       ...ad._doc,
       images: ad.images.map(formatImagePath),
     }));
 
-    res.status(200).json({
-      success: true,
-      message: 'Kullanıcıya ait ilanlar getirildi.',
-      data: updatedAds,
+    return res.status(200).json({
+      message: 'Kullanıcının ilanları başarıyla getirildi',
+      data: formattedAds,
     });
   } catch (error) {
-    res.status(500).json({
-      message: 'İlanlar getirilirken bir hata oluştu. Lütfen tekrar deneyin.',
+    console.error('getUserAds error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. getUserAds başarısız.',
       error: error.message,
     });
   }
 };
 
-const updateAd = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const imagePaths = req.files
-      ? req.files.map((file) => formatImagePath(`/uploads/${file.filename}`))
-      : [];
-
-    const ad = await Ad.findOneAndUpdate(
-      { _id: id, user: req.user.id },
-      {
-        ...req.body,
-        images: imagePaths.length > 0 ? imagePaths : undefined,
-        updatedAt: Date.now(),
-      },
-      { new: true }
-    );
-
-    if (!ad) {
-      return res.status(404).json({ message: 'İlan bulunamadı' });
-    }
-
-    res.status(200).json({
-      success: true,
-      message: 'İlan başarıyla güncellendi',
-      data: ad,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: 'İlan güncellenirken bir hata oluştu. Lütfen tekrar deneyin',
-    });
-  }
-};
-
-
 const getSingleAd = async (req, res) => {
-  const { id } = req.params;
   try {
-    const ad = await Ad.findById(id)
-      .populate('user', 'name email')
-      .populate('category', 'name')  
-      .populate('subCategory', 'name');  
+    const adId = req.params.id;
 
-    if (!ad) {
-      return res.status(404).json({ message: 'Böyle bir ilan bulunamadı.' });
+    if (!mongoose.Types.ObjectId.isValid(adId)) {
+      return res.status(400).json({ message: 'Geçersiz ilan ID' });
     }
 
-    ad.images = ad.images.map(formatImagePath);
-
-  
-
-    res.status(200).json({
-      success: true,
-      data: ad,
-    });
-  } catch (error) {
-    console.error('Error fetching ad:', error);
-    res.status(500).json({
-      message:
-        'İlan görüntülenirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
-    });
-  }
-};
-
-
-const deleteAd = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const ad = await Ad.findOneAndDelete({
-      _id: id,
-      user: req.user.id,
-    });
+    const ad = await Ad.findById(adId)
+      .populate('user', 'name avatar')
+      .populate('category', 'name')
+      .populate('subCategory', 'name');
 
     if (!ad) {
       return res.status(404).json({ message: 'İlan bulunamadı' });
     }
-    res.status(200).json({ success: true, message: 'İlan başarıyla silindi' });
+
+    return res.status(200).json({
+      message: 'İlan detayı başarıyla getirildi',
+      data: {
+        ...ad._doc,
+        images: ad.images.map(formatImagePath),
+      },
+    });
   } catch (error) {
-    res.status(500).json({
-      message:
-        'İlan silinirken bir hata oluştu. Lütfen daha sonra tekrar deneyin',
+    console.error('getSingleAd error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. getSingleAd başarısız.',
+      error: error.message,
+    });
+  }
+};
+const deleteAd = async (req, res) => {
+  try {
+    const adId = req.params.id;
+    const userId = req.user._id;
+
+    if (!mongoose.Types.ObjectId.isValid(adId)) {
+      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+    }
+
+    const ad = await Ad.findById(adId);
+    if (!ad) {
+      return res.status(404).json({ message: 'İlan bulunamadı' });
+    }
+
+    if (ad.user.toString() !== userId.toString()) {
+      return res.status(403).json({ message: 'Bu ilanı silmeye yetkiniz yok' });
+    }
+
+    await ad.remove();
+
+    return res.status(200).json({
+      message: 'İlan başarıyla silindi',
+      adId: adId,
+    });
+  } catch (error) {
+    console.error('deleteAd error:', error);
+    return res.status(500).json({
+      message: 'Sunucu hatası. deleteAd başarısız.',
+      error: error.message,
     });
   }
 };
@@ -187,29 +237,87 @@ const deleteAd = async (req, res) => {
 const getAdsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
-    const ads = await Ad.find({ category: categoryId }).populate(
-      'user',
-      'name email'
-    );
+    const {
+      sort = 'createdAt',
+      order = 'desc',
+      page = 1,
+      limit = 12,
+      search = '',
+      priceMin,
+      priceMax,
+    } = req.query;
 
-    const category = await Category.findById(categoryId);
-    if (!category) {
-      return res.status(404).json({ message: 'Kategori bulunamadı' });
+    if (!mongoose.Types.ObjectId.isValid(categoryId)) {
+      return res.status(400).json({ message: 'Geçersiz kategori ID' });
     }
 
-    res.status(200).json({ ads, categoryName: category.name });
+    const query = {
+      $or: [{ category: categoryId }, { subCategory: categoryId }],
+    };
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    if (priceMin || priceMax) {
+      query.price = {};
+      if (priceMin) query.price.$gte = Number(priceMin);
+      if (priceMax) query.price.$lte = Number(priceMax);
+    }
+
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const sortDirection = order === 'asc' ? 1 : -1;
+    const sortOptions = {};
+    sortOptions[sort] = sortDirection;
+
+    const ads = await Ad.find(query)
+      .sort(sortOptions)
+      .skip(skip)
+      .limit(Number(limit))
+      .populate('user', 'name avatar')
+      .populate('category', 'name')
+      .populate('subCategory', 'name');
+
+    const formattedAds = ads.map((ad) => ({
+      ...ad._doc,
+      images: ad.images.map(formatImagePath),
+    }));
+
+    const total = await Ad.countDocuments(query);
+
+    const category = await Category.findById(categoryId);
+    const categoryName = category ? category.name : 'Kategori';
+
+    res.status(200).json({
+      success: true,
+      message: 'Kategori ilanları başarıyla getirildi',
+      data: formattedAds,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / Number(limit)),
+      categoryName,
+    });
   } catch (error) {
-    console.error('Kategoriye ait ilanları getirirken hata oluştu:', error);
-    res.status(500).json({ message: 'Sunucu hatası' });
+    console.error('Kategori ilanlarını alırken hata oluştu:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Sunucu hatası',
+      error: error.message,
+    });
   }
 };
 
 module.exports = {
   createAd,
-  deleteAd,
+  updateAd,
   getAllAds,
   getUserAds,
   getSingleAd,
-  updateAd,
+  deleteAd,
   getAdsByCategory,
 };

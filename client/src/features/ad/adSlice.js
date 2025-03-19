@@ -6,11 +6,20 @@ import {
   createAdRequest,
   updateAdRequest,
   deleteAdRequest,
+  getAdsByCategoryRequest,
 } from '../../api/adsApi';
 
 const initialState = {
   allAds: [],
   userAds: [],
+  categoryAds: {
+    data: [],
+    total: 0,
+    page: 1,
+    totalPages: 0,
+    loading: false,
+    error: null,
+  },
   selectedAd: null,
   allAdsStatus: 'idle',
   userAdsStatus: 'idle',
@@ -47,6 +56,18 @@ export const fetchSingleAd = createAsyncThunk(
   async (adId, thunkAPI) => {
     try {
       const response = await getSingleAdRequest(adId);
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
+    }
+  }
+);
+
+export const fetchAdsByCategory = createAsyncThunk(
+  'ads/fetchAdsByCategory',
+  async ({ categoryId, filters = {} }, thunkAPI) => {
+    try {
+      const response = await getAdsByCategoryRequest(categoryId, filters);
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -98,6 +119,16 @@ const adsSlice = createSlice({
       state.selectedAd = null;
       state.singleAdStatus = 'idle';
     },
+    clearCategoryAds(state) {
+      state.categoryAds = {
+        data: [],
+        total: 0,
+        page: 1,
+        totalPages: 0,
+        loading: false,
+        error: null,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -126,7 +157,6 @@ const adsSlice = createSlice({
           action.payload?.message ||
           'Kullanıcı ilanları yüklenirken hata oluştu.';
       })
-
       .addCase(fetchSingleAd.pending, (state) => {
         state.singleAdStatus = 'loading';
       })
@@ -145,9 +175,26 @@ const adsSlice = createSlice({
             (ad) => ad._id !== action.payload.adId
           );
         }
+      })
+      .addCase(fetchAdsByCategory.pending, (state) => {
+        state.categoryAds.loading = true;
+        state.categoryAds.error = null;
+      })
+      .addCase(fetchAdsByCategory.fulfilled, (state, action) => {
+        state.categoryAds.loading = false;
+        state.categoryAds.data = action.payload.data;
+        state.categoryAds.total = action.payload.total;
+        state.categoryAds.page = action.payload.page;
+        state.categoryAds.totalPages = action.payload.totalPages;
+      })
+      .addCase(fetchAdsByCategory.rejected, (state, action) => {
+        state.categoryAds.loading = false;
+        state.categoryAds.error =
+          action.payload?.message ||
+          'Kategori ilanları yüklenirken hata oluştu.';
       });
   },
 });
 
-export const { clearSelectedAd } = adsSlice.actions;
+export const { clearSelectedAd, clearCategoryAds } = adsSlice.actions;
 export default adsSlice.reducer;

@@ -19,8 +19,17 @@ import { FiUpload, FiX, FiImage, FiArrowLeft, FiSave } from 'react-icons/fi';
 const MAX_FILES = 5;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
-const serviceTypeOptions = ['yüz yüze'];
-const priceTypeOptions = ['saatlik', 'günlük', 'iş başı'];
+
+const serviceTypeOptions = [
+  { name: 'Yüz Yüze', value: 'yüz yüze' },
+  { name: 'Online', value: 'online' },
+];
+
+const priceTypeOptions = [
+  { name: 'Saatlik', value: 'saatlik' },
+  { name: 'Günlük', value: 'günlük' },
+  { name: 'İş Başı', value: 'iş başı' },
+];
 
 const MyAdsNew = () => {
   const [cities, setCities] = useState([]);
@@ -43,19 +52,25 @@ const MyAdsNew = () => {
           fetchCities(),
           fetchCategories(),
         ]);
-        setCities(cityData);
-        setCategories(categoryData);
+        const mappedCities = cityData.map((c) => ({
+          name: c.name,
+          value: c._id,
+        }));
+
+        const mappedCategories = categoryData.map((cat) => ({
+          name: cat.name,
+          value: cat._id,
+        }));
+
+        setCities(mappedCities);
+        setCategories(mappedCategories);
       } catch (error) {
-        dispatch(
-          showToast({
-            message: 'Veriler yüklenirken bir hata oluştu',
-            type: 'error',
-          })
-        );
+        console.error('Hata:', error);
       }
     };
+
     loadInitialData();
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     const newPreviewUrls = selectedFiles.map((file) =>
@@ -71,6 +86,7 @@ const MyAdsNew = () => {
   const handleCategoryChange = async (categoryId, setFieldValue) => {
     if (!categoryId || categoryId.length < 24) {
       setSubCategories([]);
+      setFieldValue('subCategory', '');
       return;
     }
 
@@ -80,7 +96,12 @@ const MyAdsNew = () => {
 
     try {
       const subCategoryData = await fetchSubCategories(categoryId);
-      setSubCategories(subCategoryData);
+
+      const mappedSubs = subCategoryData.map((sub) => ({
+        name: sub.name,
+        value: sub._id,
+      }));
+      setSubCategories(mappedSubs);
     } catch (error) {
       dispatch(
         showToast({
@@ -92,9 +113,10 @@ const MyAdsNew = () => {
     }
   };
 
-  const otherSubCategoryId = (value) => {
-    const other = subCategories.find((item) => item.name == 'Diğer');
-    if (other && other._id == value) {
+  const otherSubCategoryId = (subCatValue) => {
+    const otherObj = subCategories.find((item) => item.name === 'Diğer');
+
+    if (otherObj && otherObj.value === subCatValue) {
       setSelectedSubCategory('Diğer');
     } else {
       setSelectedSubCategory('Other');
@@ -158,13 +180,13 @@ const MyAdsNew = () => {
   const initialValues = {
     title: '',
     description: '',
-    serviceType: 'yüz yüze',
+    serviceType: '',
     category: '',
     subCategory: '',
     customSubCategory: '',
     city: '',
     price: '',
-    priceType: 'saatlik',
+    priceType: '',
   };
 
   const handleSubmit = async (values, { setErrors }) => {
@@ -179,31 +201,30 @@ const MyAdsNew = () => {
         return;
       }
 
-      const formData = new FormData();
-      console.log(values);
-      if (selectedSubCategory == 'Diğer') {
+      if (selectedSubCategory === 'Diğer') {
         const addSubCategoryByCategoryClient =
           await fetchAddSubcategoryByCategory({
             subCategory: values['subCategory'],
             category: values['category'],
             name: values['customSubCategory'],
           });
-        console.log(addSubCategoryByCategoryClient.data);
         Object.assign(values, {
           subCategory: addSubCategoryByCategoryClient.data,
         });
       }
-      delete values.customSubCategory;
-      console.log(values);
 
+      delete values.customSubCategory;
+
+      const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
         formData.append(key, value);
       });
-
-      selectedFiles.forEach((file, index) => {
+      selectedFiles.forEach((file) => {
         formData.append('images', file);
       });
+
       const response = await dispatch(createAd(formData)).unwrap();
+
       dispatch(
         showToast({
           message: 'İlan başarıyla eklendi!',
@@ -270,7 +291,7 @@ const MyAdsNew = () => {
       >
         {({ validateForm, handleSubmit, setErrors, setFieldValue }) => {
           const customSubmit = async (e) => {
-            e?.preventDefault();
+            e.preventDefault();
             const validationErrors = await validateForm();
             if (Object.keys(validationErrors).length > 0) {
               setErrors(validationErrors);
@@ -321,13 +342,10 @@ const MyAdsNew = () => {
                   <SelectField
                     label={renderLabel('Kategori *')}
                     name="category"
-                    options={categories.map((category) => ({
-                      name: category.name,
-                      value: category._id,
-                    }))}
-                    onChange={(e) =>
-                      handleCategoryChange(e.target.value, setFieldValue)
-                    }
+                    options={categories}
+                    onChange={(e) => {
+                      handleCategoryChange(e.target.value, setFieldValue);
+                    }}
                   />
                 </div>
 
@@ -337,10 +355,7 @@ const MyAdsNew = () => {
                     name="subCategory"
                     options={
                       subCategories.length > 0
-                        ? subCategories.map((subCategory) => ({
-                            name: subCategory.name,
-                            value: subCategory._id,
-                          }))
+                        ? subCategories
                         : [
                             {
                               name: 'Bu kategoriye ait alt kategori yok',
@@ -348,12 +363,15 @@ const MyAdsNew = () => {
                             },
                           ]
                     }
-                    onClick={(e) => otherSubCategoryId(e.target.value)}
+                    onChange={(e) => {
+                      setFieldValue('subCategory', e.target.value);
+                      otherSubCategoryId(e.target.value);
+                    }}
                     disabled={!selectedCategory}
                   />
                 </div>
 
-                {selectedSubCategory == 'Diğer' && (
+                {selectedSubCategory === 'Diğer' && (
                   <div className="md:col-span-2">
                     <InputField
                       label={renderLabel('Özel Alt Kategori *')}
@@ -367,7 +385,8 @@ const MyAdsNew = () => {
                   <SelectField
                     label={renderLabel('Hizmet Tipi *')}
                     name="serviceType"
-                    options={serviceTypeOptions.map((opt) => ({ name: opt }))}
+                    options={serviceTypeOptions}
+                    placeholder="Hizmet tipini seçin"
                   />
                 </div>
 
@@ -376,6 +395,7 @@ const MyAdsNew = () => {
                     label={renderLabel('Şehir *')}
                     name="city"
                     options={cities}
+                    placeholder="Şehir seçin"
                   />
                 </div>
 
@@ -392,7 +412,8 @@ const MyAdsNew = () => {
                   <SelectField
                     label={renderLabel('Fiyat Tipi *')}
                     name="priceType"
-                    options={priceTypeOptions.map((opt) => ({ name: opt }))}
+                    options={priceTypeOptions}
+                    placeholder="Fiyat tipini seçin"
                   />
                 </div>
 

@@ -30,7 +30,7 @@ const InputField = ({ label, name, type, placeholder }) => {
 };
 
 InputField.propTypes = {
-  label: PropTypes.string,
+  label: PropTypes.node,
   name: PropTypes.string.isRequired,
   type: PropTypes.string,
   placeholder: PropTypes.string,

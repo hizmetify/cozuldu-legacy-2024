@@ -1,83 +1,61 @@
 import axiosInstance from './axiosInstance';
 
-export const getAllAdsRequest = async () => {
+export const getAdsByCategoryRequest = async (categoryId, filters = {}) => {
   try {
-    const response = await axiosInstance.get('/ads');
+    if (!categoryId) {
+      throw new Error('Kategori ID geçersiz!');
+    }
+
+    const queryParams = new URLSearchParams();
+
+    if (filters.sort) queryParams.append('sort', filters.sort);
+    if (filters.order) queryParams.append('order', filters.order);
+    if (filters.search) queryParams.append('search', filters.search);
+    if (filters.priceMin) queryParams.append('priceMin', filters.priceMin);
+    if (filters.priceMax) queryParams.append('priceMax', filters.priceMax);
+    if (filters.page) queryParams.append('page', filters.page);
+    if (filters.limit) queryParams.append('limit', filters.limit);
+
+    const queryString = queryParams.toString()
+      ? `?${queryParams.toString()}`
+      : '';
+
+    const response = await axiosInstance.get(
+      `/ads/category/${categoryId}${queryString}`
+    );
     return response.data;
   } catch (error) {
-    console.error('İlanlar yüklenirken bir hata oluştu', error);
-    throw error.response?.data || error.message;
+    console.error('Kategori ilanlarını alırken hata oluştu:', error);
+    throw error;
   }
+};
+
+export const getAllAdsRequest = async () => {
+  const response = await axiosInstance.get('/ads');
+  return response.data;
 };
 
 export const getUserAdsRequest = async () => {
-  try {
-    const response = await axiosInstance.get('/ads/my-ads');
-    return response.data;
-  } catch (error) {
-    console.error('İlanlar yüklenirken bir hata oluştu', error);
-    throw error.response?.data || error.message;
-  }
+  const response = await axiosInstance.get('/ads/my-ads');
+  return response.data;
 };
 
 export const getSingleAdRequest = async (adId) => {
-  try {
-    const response = await axiosInstance.get(`/ads/${adId}`);
-    return response.data;
-  } catch (error) {
-    console.error('İlan yüklenirken bir sorun oluştu', error);
-    throw error.response?.data || error.message;
-  }
+  const response = await axiosInstance.get(`/ads/${adId}`);
+  return response.data;
 };
 
 export const createAdRequest = async (adData) => {
-  try { 
-    
-    const response = await axiosInstance.post('/ads', adData, {
-      headers: { 
-        'Content-Type': 'multipart/form-data', 
-      }, 
-      withCredentials: true,
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error('İlan oluşturulurken bir hata oluştu', error);
-    throw error.response?.data || error.message;
-  }
+  const response = await axiosInstance.post('/ads', adData);
+  return response.data;
 };
 
 export const updateAdRequest = async ({ adId, adData }) => {
-  try {
-    const formData = new FormData();
-
-    for (const key in adData) {
-      if (key === 'images' && Array.isArray(adData.images)) {
-        adData.images.forEach((file) => {
-          formData.append('images', file);
-        });
-      } else {
-        formData.append(key, adData[key]);
-      }
-    }
-
-    const response = await axiosInstance.put(`/ads/${adId}`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    });
-
-    return response.data;
-  } catch (error) {
-    console.error('İlan güncellenirken hata oluştu', error);
-    throw error.response?.data || error.message;
-  }
+  const response = await axiosInstance.put(`/ads/${adId}`, adData);
+  return response.data;
 };
 
 export const deleteAdRequest = async (adId) => {
-  try {
-    const response = await axiosInstance.delete(`/ads/${adId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`İlan silinirken hata oluştu:`, error);
-    throw error.response?.data || error.message;
-  }
+  const response = await axiosInstance.delete(`/ads/${adId}`);
+  return response.data;
 };
