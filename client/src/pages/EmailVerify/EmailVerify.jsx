@@ -126,7 +126,7 @@ const EmailVerify = () => {
               E-posta Doğrulama
             </h1>
             <p className="text-gray-500">
-              Lütfen e-postanıza gönderilen doğrulama kodunu giriniz
+              Lütfen e-postanıza gönderilen doğrulama kodunu giriniz. Spam kutunuzu kontrol ediniz.
             </p>
           </div>
 

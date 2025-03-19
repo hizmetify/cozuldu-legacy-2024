@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema(
     },
     profilePic: {
       type: String,
-      match: [/^https?:\/\/.+/, 'Profile picture must be a valid URL'],
+      default: null,
     },
     portfolioLink: {
       type: String,

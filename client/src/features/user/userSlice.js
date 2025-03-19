@@ -1,5 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { updateEmail, updateNameInfo, deleteAccount } from '../../api/userApi';
+import {
+  updateEmail,
+  updateNameInfo,
+  deleteAccount,
+  getUserDetails,
+} from '../../api/userApi';
+
+export const fetchUserDetails = createAsyncThunk(
+  'user/getUserDetails',
+  async (_, { rejectWithValue }) => {
+    try {
+      return await getUserDetails();
+    } catch (error) {
+      return rejectWithValue(error);
+    }
+  }
+);
 
 export const updateUserEmail = createAsyncThunk(
   'user/updateEmail',
@@ -45,6 +61,28 @@ const userSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder
+      .addCase(fetchUserDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserDetails.fulfilled, (state, action) => {
+        state.loading = false;
+
+        const payloadData = action.payload;
+
+        if (payloadData.success) {
+          state.user = payloadData.data;
+        } else {
+          state.error = payloadData.message || 'Kullanıcı bilgisi alınamadı';
+        }
+      })
+      .addCase(fetchUserDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error =
+          action.payload?.message ||
+          action.payload ||
+          'Kullanıcı bilgisi alınırken hata oluştu';
+      })
       .addCase(updateUserEmail.pending, (state) => {
         state.loading = true;
         state.error = null;

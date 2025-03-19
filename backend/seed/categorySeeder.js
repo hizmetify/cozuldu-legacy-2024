@@ -2,149 +2,183 @@ const mongoose = require('mongoose');
 const Category = require('../models/category');
 const SubCategory = require('../models/subCategory');
 const dotenv = require('dotenv');
+
 dotenv.config({ path: '../.env' });
 
 const categorySeeder = async () => {
   const categories = [
     {
-      name: 'Özel Ders',
-      subcategories: ['Spor', 'Ders', 'Müzik', 'Danışmanlık', 'Diğer'],
-    },
-    {
-      name: 'Spor',
+      name: 'Temizlik',
       subcategories: [
-        'Bisiklet',
-        'Fitness & Kondisyon',
-        'Vücut Geliştirme',
-        'Pilates, Yoga & Jimnastik',
-        'Takım Sporları',
-        'Atletizm',
-        'Doğa Sporları',
-        'Dövüş Sporları',
-        'Raket Sporları',
-        'Salon Oyunları',
-        'Sıra Dışı Sporlar',
-        'Su Sporları',
-        'Diğer',
-      ],
-    },
-    {
-      name: 'Bakım Onarım',
-      subcategories: [
-        'Araç',
-        'Elektronik aletler',
-        'Elektronik olmayan aletler',
-        'Ev elektroniği',
-        'Ev bakım onarım',
-        'Diğer',
+        'Ev Temizliği',
+        'Koltuk Yıkama',
+        'Halı Yıkama',
+        'İnşaat Sonrası Temizlik',
+        'Ofis Temizliği',
+        'Dış Cephe Temizliği',
+        'Cam Temizliği',
+        'Fabrika Temizliği',
+        'Organize Ev Temizliği',
+        'Yazlık/Kışlık Ev Temizliği',
       ],
     },
     {
       name: 'Tadilat',
       subcategories: [
-        'Ev içi tadilatı',
-        'Ev dışı tadilatı',
-        'İş yeri tadilatı',
-        'Boya-badana',
-        'Su tesisatı',
-        'Elektrik tesisatı',
-        'Diğer',
+        'Boya Badana',
+        'Asma Tavan Yapımı',
+        'Alçıpan Uygulaması',
+        'Parke Döşeme',
+        'Seramik/Fayans Döşeme',
+        'Mutfak ve Banyo Tadilatı',
+        'İç Mekan Tasarımı',
+        'Dış Cephe Mantolama',
+        'Çatı Tadilatı',
+        'Deprem Tadilatı',
       ],
     },
     {
-      name: 'Temizlik',
+      name: 'Nakliyat',
       subcategories: [
-        'Ev içi eşya temizliği',
-        'Ev temizliği',
-        'Kuru temizleme',
-        'Halı ve Koltuk Temizliği',
-        'İnşaat sonrası temizlik',
-        'Ofis temizliği',
-        'Diğer',
+        'Evden Eve Nakliyat',
+        'Şehirler Arası Nakliyat',
+        'Parça Eşya Taşıma',
+        'Ofis Taşıma',
+        'Eşya Depolama',
+        'Küçük Ev Eşyası Taşıma',
+        'Yük Taşıma',
+        'Kargo ve Lojistik Hizmetleri',
+        'Fuar Taşıma',
+        'Eve Özel Taşıma',
       ],
     },
     {
-      name: 'Üretim',
+      name: 'Tamir',
       subcategories: [
-        'Catering',
-        'Tekstilciler',
-        'Toptancılar',
-        'Ham maddeler',
-        'Mobilya üretimi',
-        'Gıda üretimi',
-        'Kimyasal üretim',
-        'Diğer',
+        'Elektrikçi',
+        'Tesisatçı',
+        'Beyaz Eşya Tamiri',
+        'Kombi ve Doğalgaz Hizmetleri',
+        'Klima Servisi',
+        'Çilingir',
+        'Sıhhi Tesisat',
+        'Su Tesisatı',
+        'Isı Pompası Servisi',
+        'Ağaç ve Bahçe Bakımı',
       ],
     },
     {
-      name: 'Ulaşım',
+      name: 'Sağlık',
       subcategories: [
-        'Şehir içi',
-        'Yurt dışı',
-        'Yurt içi',
-        'Transfer hizmetleri',
-        'Lojistik & Nakliye',
-        'Kargo & Kurye',
-        'Diğer',
+        'Online Psikolog',
+        'Fizyoterapi',
+        'Diyetisyen',
+        'Ağız ve Diş Sağlığı',
+        'Göz Muayenesi',
+        'Kişisel Antrenör',
+        'Saç Ekimi',
+        'Cilt Bakımı',
+        'Sağlık Danışmanlığı',
+        'Medikal Estetik',
       ],
     },
     {
-      name: 'Güzellik',
+      name: 'Organizasyon',
       subcategories: [
-        'Kuaför',
-        'Berber',
-        'Güzellik merkezi',
-        'Nail artist',
-        'Dövme sanatçıları – piercing',
-        'Epilasyon',
-        'Cilt bakımı',
-        'Spa & Masaj',
-        'Diğer',
-      ],
-    },
-    {
-      name: 'Yardımcılar',
-      subcategories: [
-        'Hasta bakıcılar',
-        'Çocuk bakıcılar',
-        'Ev içi yardımcılar',
-        'Güvenlik görevlileri',
-        'Özel şoförler',
-        'Yaşlı bakım hizmetleri',
-        'Diğer',
-      ],
-    },
-    {
-      name: 'Organizasyonlar',
-      subcategories: [
-        'Doğum günü',
-        'Kına',
-        'Düğün',
-        'Sünnet',
-        'Baby Shower',
-        'Mezuniyet',
+        'Düğün Organizasyonu',
+        'Nişan ve Söz Organizasyonu',
+        'Doğum Günü Organizasyonu',
         'Kurumsal Etkinlikler',
-        'Açılış organizasyonu',
-        'Diğer',
+        'Kokteyl ve Davet Organizasyonu',
+        'Konser ve Festival Organizasyonu',
+        'Sünnet Düğünü Organizasyonu',
+        'Baby Shower Organizasyonu',
+        'Açılış ve Lansman Organizasyonu',
+        'Spor Etkinlikleri Organizasyonu',
+      ],
+    },
+    {
+      name: 'Diğer',
+      subcategories: [
+        'Fotoğraf & Video',
+        'Dış Çekim',
+        'Günü Fotoğrafçısı',
+        'Düğün Fotoğrafçısı',
+        'Drone Çekimi',
+        'Video Çekimi',
+        'Evcil Hayvanlar',
+        'Evde Kedi Bakımı',
+        'Kedi Kuaförü',
+        'Köpek Eğitimi',
+      ],
+    },
+    {
+      name: 'Özel Ders',
+      subcategories: [
+        'Matematik Özel Ders',
+        'İngilizce Özel Ders',
+        'Fizik Özel Ders',
+        'Kimya Özel Ders',
+        'Biyoloji Özel Ders',
+        'Türkçe Özel Ders',
+        'Lise ve Üniversite Hazırlık',
+        'Yabancı Dil Kursları',
+        'Müzik Dersleri',
+        'Sanat ve Tasarım Dersleri',
+      ],
+    },
+    {
+      name: 'Spor Branşları (Özel Ders)',
+      subcategories: [
+        'Futbol',
+        'Basketbol',
+        'Voleybol',
+        'Tenis',
+        'Yüzme',
+        'Jimnastik',
+        'Boks',
+        'Kickboks',
+        'Judo',
+        'Taekwondo',
+        'Masa Tenisi',
+        'Rugby',
+        'Amerikan Futbolu',
+        'Badminton',
+        'Güreş',
+        'Atletizm',
+        'Skeletik Sporlar',
+        'Kürek',
+        'Okçuluk',
+        'Dalgıçlık',
+        'Fencing (Kılıç Kavgaları)',
+        'Fitness',
+        'Yoga',
+        'Pilates',
+        'Salsa ve Dans Dersleri',
+        'Buz Pateni',
       ],
     },
   ];
 
   try {
     await mongoose.connect(process.env.MONGO_URI);
+
     await Category.deleteMany();
     await SubCategory.deleteMany();
+
     for (const cat of categories) {
       const newCategory = await Category.create({ name: cat.name });
       for (const subCatName of cat.subcategories) {
-        const newSubCategory = await SubCategory.create({
+        await SubCategory.create({
           name: subCatName,
           category: newCategory._id,
         });
       }
     }
+
+    console.log('Kategori ve alt kategoriler başarıyla eklendi!');
   } catch (error) {
-    console.error(error);
+    console.error('Hata:', error);
   } finally {
     mongoose.disconnect();
   }

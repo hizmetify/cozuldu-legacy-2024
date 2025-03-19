@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,7 +6,9 @@ import {
   updateUserEmail,
   updateUserName,
   removeUserAccount,
+  fetchUserDetails,
 } from '../../features/user/userSlice';
+
 import {
   FaTrash,
   FaEnvelope,
@@ -17,46 +19,9 @@ import {
   FaBell,
   FaShieldAlt,
 } from 'react-icons/fa';
-import InputField from '../../components/UI/InputField';
 
-const SettingsCard = ({
-  icon: Icon,
-  title,
-  description,
-  children,
-  variant = 'default',
-}) => (
-  <div
-    className={`bg-white rounded-2xl shadow-lg border transition-all duration-300 mb-6 ${
-      variant === 'danger'
-        ? 'hover:border-red-300 border-red-100 hover:shadow-red-100'
-        : 'hover:border-blue-300 border-blue-100 hover:shadow-blue-100'
-    }`}
-  >
-    <div className="p-6 border-b">
-      <div className="flex items-start gap-5">
-        <div
-          className={`p-4 rounded-xl ${
-            variant === 'danger'
-              ? 'bg-red-50 ring-4 ring-red-50/50'
-              : 'bg-blue-50 ring-4 ring-blue-50/50'
-          }`}
-        >
-          <Icon
-            className={`text-xl ${
-              variant === 'danger' ? 'text-red-500' : 'text-blue-500'
-            }`}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <h2 className="text-xl font-bold text-gray-800">{title}</h2>
-          <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
-        </div>
-      </div>
-    </div>
-    <div className="p-6 bg-gray-50/50 rounded-b-2xl">{children}</div>
-  </div>
-);
+import InputField from '../../components/UI/InputField';
+import Avatar from '../../components/Profile/Avatar';
 
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
@@ -74,13 +39,17 @@ const TabButton = ({ active, icon: Icon, label, onClick }) => (
 
 const Settings = () => {
   const dispatch = useDispatch();
-  const { loading, error, user } = useSelector((state) => state.user);
-  const [activeTab, setActiveTab] = useState('profile');
-  const [profileImage, setProfileImage] = useState(
-    user?.profileImage || '/default-avatar.png'
-  );
-  const fileInputRef = useRef(null);
 
+  const { loading, error, user } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    dispatch(fetchUserDetails());
+  }, [dispatch]);
+
+  const [activeTab, setActiveTab] = useState('profile');
+
+  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+  const fileInputRef = useRef(null);
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -95,8 +64,14 @@ const Settings = () => {
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
-
   const renderTabContent = () => {
+    if (loading && !user) {
+      return <div>Yükleniyor...</div>;
+    }
+    if (error) {
+      return <div className="text-red-500">Hata: {error}</div>;
+    }
+
     switch (activeTab) {
       case 'profile':
         return (
@@ -104,11 +79,17 @@ const Settings = () => {
             <div className="bg-gradient-to-r from-blue-500 to-indigo-600 h-48 rounded-xl mb-16 relative">
               <div className="absolute -bottom-2 left-8 flex items-end">
                 <div className="relative">
-                  <div className="h-24 w-24 rounded-full border-4 border-white bg-white overflow-hidden">
-                    <img
-                      src={profileImage || '/placeholder.svg'}
-                      alt="Profile"
-                      className="h-full w-full object-cover"
+                  <div className="h-24 w-24 rounded-full border-4 border-white bg-white overflow-hidden flex items-center justify-center">
+                    <Avatar
+                      profilePicture={profileImage}
+                      name={user?.name}
+                      size="w-24 h-24"
+                      textSize="text-3xl"
+                      border={true}
+                      borderColor="border-white"
+                      borderWidth="border-4"
+                      onClick={triggerFileInput}
+                      className="shadow-md"
                     />
                   </div>
                   <button
@@ -117,9 +98,6 @@ const Settings = () => {
                   >
                     <FaCamera size={14} />
                   </button>
-                  <span className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full whitespace-nowrap font-medium">
-                    Profil Yükle
-                  </span>
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -152,9 +130,9 @@ const Settings = () => {
                   </p>
                 </div>
               </div>
-
               <div className="p-6 border-t border-gray-100">
                 <Formik
+                  enableReinitialize
                   initialValues={{
                     name: user?.name || '',
                     surname: user?.lastname || '',
@@ -230,9 +208,9 @@ const Settings = () => {
                   </p>
                 </div>
               </div>
-
               <div className="p-6 border-t border-gray-100">
                 <Formik
+                  enableReinitialize
                   initialValues={{ email: user?.email || '' }}
                   validationSchema={Yup.object({
                     email: Yup.string()
@@ -373,6 +351,7 @@ const Settings = () => {
             </div>
           </div>
         );
+
       case 'notifications':
         return (
           <div className="space-y-6">
@@ -508,11 +487,12 @@ const Settings = () => {
                           'Hesabınızı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.'
                         )
                       ) {
-                        dispatch(
-                          removeUserAccount(
-                            prompt('Hesabınızı silmek için şifrenizi girin:')
-                          )
+                        const password = window.prompt(
+                          'Hesabınızı silmek için şifrenizi girin:'
                         );
+                        if (password) {
+                          dispatch(removeUserAccount(password));
+                        }
                       }
                     }}
                     className="w-full bg-white hover:bg-red-50 active:bg-red-100 border-2 border-red-500 text-red-500 px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-3"
@@ -525,6 +505,7 @@ const Settings = () => {
             </div>
           </div>
         );
+
       default:
         return null;
     }
@@ -573,6 +554,7 @@ const Settings = () => {
               </div>
             </div>
           </div>
+
           <div className="flex-1">{renderTabContent()}</div>
         </div>
       </div>
