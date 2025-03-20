@@ -9,6 +9,7 @@ import { updateRegisterData } from '../../features/register/registerSlice';
 import { fetchCities } from '../../api/cityApi';
 import SelectField from '../UI/SelectField';
 import PhoneInputField from '../UI/PhoneInputField';
+import InputField from '../UI/InputField';
 
 const StepTwo = () => {
   const [cities, setCities] = useState([]);
@@ -23,9 +24,7 @@ const StepTwo = () => {
     loadCities();
   }, []);
 
-  const { phone, city } = useSelector(
-    (state) => state.register.data
-  );
+  const { phone, city, email } = useSelector((state) => state.register.data);
 
   const initialValues = { phone, city };
 
@@ -68,6 +67,11 @@ const StepTwo = () => {
           <div className="flex flex-col gap-3 flex-grow">
             <PhoneInputField name="phone" label="Telefon" />
             <SelectField name="city" label="Şehir" options={cities} />
+            <InputField
+              name="email"
+              label="E-posta"
+              placeholder="E-posta adresinizi girin"
+            />
           </div>
         </Form>
       )}

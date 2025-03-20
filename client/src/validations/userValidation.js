@@ -10,10 +10,6 @@ export const stepOneValidationSchema = Yup.object({
     .required('Soyisim zorunludur.')
     .min(2, 'Soyisim en az iki karakter olmalıdır.')
     .max(50, 'Soyisim en fazla 50 karakter olabilir.'),
-
-  email: Yup.string()
-    .required('E-posta zorunludur.')
-    .email('Geçerli bir e-posta adresi girin'),
 });
 
 export const stepTwoValidationSchema = Yup.object({
@@ -24,6 +20,9 @@ export const stepTwoValidationSchema = Yup.object({
     )
     .notRequired(),
   city: Yup.string().nullable().required('Şehir alanı zorunludur'),
+  email: Yup.string()
+    .required('E-posta zorunludur.')
+    .email('Geçerli bir e-posta adresi girin'),
 });
 
 export const stepThreeValidationSchema = Yup.object({

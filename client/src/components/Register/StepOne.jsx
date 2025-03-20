@@ -10,11 +10,11 @@ import InputField from '../UI/InputField';
 const StepOne = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { name, lastname, email } = useSelector((state) => state.register.data);
+  const { name, lastname } = useSelector((state) => state.register.data);
 
   return (
     <Formik
-      initialValues={{ name, lastname, email }}
+      initialValues={{ name, lastname }}
       validationSchema={stepOneValidationSchema}
       validateOnChange={false}
       validateOnBlur={false}
@@ -60,11 +60,6 @@ const StepOne = () => {
                 name="lastname"
                 label="Soyisim"
                 placeholder="Soyadınızı girin"
-              />
-              <InputField
-                name="email"
-                label="E-posta"
-                placeholder="E-posta adresinizi girin"
               />
             </div>
           </Form>
