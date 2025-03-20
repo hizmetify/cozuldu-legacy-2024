@@ -7,8 +7,6 @@ const initialState = {
     email: '',
     phone: '',
     city: '',
-    profilePic: '',
-    portfolioLink: '',
     password: '',
     confirmPassword: '',
   },

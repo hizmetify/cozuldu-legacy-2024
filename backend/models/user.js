@@ -45,10 +45,6 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    portfolioLink: {
-      type: String,
-      match: [/^https?:\/\/.+/, 'Portfolio link must be a valid URL'],
-    },
     createdAt: {
       type: Date,
       default: Date.now,

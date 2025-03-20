@@ -7,8 +7,6 @@ import { showToast } from '../../features/toast/toastSlice';
 import { stepTwoValidationSchema } from '../../validations/userValidation';
 import { updateRegisterData } from '../../features/register/registerSlice';
 import { fetchCities } from '../../api/cityApi';
-
-import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
 import PhoneInputField from '../UI/PhoneInputField';
 
@@ -25,11 +23,11 @@ const StepTwo = () => {
     loadCities();
   }, []);
 
-  const { phone, city, profilePic, portfolioLink } = useSelector(
+  const { phone, city } = useSelector(
     (state) => state.register.data
   );
 
-  const initialValues = { phone, city, profilePic, portfolioLink };
+  const initialValues = { phone, city };
 
   const handleSubmit = async (
     values,
@@ -70,16 +68,6 @@ const StepTwo = () => {
           <div className="flex flex-col gap-3 flex-grow">
             <PhoneInputField name="phone" label="Telefon" />
             <SelectField name="city" label="Şehir" options={cities} />
-            <InputField
-              name="profilePic"
-              label="Profil Resmi URL"
-              placeholder="Profil fotoğrafı linki"
-            />
-            <InputField
-              name="portfolioLink"
-              label="Portfolio Linki"
-              placeholder="Portfolio linkinizi girin"
-            />
           </div>
         </Form>
       )}

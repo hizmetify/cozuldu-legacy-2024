@@ -7,8 +7,7 @@ const {
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const register = async (req, res) => { 
-
+const register = async (req, res) => {
   try {
     const {
       name,
@@ -28,18 +27,15 @@ const register = async (req, res) => {
       password,
       phone,
       city,
-      profilePic,
-      portfolioLink,
     });
 
-    if (error) { 
+    if (error) {
       return res.status(401).json({ error: error.details[0].message });
     }
 
     const emailExists = await User.findOne({ email });
 
-    if (emailExists) { 
-
+    if (emailExists) {
       return res.status(400).json({ error: 'Email already exists' });
     }
     const salt = await bcrypt.genSalt(10);
@@ -52,8 +48,6 @@ const register = async (req, res) => {
       password: hashedPassword,
       phone,
       city,
-      profilePic,
-      portfolioLink,
     });
 
     const savedUser = await newUser.save();
@@ -123,7 +117,9 @@ const login = async (req, res) => {
       maxAge: rememberMe ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
     });
 
-    res.status(201).json({ message: 'Başarıyla giriş yapıldı.', token, user: userData });
+    res
+      .status(201)
+      .json({ message: 'Başarıyla giriş yapıldı.', token, user: userData });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Giriş yapılırken bir hata oluştu.' });
