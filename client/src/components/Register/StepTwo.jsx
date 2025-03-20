@@ -10,11 +10,13 @@ import { fetchCities } from '../../api/cityApi';
 
 import InputField from '../UI/InputField';
 import SelectField from '../UI/SelectField';
+import PhoneInputField from '../UI/PhoneInputField';
 
 const StepTwo = () => {
   const [cities, setCities] = useState([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   useEffect(() => {
     const loadCities = async () => {
       const cityData = await fetchCities();
@@ -22,16 +24,18 @@ const StepTwo = () => {
     };
     loadCities();
   }, []);
+
   const { phone, city, profilePic, portfolioLink } = useSelector(
     (state) => state.register.data
   );
+
   const initialValues = { phone, city, profilePic, portfolioLink };
 
   const handleSubmit = async (
     values,
     { setSubmitting, setErrors, validateForm }
   ) => {
-    const errors = await validateForm(); 
+    const errors = await validateForm();
     if (Object.keys(errors).length) {
       Object.keys(errors).forEach((key) => {
         dispatch(showToast({ message: errors[key], type: 'error' }));
@@ -64,11 +68,7 @@ const StepTwo = () => {
       {() => (
         <Form id="stepForm-1" className="flex flex-col h-full">
           <div className="flex flex-col gap-3 flex-grow">
-            <InputField
-              name="phone"
-              label="Telefon"
-              placeholder="Telefon Numarası"
-            />
+            <PhoneInputField name="phone" label="Telefon" />
             <SelectField name="city" label="Şehir" options={cities} />
             <InputField
               name="profilePic"
