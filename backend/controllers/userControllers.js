@@ -12,33 +12,56 @@ const decodedId = async (req) => {
 };
 
 const emailUpdate = async (req, res) => {
-  let user = await userId(req);
-  let { email } = req.body;
-  let response = await User.findByIdAndUpdate(
-    user?._id,
-    { $set: { email } },
-    { new: true }
-  );
-  if (!response) {
-    return res.status(404).json({ message: 'Mail Güncellenmedi' });
+  try{
+    let user = await decodedId(req);
+    let { email } = req.body;
+    let myUs=await User.findById(user)
+    let users=await User.findOne({email}) 
+   
+    let response
+    if(users){
+      response= {
+        success:false,
+        message:'Mail Kullanımda'
+      }}
+    else{
+    response = await User.findByIdAndUpdate(  user, { email } , { new: true } );
+}
+    if (!response) {
+      return res.status(404).json({ message: 'Mail Güncellenmedi' });
+    } 
+    return res.status(200).json({
+      success: true,
+      data: response,
+    });
+  } catch (error) {
+    console.error('Hata:', error);
+    
   }
-  return res.status(200).json({ message: 'Mail güncellendi' });
+  
 };
 const nameInfoUpdate = async (req, res) => {
-  let user = await userId(req);
+  try{
+  let user = await decodedId(req);
   let { name, lastname } = req.body;
   let response = await User.findByIdAndUpdate(
-    user?._id,
-    { $set: { name, lastname } },
+    user,
+   { name, lastname } ,
     { new: true }
-  );
+  ); 
   if (!response) {
     return res.status(404).json({ message: 'Ad soyad güncellenmedi' });
   }
   return res.status(200).json({ message: 'Ad soyad güncellendi' });
+} catch (error) {
+  console.error('Hata:', error);
+  
+}
+
 };
 
 const deleteAccount = async (req, res) => {
+  try{
   let { password } = req.body;
   let decoded = await decodedId(req);
   const user = await User.findById(decoded).select('-password');
@@ -56,6 +79,11 @@ const deleteAccount = async (req, res) => {
   } else {
     return res.status(401).json({ message: 'Şifre doğru değil.' });
   }
+} catch (error) {
+  console.error('Hata:', error);
+  
+}
+
 };
 
 const favoriPostAndDelete = async (req, res) => {
@@ -189,8 +217,7 @@ const contactInfo = async (req, res) => {
     }
     const userids = await User.findById(adids?.user?._id);
     if (!userids) return res.json({ message: 'sonuç bulunamadı' });
-
-    //loglama kodları yazacak
+ 
     return res.json({
       phone: userids?.phone,
       mail: userids?.email,

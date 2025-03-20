@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchUserAds, deleteAd } from '../../features/ad/adSlice';
+import { fetchUserAds, deleteAd, changeAdStatus } from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { FaEdit, FaEye, FaSearch, FaFilter } from 'react-icons/fa';
@@ -18,6 +18,7 @@ import {
 import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 import { emailSend } from '../../api/authApi';
 import { motion, AnimatePresence } from 'framer-motion';
+import { makeAdStatusChange } from '../../api/adsApi';
 
 const AdStatusBadge = ({ status }) => {
   const statusConfig = {
@@ -29,8 +30,8 @@ const AdStatusBadge = ({ status }) => {
       color: 'bg-yellow-100 text-yellow-800',
       icon: <FiClock className="mr-1" />,
     },
-    inactive: {
-      color: 'bg-gray-100 text-gray-800',
+    pasif: {
+      color: 'bg-red-100 text-red-800',
       icon: <FiAlertCircle className="mr-1" />,
     },
   };
@@ -113,7 +114,7 @@ const ErrorState = ({ error }) => (
   </motion.div>
 );
 
-const AdCard = ({ ad, onView, onEdit, onDelete }) => (
+const AdCard = ({ ad, onView, onEdit, onDelete,changeStatus }) => (
   <motion.div
     layout
     initial={{ opacity: 0, scale: 0.9 }}
@@ -134,7 +135,7 @@ const AdCard = ({ ad, onView, onEdit, onDelete }) => (
         className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
       />
       <div className="absolute top-2 right-2">
-        <AdStatusBadge status={ad.status || 'active'} />
+        <AdStatusBadge status={ad.status} />
       </div>
     </div>
     <div className="p-5">
@@ -177,6 +178,17 @@ const AdCard = ({ ad, onView, onEdit, onDelete }) => (
           <FaRegTrashCan />
         </button>
       </div>
+      
+    </div>
+    {/* Yayınlama butonu kodları aşağıda */}
+    <div className='p-3 w-full flex items-center justify-center'>
+    <button
+      onClick={()=>changeStatus(ad._id,ad.status)}
+      className={`w-25 px-4 py-2 rounded-lg border-2 shadow-sm text-center font-medium transition-all duration-300 cursor-pointer 
+       `}
+    >
+      {ad.status == 'active' ? 'Yayından Kaldır' : 'Yayınla'}
+    </button> 
     </div>
   </motion.div>
 );
@@ -207,7 +219,13 @@ const MyAdsList = () => {
     setAdToDelete(adId);
     setIsDeleteModalOpen(true);
   };
-
+  const handleChangeStatus=async(adId,adStatus)=>{
+    
+    const status=adStatus=='active'?'pasif':'active' 
+    dispatch(changeAdStatus({adId,adData:status}))
+    
+    // dispatch(fetchUserAds())
+  }
   const handleConfirmDelete = async () => {
     if (adToDelete) {
       try {
@@ -460,12 +478,14 @@ const MyAdsList = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <AnimatePresence>
                 {filteredAds.map((ad) => (
+                
                   <AdCard
                     key={ad._id}
                     ad={ad}
                     onView={handleViewAd}
                     onEdit={handleEditAd}
                     onDelete={handleDeleteClick}
+                    changeStatus={handleChangeStatus}
                   />
                 ))}
               </AnimatePresence>

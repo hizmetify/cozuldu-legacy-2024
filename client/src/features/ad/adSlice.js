@@ -7,6 +7,7 @@ import {
   updateAdRequest,
   deleteAdRequest,
   getAdsByCategoryRequest,
+  makeAdStatusChange,
 } from '../../api/adsApi';
 
 const initialState = {
@@ -43,7 +44,8 @@ export const fetchUserAds = createAsyncThunk(
   'ads/fetchUserAds',
   async (_, thunkAPI) => {
     try {
-      const response = await getUserAdsRequest();
+      const response = await getUserAdsRequest(); 
+      
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -98,7 +100,17 @@ export const updateAd = createAsyncThunk(
     }
   }
 );
-
+export const changeAdStatus=createAsyncThunk(
+  'ads/makeAdStatusChange',
+  async({adId,adData},thunkAPI)=>{
+    try{ 
+      const response=await makeAdStatusChange({adId,adData})
+      return response
+    }catch(error){
+      return thunkAPI.rejectWithValue(error)
+    }
+  }
+)
 export const deleteAd = createAsyncThunk(
   'ads/deleteAd',
   async (adId, thunkAPI) => {

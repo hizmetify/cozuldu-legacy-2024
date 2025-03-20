@@ -7,6 +7,7 @@ const {
   getSingleAd,
   deleteAd,
   getAdsByCategory,
+  makeAdStatusChange,
 } = require("../controllers/adControllers");
 const validateAd = require("../middlewares/adMiddleware");
 const protect = require("../middlewares/authMiddleware");
@@ -20,7 +21,8 @@ router.get("/:id", getSingleAd);
 
 router.use(protect);
 router.post("/", upload.array("images", 5), validateAd, createAd);
-router.put("/:id", upload.array("images", 5), validateAd, updateAd);
+router.put("/:id", upload.array("images", 5), validateAd, updateAd); 
+router.post("/statusChange/:id",makeAdStatusChange)
 router.delete("/:id", deleteAd);
 
 module.exports = router;

@@ -54,7 +54,13 @@ export const updateAdRequest = async ({ adId, adData }) => {
   const response = await axiosInstance.put(`/ads/${adId}`, adData);
   return response.data;
 };
-
+export const makeAdStatusChange=async({adId,adData})=>{
+  
+  console.log(adId,adData);
+  
+  const response=await axiosInstance.post(`/ads/statusChange/${adId}`,{statuse:adData});
+  return response.data
+}
 export const deleteAdRequest = async (adId) => {
   const response = await axiosInstance.delete(`/ads/${adId}`);
   return response.data;
