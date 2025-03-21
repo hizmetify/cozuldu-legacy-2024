@@ -7,22 +7,23 @@ export const getAdsByCategoryRequest = async (categoryId, filters = {}) => {
     }
 
     const queryParams = new URLSearchParams();
-
+    queryParams.append('status','active')
     if (filters.sort) queryParams.append('sort', filters.sort);
     if (filters.order) queryParams.append('order', filters.order);
     if (filters.search) queryParams.append('search', filters.search);
     if (filters.priceMin) queryParams.append('priceMin', filters.priceMin);
     if (filters.priceMax) queryParams.append('priceMax', filters.priceMax);
     if (filters.page) queryParams.append('page', filters.page);
-    if (filters.limit) queryParams.append('limit', filters.limit);
-
+    if (filters.limit) queryParams.append('limit', filters.limit); 
     const queryString = queryParams.toString()
       ? `?${queryParams.toString()}`
       : '';
-
+    
     const response = await axiosInstance.get(
       `/ads/category/${categoryId}${queryString}`
     );
+    
+    console.log( `/ads/category/${categoryId}${queryString}`);
     return response.data;
   } catch (error) {
     console.error('Kategori ilanlarını alırken hata oluştu:', error);
