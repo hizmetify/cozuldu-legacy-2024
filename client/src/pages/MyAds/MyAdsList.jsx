@@ -6,7 +6,7 @@ import {
   deleteAd,
   changeAdStatus,
 } from '../../features/ad/adSlice';
-import Spinner from '../../components/UI/Spinner';
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { FaEdit, FaEye, FaSearch, FaFilter } from 'react-icons/fa';
 import { FaSortAmountDown, FaSortAmountUp } from 'react-icons/fa';
@@ -217,14 +217,7 @@ const EmptyState = ({ onAddNew }) => (
   </motion.div>
 );
 
-const LoadingState = () => (
-  <div className="flex flex-col items-center justify-center w-full h-[70vh] bg-white rounded-lg shadow-md">
-    <Spinner className="w-12 h-12 text-blue-600" />
-    <p className="mt-4 text-gray-600 animate-pulse">
-      İlanlarınız yükleniyor...
-    </p>
-  </div>
-);
+const LoadingState = () => <LoadingSpinner message="İlanlarınız Yükleniyor" />;
 
 const ErrorState = ({ error }) => (
   <motion.div

@@ -14,7 +14,8 @@ import { fetchUserAds } from '../../features/ad/adSlice';
 import { fetchStats } from '../../api/statsApi';
 import { countFav } from '../../api/userApi';
 import { motion, AnimatePresence } from 'framer-motion';
-import Spinner from '../../components/UI/Spinner'; 
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
+
 const COLORS = {
   views: ['#0082F6', '#E2F0FF'],
   favorites: ['#FF4D6D', '#FFE2E6'],
@@ -378,19 +379,9 @@ const Statistics = () => {
   );
 
   if (status === 'loading' || isLoading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center w-full h-[70vh]"
-      >
-        <Spinner className="w-12 h-12 text-blue-600" />
-        <p className="mt-4 text-gray-600 animate-pulse">
-          İstatistikler yükleniyor...
-        </p>
-      </motion.div>
-    );
+    return <LoadingSpinner message="İstatistikler yükleniyor" />;
   }
+
   if (status === 'failed') {
     return (
       <motion.div
@@ -426,126 +417,126 @@ const Statistics = () => {
       </motion.div>
     );
   }
-  if (!filteredAds.length) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="max-w-3xl mx-auto my-12 text-center p-12 bg-white shadow-md rounded-lg"
-      >
-        <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-          <FaChartLine className="text-blue-600 text-3xl" />
-        </div>
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Henüz istatistik gösterilecek ilan yok
-        </h3>
-        <p className="text-gray-600 mb-6 max-w-md mx-auto">
-          İlanlarınız oluşturulduktan sonra görüntülenme ve favorileme
-          istatistiklerini burada takip edebilirsiniz.
-        </p>
-        <Link
-          to="/emailverify"
-          className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
-        >
-          Yeni İlan Ekle
-        </Link>
-      </motion.div>
-    );
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 min-h-screen"
-    >
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="mb-8"
-      >
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-3xl font-extrabold text-gray-900 flex items-center">
-              <span className="bg-blue-100 text-blue-800 p-2 rounded-lg mr-3">
-                <FaChartLine className="text-xl" />
-              </span>
-              İstatistikler
-            </h1>
-            <p className="text-gray-500 text-lg mt-2">
-              Hizmetlerinize olan ilgiyi buradan takip edebilirsiniz
-            </p>
+    <>
+      {!filteredAds.length ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-3xl mx-auto my-12 text-center p-12 bg-white shadow-md rounded-lg"
+        >
+          <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+            <FaChartLine className="text-blue-600 text-3xl" />
           </div>
-
-          <div className="mt-4 md:mt-0 relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <FaSearch className="text-gray-400" />
-            </div>
-            <input
-              type="text"
-              placeholder="İlanlarınızda ara..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 w-full md:w-64 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-            />
-          </div>
-        </div>
-      </motion.div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <StatCard
-          title="Toplam Kullanıcı"
-          value={counts.userCount.toLocaleString()}
-          icon={FaUsers}
-          color="bg-blue-600"
-        />
-
-        <StatCard
-          title="Toplam İlanınız"
-          value={filteredAds.length}
-          icon={FaChartLine}
-          color="bg-green-600"
-        />
-
-        <StatCard
-          title="Toplam Görüntülenme"
-          value={filteredAds
-            .reduce((total, ad) => total + (ad.viewing?.length || 0), 0)
-            .toLocaleString()}
-          icon={FaEye}
-          color="bg-purple-600"
-        />
-      </div>
-      <div className="space-y-6">
-        <AnimatePresence>
-          {filteredAds.map((ad, index) => (
-            <AdStatCard
-              key={ad._id}
-              ad={ad}
-              totalUsers={stats.userCount}
-              favCounts={favCounts[ad._id] || 0}
-              index={index}
-            />
-          ))}
-        </AnimatePresence>
-
-        {filteredAds.length === 0 && searchTerm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="p-12 text-center bg-white rounded-lg shadow-md"
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Henüz istatistik gösterilecek ilan yok
+          </h3>
+          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            İlanlarınız oluşturulduktan sonra görüntülenme ve favorileme
+            istatistiklerini burada takip edebilirsiniz.
+          </p>
+          <Link
+            to="/emailverify"
+            className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
           >
-            <FaSearch className="mx-auto text-4xl text-gray-300 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900">
-              Sonuç bulunamadı
-            </h3>
-            <p className="mt-1 text-gray-500">
-              Arama kriterlerinize uygun ilan bulunamadı.
-            </p>
+            Yeni İlan Ekle
+          </Link>
+        </motion.div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 bg-gray-50 min-h-screen"
+        >
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div>
+                <h1 className="text-3xl font-extrabold text-gray-900 flex items-center">
+                  <span className="bg-blue-100 text-blue-800 p-2 rounded-lg mr-3">
+                    <FaChartLine className="text-xl" />
+                  </span>
+                  İstatistikler
+                </h1>
+                <p className="text-gray-500 text-lg mt-2">
+                  Hizmetlerinize olan ilgiyi buradan takip edebilirsiniz
+                </p>
+              </div>
+
+              <div className="mt-4 md:mt-0 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <FaSearch className="text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="İlanlarınızda ara..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10 pr-4 py-2 w-full md:w-64 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                />
+              </div>
+            </div>
           </motion.div>
-        )}
-      </div>
-    </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <StatCard
+              title="Toplam Kullanıcı"
+              value={counts.userCount.toLocaleString()}
+              icon={FaUsers}
+              color="bg-blue-600"
+            />
+
+            <StatCard
+              title="Toplam İlanınız"
+              value={filteredAds.length}
+              icon={FaChartLine}
+              color="bg-green-600"
+            />
+
+            <StatCard
+              title="Toplam Görüntülenme"
+              value={filteredAds
+                .reduce((total, ad) => total + (ad.viewing?.length || 0), 0)
+                .toLocaleString()}
+              icon={FaEye}
+              color="bg-purple-600"
+            />
+          </div>
+          <div className="space-y-6">
+            <AnimatePresence>
+              {filteredAds.map((ad, index) => (
+                <AdStatCard
+                  key={ad._id}
+                  ad={ad}
+                  totalUsers={stats.userCount}
+                  favCounts={favCounts[ad._id] || 0}
+                  index={index}
+                />
+              ))}
+            </AnimatePresence>
+
+            {filteredAds.length === 0 && searchTerm && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-12 text-center bg-white rounded-lg shadow-md"
+              >
+                <FaSearch className="mx-auto text-4xl text-gray-300 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900">
+                  Sonuç bulunamadı
+                </h3>
+                <p className="mt-1 text-gray-500">
+                  Arama kriterlerinize uygun ilan bulunamadı.
+                </p>
+              </motion.div>
+            )}
+          </div>
+        </motion.div>
+      )}
+    </>
   );
 };
 

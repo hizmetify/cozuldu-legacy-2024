@@ -22,6 +22,7 @@ import {
 
 import InputField from '../../components/UI/InputField';
 import Avatar from '../../components/Profile/Avatar';
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
 
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
@@ -66,7 +67,7 @@ const Settings = () => {
   };
   const renderTabContent = () => {
     if (loading && !user) {
-      return <div>Yükleniyor...</div>;
+      return <LoadingSpinner message="Kullanıcı bilgileri yükleniyor" />;
     }
     if (error) {
       return <div className="text-red-500">Hata: {error}</div>;

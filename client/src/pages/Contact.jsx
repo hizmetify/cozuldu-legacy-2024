@@ -1,12 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FAQ from '../components/Hero/FAQ';
 import ContactUs from '../components/Hero/ContactUs';
 import Header from '../components/Header/Header';
+import { useDispatch } from 'react-redux';
 
 import { MdHeadsetMic, MdQuestionAnswer, MdSupportAgent } from 'react-icons/md';
+import { startLoading, stopLoading } from '../features/loading/loadingSlice';
 
 const Contact = () => {
   const [activeTab, setActiveTab] = useState('faq');
+  const dispatch = useDispatch();
+  const [isContentLoading, setIsContentLoading] = useState(false);
+
+  useEffect(() => {
+    if (isContentLoading) {
+      dispatch(startLoading({ message: 'İletişim sayfası yükleniyor' }));
+    } else {
+      dispatch(stopLoading());
+    }
+  }, [isContentLoading, dispatch]);
+
+  useEffect(() => {
+    const loadContent = async () => {
+      setIsContentLoading(true);
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      setIsContentLoading(false);
+    };
+
+    loadContent();
+  }, [activeTab]);
 
   return (
     <>

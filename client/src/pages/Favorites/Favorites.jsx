@@ -3,7 +3,7 @@ import { favoriAction, favoriGet } from '../../api/userApi';
 import { Link } from 'react-router-dom';
 import { FaEye, FaHeart, FaSearch } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import Spinner from '../../components/UI/Spinner'; // Assuming you have this component
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
 
 const Favorites = () => {
   const [ilanlar, setIlanlar] = useState([]);
@@ -47,18 +47,7 @@ const Favorites = () => {
   );
 
   if (loading) {
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center w-full h-[70vh] bg-white rounded-lg shadow-md"
-      >
-        <Spinner className="w-12 h-12 text-blue-600" />
-        <p className="mt-4 text-gray-600 animate-pulse">
-          Favorileriniz yükleniyor...
-        </p>
-      </motion.div>
-    );
+    return <LoadingSpinner message="Favorileriniz Yükleniyor" />;
   }
 
   if (error) {

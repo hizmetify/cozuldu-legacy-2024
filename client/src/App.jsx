@@ -10,7 +10,6 @@ import { HelmetProvider } from 'react-helmet-async';
 
 import PrivateRoute from './guards/PrivateRoute';
 import PublicRoute from './guards/PublicRoute';
-import Spinner from './components/UI/Spinner';
 import RegisterLayout from './layouts/RegisterLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import { fetchMe } from './features/auth/authSlice';
@@ -44,6 +43,8 @@ import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
 import IlanListesi from './pages/TestPage/test';
+import LoadingOverlay from './components/UI/LoadingOverlay';
+import LoadingSpinner from './components/UI/LoadingSpinner';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -67,10 +68,11 @@ const App = () => {
   return (
     <HelmetProvider>
       <Router>
+        <LoadingOverlay />
         <Suspense
           fallback={
             <div className="flex items-center justify-center h-screen">
-              <Spinner />
+              <LoadingSpinner message="Sayfa Yükleniyor" />
             </div>
           }
         >

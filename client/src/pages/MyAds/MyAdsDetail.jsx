@@ -1,3 +1,4 @@
+
 import { useEffect, useState, memo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSingleAd } from '../../features/ad/adSlice';
@@ -33,14 +34,8 @@ import {
 import { logs } from '../../api/authApi';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const LoadingSpinner = () => (
-  <div className="flex h-screen items-center justify-center bg-gray-50">
-    <div className="flex flex-col items-center">
-      <div className="h-16 w-16 animate-spin rounded-full border-b-4 border-t-4 border-blue-600"></div>
-      <p className="mt-4 text-blue-600 animate-pulse">Yükleniyor...</p>
-    </div>
-  </div>
-);
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
+
 
 const NotFound = () => (
   <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -572,7 +567,7 @@ const MyAdsDetail = () => {
   };
 
   if (singleAdStatus === 'loading') {
-    return <LoadingSpinner />;
+    return <LoadingSpinner message="İlan detayları yükleniyor" />;
   }
 
   if (!selectedAd || !selectedAd.data) {
@@ -580,7 +575,6 @@ const MyAdsDetail = () => {
   }
 
   const ad = selectedAd.data;
-
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 overflow-x-hidden">
       <div className="mx-auto max-w-7xl">

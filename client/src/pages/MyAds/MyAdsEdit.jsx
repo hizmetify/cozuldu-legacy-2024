@@ -3,7 +3,8 @@ import { Formik, Form } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateAd, fetchSingleAd } from '../../features/ad/adSlice';
 import { useNavigate, useParams } from 'react-router-dom';
-import Spinner from '../../components/UI/Spinner';
+
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import { AdSchema } from '../../validations/adValidation';
 import { fetchCities } from '../../api/cityApi';
 import SelectField from '../../components/UI/SelectField';
@@ -32,7 +33,7 @@ const MyAdsEdit = () => {
     fetchAdData();
   }, [dispatch, adId]);
 
-  if (singleAdStatus === 'loading' || !selectedAd) return <Spinner />;
+  if (singleAdStatus === 'loading' || !selectedAd) return <LoadingSpinner />;
 
   const ad = selectedAd.data;
 
