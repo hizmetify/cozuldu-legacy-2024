@@ -44,8 +44,7 @@ export const fetchUserAds = createAsyncThunk(
   'ads/fetchUserAds',
   async (_, thunkAPI) => {
     try {
-      const response = await getUserAdsRequest(); 
-      
+      const response = await getUserAdsRequest();
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -100,17 +99,19 @@ export const updateAd = createAsyncThunk(
     }
   }
 );
-export const changeAdStatus=createAsyncThunk(
+
+export const changeAdStatus = createAsyncThunk(
   'ads/makeAdStatusChange',
-  async({adId,adData},thunkAPI)=>{
-    try{ 
-      const response=await makeAdStatusChange({adId,adData})
-      return response
-    }catch(error){
-      return thunkAPI.rejectWithValue(error)
+  async ({ adId, adData }, thunkAPI) => {
+    try {
+      const response = await makeAdStatusChange({ adId, adData });
+      return response;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error);
     }
   }
-)
+);
+
 export const deleteAd = createAsyncThunk(
   'ads/deleteAd',
   async (adId, thunkAPI) => {
@@ -182,12 +183,28 @@ const adsSlice = createSlice({
           action.payload?.message || 'İlan detayları yüklenirken hata oluştu.';
       })
       .addCase(deleteAd.fulfilled, (state, action) => {
-        if (Array.isArray(state.userAds.data)) {
-          state.userAds.data = state.userAds.data.filter(
-            (ad) => ad._id !== action.payload.adId
-          );
+        if (Array.isArray(state.userAds?.data)) {
+          state.userAds = {
+            ...state.userAds,
+            data: state.userAds.data.filter(
+              (ad) => ad._id !== action.payload.adId
+            ),
+          };
         }
       })
+      .addCase(changeAdStatus.fulfilled, (state, action) => {
+        const updatedAd = action.payload.data;
+
+        if (Array.isArray(state.userAds?.data)) {
+          state.userAds = {
+            ...state.userAds,
+            data: state.userAds.data.map((ad) =>
+              ad._id === updatedAd._id ? updatedAd : ad
+            ),
+          };
+        }
+      })
+
       .addCase(fetchAdsByCategory.pending, (state) => {
         state.categoryAds.loading = true;
         state.categoryAds.error = null;

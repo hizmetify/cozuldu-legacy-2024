@@ -1,7 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { fetchUserAds, deleteAd, changeAdStatus } from '../../features/ad/adSlice';
+import {
+  fetchUserAds,
+  deleteAd,
+  changeAdStatus,
+} from '../../features/ad/adSlice';
 import Spinner from '../../components/UI/Spinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
 import { FaEdit, FaEye, FaSearch, FaFilter } from 'react-icons/fa';
@@ -14,11 +18,12 @@ import {
   FiGrid,
   FiList,
   FiSearch as FiSearchIcon,
+  FiEye,
+  FiEyeOff,
 } from 'react-icons/fi';
 import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 import { emailSend } from '../../api/authApi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { makeAdStatusChange } from '../../api/adsApi';
 
 const AdStatusBadge = ({ status }) => {
   const statusConfig = {
@@ -51,70 +56,7 @@ const AdStatusBadge = ({ status }) => {
     </span>
   );
 };
-
-const EmptyState = ({ onAddNew }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="text-center p-12 bg-white shadow-md rounded-lg"
-  >
-    <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
-      <FiPlus className="text-blue-600 text-3xl" />
-    </div>
-    <h3 className="text-xl font-semibold text-gray-800 mb-2">
-      Henüz bir ilanınız yok
-    </h3>
-    <p className="text-gray-600 mb-6 max-w-md mx-auto">
-      İlk ilanınızı ekleyerek hizmetlerinizi potansiyel müşterilerinize
-      göstermeye başlayın.
-    </p>
-    <button
-      onClick={onAddNew}
-      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
-    >
-      <FiPlus className="mr-2" />
-      Yeni İlan Ekle
-    </button>
-  </motion.div>
-);
-
-const LoadingState = () => (
-  <div className="flex flex-col items-center justify-center w-full h-[70vh] bg-white rounded-lg shadow-md">
-    <Spinner className="w-12 h-12 text-blue-600" />
-    <p className="mt-4 text-gray-600 animate-pulse">
-      İlanlarınız yükleniyor...
-    </p>
-  </div>
-);
-
-const ErrorState = ({ error }) => (
-  <motion.div
-    initial={{ opacity: 0 }}
-    animate={{ opacity: 1 }}
-    className="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md"
-    role="alert"
-  >
-    <div className="flex items-center">
-      <FiAlertCircle className="text-2xl mr-4 text-red-500" />
-      <div>
-        <p className="font-bold text-lg mb-1">
-          İşlem sırasında bir hata oluştu
-        </p>
-        <p className="text-sm">{error}</p>
-      </div>
-    </div>
-    <div className="mt-4">
-      <button
-        onClick={() => window.location.reload()}
-        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-      >
-        Yeniden Dene
-      </button>
-    </div>
-  </motion.div>
-);
-
-const AdCard = ({ ad, onView, onEdit, onDelete,changeStatus }) => (
+const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
   <motion.div
     layout
     initial={{ opacity: 0, scale: 0.9 }}
@@ -178,17 +120,118 @@ const AdCard = ({ ad, onView, onEdit, onDelete,changeStatus }) => (
           <FaRegTrashCan />
         </button>
       </div>
-      
     </div>
-    {/* Yayınlama butonu kodları aşağıda */}
-    <div className='p-3 w-full flex items-center justify-center'>
+
+    <div className="px-4 pb-4 pt-1">
+      <button
+        onClick={() => changeStatus(ad._id, ad.status)}
+        disabled={isLoading}
+        className={`w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 ${
+          isLoading
+            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            : ad.status === 'active'
+            ? 'text-gray-700 hover:text-red-600 bg-white border border-gray-200 hover:border-red-200'
+            : 'text-gray-700 hover:text-green-600 bg-white border border-gray-200 hover:border-green-200'
+        }`}
+      >
+        {isLoading ? (
+          <>
+            <svg
+              className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-400"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            <span>İşleniyor...</span>
+          </>
+        ) : ad.status === 'active' ? (
+          <>
+            <FiEyeOff className="h-4 w-4" />
+            <span>Yayından Kaldır</span>
+          </>
+        ) : (
+          <>
+            <FiEye className="h-4 w-4" />
+            <span>Yayınla</span>
+          </>
+        )}
+      </button>
+    </div>
+  </motion.div>
+);
+
+const EmptyState = ({ onAddNew }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="text-center p-12 bg-white shadow-md rounded-lg"
+  >
+    <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+      <FiPlus className="text-blue-600 text-3xl" />
+    </div>
+    <h3 className="text-xl font-semibold text-gray-800 mb-2">
+      Henüz bir ilanınız yok
+    </h3>
+    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+      İlk ilanınızı ekleyerek hizmetlerinizi potansiyel müşterilerinize
+      göstermeye başlayın.
+    </p>
     <button
-      onClick={()=>changeStatus(ad._id,ad.status)}
-      className={`w-25 px-4 py-2 rounded-lg border-2 shadow-sm text-center font-medium transition-all duration-300 cursor-pointer 
-       `}
+      onClick={onAddNew}
+      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300"
     >
-      {ad.status == 'active' ? 'Yayından Kaldır' : 'Yayınla'}
-    </button> 
+      <FiPlus className="mr-2" />
+      Yeni İlan Ekle
+    </button>
+  </motion.div>
+);
+
+const LoadingState = () => (
+  <div className="flex flex-col items-center justify-center w-full h-[70vh] bg-white rounded-lg shadow-md">
+    <Spinner className="w-12 h-12 text-blue-600" />
+    <p className="mt-4 text-gray-600 animate-pulse">
+      İlanlarınız yükleniyor...
+    </p>
+  </div>
+);
+
+const ErrorState = ({ error }) => (
+  <motion.div
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    className="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md"
+    role="alert"
+  >
+    <div className="flex items-center">
+      <FiAlertCircle className="text-2xl mr-4 text-red-500" />
+      <div>
+        <p className="font-bold text-lg mb-1">
+          İşlem sırasında bir hata oluştu
+        </p>
+        <p className="text-sm">{error}</p>
+      </div>
+    </div>
+    <div className="mt-4">
+      <button
+        onClick={() => window.location.reload()}
+        className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+      >
+        Yeniden Dene
+      </button>
     </div>
   </motion.div>
 );
@@ -200,6 +243,7 @@ const MyAdsList = () => {
     userAds,
     userAdsStatus: status,
     error,
+    statusChangeLoading,
   } = useSelector((state) => state.ads);
 
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -219,13 +263,16 @@ const MyAdsList = () => {
     setAdToDelete(adId);
     setIsDeleteModalOpen(true);
   };
-  const handleChangeStatus=async(adId,adStatus)=>{
-    
-    const status=adStatus=='active'?'pasif':'active' 
-    dispatch(changeAdStatus({adId,adData:status}))
-    
-    // dispatch(fetchUserAds())
-  }
+
+  const handleChangeStatus = async (adId, adStatus) => {
+    const newStatus = adStatus === 'active' ? 'pasif' : 'active';
+    try {
+      await dispatch(changeAdStatus({ adId, adData: newStatus })).unwrap();
+    } catch (error) {
+      console.error('Durum değişikliği hatası:', error);
+    }
+  };
+
   const handleConfirmDelete = async () => {
     if (adToDelete) {
       try {
@@ -421,11 +468,11 @@ const MyAdsList = () => {
                       </button>
                       <button
                         onClick={() => {
-                          setSelectedFilter('inactive');
+                          setSelectedFilter('pasif');
                           setIsFilterMenuOpen(false);
                         }}
                         className={`block px-4 py-2 text-sm w-full text-left ${
-                          selectedFilter === 'inactive'
+                          selectedFilter === 'pasif'
                             ? 'bg-blue-50 text-blue-700'
                             : 'text-gray-700'
                         }`}
@@ -478,7 +525,6 @@ const MyAdsList = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               <AnimatePresence>
                 {filteredAds.map((ad) => (
-                
                   <AdCard
                     key={ad._id}
                     ad={ad}
@@ -486,6 +532,7 @@ const MyAdsList = () => {
                     onEdit={handleEditAd}
                     onDelete={handleDeleteClick}
                     changeStatus={handleChangeStatus}
+                    isLoading={statusChangeLoading}
                   />
                 ))}
               </AnimatePresence>

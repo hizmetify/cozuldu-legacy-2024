@@ -241,7 +241,7 @@ const makeAdStatusChange=async(req,res)=>{
     if (!mongoose.Types.ObjectId.isValid(adId)) {
       return res.status(400).json({ message: 'Geçersiz ilan ID' });
     }
-    const { statuse } = req.body;
+    const { status } = req.body;
     const existingAd = await Ad.findById(adId);
     if (!existingAd) {
       return res.status(404).json({ message: 'İlan bulunamadı' });
@@ -249,7 +249,7 @@ const makeAdStatusChange=async(req,res)=>{
     if (existingAd.user.toString() !== userId.toString()) {
       return res.status(403).json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
     }
-    existingAd.status = statuse;
+    existingAd.status = status;
     
     await existingAd.save();
     
