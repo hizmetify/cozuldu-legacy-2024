@@ -125,7 +125,7 @@ const PutAdmin=async(req,res)=>{
             const updateCateogry=await Category.findByIdAndDelete(cateogryId,{name:req.body.name},{new:true})
             updateCateogry.save()
             return res.json(updateCateogry) 
-        case 'updateCategory':
+        case 'updateSubCategory':
             const subCateogryId=req.params
             if(!subCateogryId)
                 return res.json({message:'Validation error'})
