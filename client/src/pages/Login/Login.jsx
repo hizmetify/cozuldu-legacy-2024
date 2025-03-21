@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import { useNavigate } from 'react-router-dom';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaEnvelope, FaLock } from 'react-icons/fa';
 import { loginValidation } from '../../validations/userValidation';
 import { login } from '../../features/auth/authSlice';
 import { showToast } from '../../features/toast/toastSlice';
@@ -20,6 +20,8 @@ const Login = () => {
   const [initialValues, setInitialValues] = useState(null);
 
   const [showPassword, setShowPassword] = useState(false);
+
+  const modalRef = useRef(null);
 
   const resetPassword = async (e) => {
     e.preventDefault();
@@ -40,6 +42,23 @@ const Login = () => {
       rememberMe: storedRememberMe,
     });
   }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        resetPass &&
+        modalRef.current &&
+        !modalRef.current.contains(event.target)
+      ) {
+        setResetPass(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [resetPass]);
 
   const handleSubmit = async (values, { setErrors }) => {
     try {
@@ -113,7 +132,7 @@ const Login = () => {
                       name="email"
                       type="email"
                       placeholder="E-posta adresinizi girin"
-                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      icon={FaEnvelope}
                     />
 
                     <div className="relative">
@@ -122,14 +141,18 @@ const Login = () => {
                         name="password"
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Şifrenizi girin"
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        icon={FaLock}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                        className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-600 transition-colors"
                       >
-                        {showPassword ? <FaEye /> : <FaEyeSlash />}
+                        {showPassword ? (
+                          <FaEye size={18} />
+                        ) : (
+                          <FaEyeSlash size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
@@ -183,7 +206,10 @@ const Login = () => {
 
         {resetPass && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm">
-            <div className="relative w-full max-w-md bg-white rounded-xl shadow-2xl mx-4 p-8 transform transition-all duration-300 ease-in-out">
+            <div
+              ref={modalRef}
+              className="relative w-full max-w-md bg-white rounded-xl shadow-2xl mx-4 p-8 transform transition-all duration-300 ease-in-out"
+            >
               <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-blue-600 rounded-full p-4 shadow-lg">
                 <svg
                   className="w-8 h-8 text-white"
