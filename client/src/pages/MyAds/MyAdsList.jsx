@@ -20,6 +20,7 @@ import {
   FiSearch as FiSearchIcon,
   FiEye,
   FiEyeOff,
+  FiXCircle,
 } from 'react-icons/fi';
 import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 import { emailSend } from '../../api/authApi';
@@ -37,7 +38,7 @@ const AdStatusBadge = ({ status }) => {
     },
     pasif: {
       color: 'bg-red-100 text-red-800',
-      icon: <FiAlertCircle className="mr-1" />,
+      icon: <FiXCircle className="mr-1" />,
     },
   };
 
@@ -64,7 +65,8 @@ const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
     exit={{ opacity: 0, scale: 0.9 }}
     whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
     transition={{ duration: 0.2 }}
-    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
+    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
+    onClick={() => onView(ad._id)}
   >
     <div className="relative h-48 overflow-hidden">
       <img
@@ -96,24 +98,36 @@ const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
         </span>
       </div>
     </div>
-    <div className="border-t border-gray-100 p-4 bg-gray-50">
+    <div
+      className="border-t border-gray-100 p-4 bg-gray-50"
+      onClick={(e) => e.stopPropagation()}
+    >
       <div className="flex justify-between">
         <button
-          onClick={() => onView(ad._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onView(ad._id);
+          }}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
           title="Görüntüle"
         >
           <FaEye />
         </button>
         <button
-          onClick={() => onEdit(ad._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(ad._id);
+          }}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
           title="Düzenle"
         >
           <FaEdit />
         </button>
         <button
-          onClick={() => onDelete(ad._id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(ad._id);
+          }}
           className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
           title="Sil"
         >
@@ -122,16 +136,19 @@ const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
       </div>
     </div>
 
-    <div className="px-4 pb-4 pt-1">
+    <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
       <button
-        onClick={() => changeStatus(ad._id, ad.status)}
+        onClick={(e) => {
+          e.stopPropagation();
+          changeStatus(ad._id, ad.status);
+        }}
         disabled={isLoading}
         className={`w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 ${
           isLoading
             ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
             : ad.status === 'active'
-            ? 'text-gray-700 hover:text-red-600 bg-white border border-gray-200 hover:border-red-200'
-            : 'text-gray-700 hover:text-green-600 bg-white border border-gray-200 hover:border-green-200'
+            ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 hover:border-red-300 hover:shadow-md'
+            : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 hover:border-green-300 hover:shadow-md'
         }`}
       >
         {isLoading ? (
@@ -161,12 +178,12 @@ const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
         ) : ad.status === 'active' ? (
           <>
             <FiEyeOff className="h-4 w-4" />
-            <span>Yayından Kaldır</span>
+            <span className="font-medium">Yayından Kaldır</span>
           </>
         ) : (
           <>
             <FiEye className="h-4 w-4" />
-            <span>Yayınla</span>
+            <span className="font-medium">Yayınla</span>
           </>
         )}
       </button>
@@ -596,7 +613,8 @@ const MyAdsList = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      className="hover:bg-gray-50 transition duration-150 ease-in-out"
+                      className="hover:bg-gray-50 transition duration-150 ease-in-out cursor-pointer"
+                      onClick={() => handleViewAd(ad._id)}
                     >
                       <td className="py-4 px-4">
                         <div className="w-16 h-16 md:w-20 md:h-20 rounded-md overflow-hidden shadow-sm">
@@ -628,7 +646,10 @@ const MyAdsList = () => {
                       <td className="py-4 px-4">
                         <AdStatusBadge status={ad.status || 'active'} />
                       </td>
-                      <td className="py-4 px-4 text-center">
+                      <td
+                        className="py-4 px-4 text-center"
+                        onClick={(e) => e.stopPropagation()}
+                      >
                         <div className="flex justify-center space-x-2">
                           <button
                             onClick={() => handleViewAd(ad._id)}
@@ -650,6 +671,35 @@ const MyAdsList = () => {
                             title="Sil"
                           >
                             <FaRegTrashCan className="text-lg" />
+                          </button>
+                        </div>
+                        <div className="mt-2">
+                          <button
+                            onClick={() =>
+                              handleChangeStatus(ad._id, ad.status)
+                            }
+                            disabled={statusChangeLoading}
+                            className={`w-full py-1.5 px-3 rounded text-xs font-medium transition-all duration-200 ${
+                              statusChangeLoading
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : ad.status === 'active'
+                                ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200'
+                                : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200'
+                            }`}
+                          >
+                            {statusChangeLoading ? (
+                              <span>İşleniyor...</span>
+                            ) : ad.status === 'active' ? (
+                              <>
+                                <FiEyeOff className="inline-block h-3 w-3 mr-1" />
+                                <span>Yayından Kaldır</span>
+                              </>
+                            ) : (
+                              <>
+                                <FiEye className="inline-block h-3 w-3 mr-1" />
+                                <span>Yayınla</span>
+                              </>
+                            )}
                           </button>
                         </div>
                       </td>
