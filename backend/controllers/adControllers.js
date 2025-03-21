@@ -30,7 +30,7 @@ const createAd = async (req, res) => {
       city,
       price,
       priceType,
-      status
+      status,
     } = req.body;
 
     const images = req.files ? req.files.map((file) => file.path) : [];
@@ -46,7 +46,7 @@ const createAd = async (req, res) => {
       price,
       priceType,
       images,
-      status
+      status,
     });
 
     await ad.save();
@@ -76,7 +76,8 @@ const updateAd = async (req, res) => {
       return res.status(400).json({ message: 'Geçersiz ilan ID' });
     }
 
-    const { title, description, category, subCategory, price,status } = req.body;
+    const { title, description, category, subCategory, price, status } =
+      req.body;
 
     const newImages = req.files ? req.files.map((file) => file.path) : [];
 
@@ -98,7 +99,7 @@ const updateAd = async (req, res) => {
     existingAd.subCategory = subCategory || existingAd.subCategory;
     existingAd.price = price || existingAd.price;
     existingAd.images = updatedImages;
-    existingAd.status=status || existingAd.status
+    existingAd.status = status || existingAd.status;
     await existingAd.save();
 
     return res.status(200).json({
@@ -221,10 +222,10 @@ const deleteAd = async (req, res) => {
       return res.status(403).json({ message: 'Bu ilanı silmeye yetkiniz yok' });
     }
 
-    await Ad.findByIdAndDelete(adId)
+    await Ad.findByIdAndDelete(adId);
 
     return res.status(200).json({
-      message: 'İlan başarıyla silindi', 
+      message: 'İlan başarıyla silindi',
     });
   } catch (error) {
     console.error('deleteAd error:', error);
@@ -234,8 +235,8 @@ const deleteAd = async (req, res) => {
     });
   }
 };
-const makeAdStatusChange=async(req,res)=>{
-  try{
+const makeAdStatusChange = async (req, res) => {
+  try {
     const adId = req.params.id;
     const userId = req.user._id;
     if (!mongoose.Types.ObjectId.isValid(adId)) {
@@ -247,15 +248,17 @@ const makeAdStatusChange=async(req,res)=>{
       return res.status(404).json({ message: 'İlan bulunamadı' });
     }
     if (existingAd.user.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
+      return res
+        .status(403)
+        .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
     }
     existingAd.status = status;
-    
+
     await existingAd.save();
-    
+
     return res.status(200).json({
       message: 'İlan başarıyla güncellendi',
-      data: existingAd
+      data: existingAd,
     });
   } catch (error) {
     console.error('updateAd error:', error);
@@ -264,7 +267,8 @@ const makeAdStatusChange=async(req,res)=>{
       error: error.message,
     });
   }
-}
+};
+
 const getAdsByCategory = async (req, res) => {
   try {
     const { categoryId } = req.params;
@@ -284,6 +288,7 @@ const getAdsByCategory = async (req, res) => {
 
     const query = {
       $or: [{ category: categoryId }, { subCategory: categoryId }],
+      status: 'active',
     };
 
     if (search) {
@@ -351,5 +356,5 @@ module.exports = {
   getSingleAd,
   deleteAd,
   getAdsByCategory,
-  makeAdStatusChange
+  makeAdStatusChange,
 };
