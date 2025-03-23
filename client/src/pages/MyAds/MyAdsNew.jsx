@@ -3,8 +3,12 @@ import { Formik, Form, Field } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { createAd } from '../../features/ad/adSlice';
 import { useNavigate } from 'react-router-dom';
-import Spinner from '../../components/UI/Spinner';
-import { AdSchema } from '../../validations/adValidation';
+import LoadingSpinner from '../../components/UI/LoadingSpinner';
+import {
+  step1Schema,
+  step2Schema,
+  fullAdSchema,
+} from '../../validations/adValidation';
 import { fetchCities } from '../../api/cityApi';
 import {
   fetchAddSubcategoryByCategory,
@@ -14,11 +18,22 @@ import {
 import SelectField from '../../components/UI/SelectField';
 import InputField from '../../components/UI/InputField';
 import { showToast } from '../../features/toast/toastSlice';
-import { FiUpload, FiX, FiImage, FiArrowLeft, FiSave } from 'react-icons/fi';
-
-const MAX_FILES = 5;
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+import {
+  FiImage,
+  FiArrowLeft,
+  FiSave,
+  FiInfo,
+  FiMapPin,
+  FiTag,
+  FiDollarSign,
+  FiList,
+  FiGrid,
+  FiMessageSquare,
+  FiPlus,
+  FiCheckCircle,
+  FiEdit,
+} from 'react-icons/fi';
+import UploadFile from '../../components/MyAds/UploadFile';
 
 const serviceTypeOptions = [
   { name: 'Yüz Yüze', value: 'yüz yüze' },
@@ -39,7 +54,7 @@ const MyAdsNew = () => {
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [previewUrls, setPreviewUrls] = useState([]);
-  const fileInputRef = useRef(null);
+  const [currentStep, setCurrentStep] = useState(1);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -96,7 +111,6 @@ const MyAdsNew = () => {
 
     try {
       const subCategoryData = await fetchSubCategories(categoryId);
-
       const mappedSubs = subCategoryData.map((sub) => ({
         name: sub.name,
         value: sub._id,
@@ -115,66 +129,11 @@ const MyAdsNew = () => {
 
   const otherSubCategoryId = (subCatValue) => {
     const otherObj = subCategories.find((item) => item.name === 'Diğer');
-
     if (otherObj && otherObj.value === subCatValue) {
       setSelectedSubCategory('Diğer');
     } else {
       setSelectedSubCategory('Other');
     }
-  };
-
-  const validateFile = (file) => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      throw new Error('Sadece JPG, PNG ve WEBP formatları desteklenir');
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      throw new Error("Dosya boyutu 5MB'dan küçük olmalıdır");
-    }
-  };
-
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
-
-    if (selectedFiles.length + files.length > MAX_FILES) {
-      dispatch(
-        showToast({
-          message: `En fazla ${MAX_FILES} görsel yükleyebilirsiniz`,
-          type: 'error',
-        })
-      );
-      return;
-    }
-    const validFiles = files.filter((file) => {
-      try {
-        validateFile(file);
-        return true;
-      } catch (error) {
-        dispatch(showToast({ message: error.message, type: 'error' }));
-        return false;
-      }
-    });
-
-    setSelectedFiles((prev) => [...prev, ...validFiles]);
-    e.target.value = '';
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length) {
-      const imageFiles = files.filter((file) => file.type.startsWith('image/'));
-      if (imageFiles.length) {
-        handleFileChange({ target: { files: imageFiles } });
-      }
-    }
-  };
-
-  const removeFile = (index) => {
-    setSelectedFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const initialValues = {
@@ -223,7 +182,7 @@ const MyAdsNew = () => {
         formData.append('images', file);
       });
 
-      const response = await dispatch(createAd(formData)).unwrap();
+      await dispatch(createAd(formData)).unwrap();
 
       dispatch(
         showToast({
@@ -252,44 +211,173 @@ const MyAdsNew = () => {
     }
   };
 
-  const renderLabel = (text) => {
+  const renderLabel = (text, icon = null) => {
     if (text.includes('*')) {
       const parts = text.split('*');
       return (
-        <>
+        <div className="flex items-center">
+          {icon && <span className="mr-2 text-indigo-600">{icon}</span>}
           {parts[0]}
           <span className="text-red-600 font-bold">*</span>
-        </>
+        </div>
       );
     }
-    return text;
+    return (
+      <div className="flex items-center">
+        {icon && <span className="mr-2 text-indigo-600">{icon}</span>}
+        {text}
+      </div>
+    );
   };
+
+  const nextStep = () => {
+    setCurrentStep(currentStep + 1);
+    window.scrollTo(0, 0);
+  };
+
+  const prevStep = () => {
+    setCurrentStep(currentStep - 1);
+    window.scrollTo(0, 0);
+  };
+
+  const stepInfo = [
+    {
+      title: 'Temel Bilgiler',
+      description: 'İlanınızın başlık ve açıklamasını girin',
+      icon: <FiEdit />,
+    },
+    {
+      title: 'Kategori ve Fiyat',
+      description: 'Hizmet kategorisi ve fiyat bilgilerini belirleyin',
+      icon: <FiTag />,
+    },
+    {
+      title: 'Görseller ve Tamamlama',
+      description: 'İlanınız için görseller ekleyin ve yayınlayın',
+      icon: <FiImage />,
+    },
+  ];
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6">
-        <h2 className="text-2xl font-bold text-white flex items-center">
-          <FiImage className="mr-2" /> Yeni İlan Ekle
-        </h2>
-        <p className="text-indigo-100 mt-1">
-          Hizmetinizi tanıtmak için aşağıdaki formu doldurun
-        </p>
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-blue-600 opacity-90"></div>
+        <div className="relative px-6 py-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div className="mb-4 md:mb-0">
+              <div className="flex items-center">
+                <div className="bg-white bg-opacity-20 p-3 rounded-full mr-4">
+                  <FiPlus className="text-white text-xl" />
+                </div>
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">
+                    Yeni İlan Oluştur
+                  </h1>
+                  <p className="text-indigo-100 mt-1">
+                    Hizmetlerinizi potansiyel müşterilerinize tanıtın
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              {[1, 2, 3].map((step) => (
+                <div
+                  key={step}
+                  className={`flex items-center ${
+                    currentStep === step ? 'text-white' : 'text-indigo-200'
+                  }`}
+                >
+                  <div
+                    className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${
+                      currentStep === step
+                        ? 'bg-white bg-opacity-20 border-white'
+                        : currentStep > step
+                        ? 'bg-green-500 border-green-500'
+                        : 'border-indigo-300 bg-transparent'
+                    }`}
+                  >
+                    {currentStep > step ? (
+                      <FiCheckCircle className="text-white" />
+                    ) : (
+                      <span className="font-medium">{step}</span>
+                    )}
+                  </div>
+                  {step < 3 && (
+                    <div
+                      className={`w-6 md:w-10 h-0.5 mx-1 ${
+                        currentStep > step
+                          ? 'bg-green-500'
+                          : 'bg-indigo-300 bg-opacity-50'
+                      }`}
+                    ></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-6 bg-white bg-opacity-10 rounded-lg p-4">
+            <div className="flex items-center">
+              {stepInfo[currentStep - 1].icon}
+              <div className="ml-3">
+                <h3 className="text-white font-medium">
+                  {stepInfo[currentStep - 1].title}
+                </h3>
+                <p className="text-indigo-100 text-sm">
+                  {stepInfo[currentStep - 1].description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="px-6 pt-6">
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm font-medium text-indigo-700">
+            Adım {currentStep} / 3
+          </div>
+          <div className="text-sm text-gray-500">
+            {currentStep === 1
+              ? 'Temel Bilgiler'
+              : currentStep === 2
+              ? 'Kategori ve Fiyat'
+              : 'Görseller ve Tamamlama'}
+          </div>
+        </div>
+        <div className="w-full bg-gray-200 rounded-full h-2.5">
+          <div
+            className="bg-indigo-600 h-2.5 rounded-full transition-all duration-500 ease-in-out"
+            style={{ width: `${(currentStep / 3) * 100}%` }}
+          ></div>
+        </div>
       </div>
 
       {status === 'loading' && (
-        <div className="flex justify-center p-6">
-          <Spinner className="w-10 h-10 text-indigo-600" />
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center">
+            <LoadingSpinner />
+            <p className="mt-4 text-gray-700 font-medium">
+              İlanınız kaydediliyor...
+            </p>
+          </div>
         </div>
       )}
 
       <Formik
         initialValues={initialValues}
-        validationSchema={AdSchema}
+        validationSchema={fullAdSchema}
         validateOnChange={false}
         validateOnBlur={false}
         onSubmit={handleSubmit}
       >
-        {({ validateForm, handleSubmit, setErrors, setFieldValue }) => {
+        {({
+          validateForm,
+          handleSubmit,
+          setErrors,
+          setFieldValue,
+          values,
+          errors,
+          touched,
+        }) => {
           const customSubmit = async (e) => {
             e.preventDefault();
             const validationErrors = await validateForm();
@@ -305,213 +393,266 @@ const MyAdsNew = () => {
 
           return (
             <Form className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                <div className="md:col-span-2">
-                  <InputField
-                    label={renderLabel('Başlık *')}
-                    name="title"
-                    placeholder="İlanınız için çekici bir başlık girin"
-                  />
-                </div>
-
-                <div className="md:col-span-2">
-                  <div className="space-y-2">
-                    <label
-                      htmlFor="description"
-                      className="block text-sm font-medium text-gray-700"
+              {currentStep === 1 && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100 mb-6">
+                    <h3 className="text-lg font-medium text-indigo-800 flex items-center mb-2">
+                      <FiInfo className="mr-2" /> Temel Bilgiler
+                    </h3>
+                    <p className="text-sm text-indigo-700">
+                      İlanınızın başlığı ve açıklaması, potansiyel müşterilerin
+                      ilk göreceği bilgilerdir. Detaylı ve açıklayıcı olun.
+                    </p>
+                  </div>
+                  <div className="mb-6">
+                    <InputField
+                      label={renderLabel('Başlık *', <FiTag />)}
+                      name="title"
+                      placeholder="İlanınız için çekici bir başlık girin"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      Örnek: "Profesyonel Web Tasarım ve Geliştirme Hizmeti"
+                    </p>
+                  </div>
+                  <div className="mb-6">
+                    <div className="space-y-2">
+                      <label
+                        htmlFor="description"
+                        className="block text-sm font-medium text-gray-700"
+                      >
+                        {renderLabel('Açıklama *', <FiMessageSquare />)}
+                      </label>
+                      <div className="relative">
+                        <Field
+                          as="textarea"
+                          id="description"
+                          name="description"
+                          rows={6}
+                          placeholder="Hizmetinizi detaylı olarak açıklayın"
+                          className="w-full py-2.5 px-3 bg-white border border-gray-300 rounded-lg focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200 outline-none transition-all duration-300 text-gray-800 placeholder-gray-400 resize-none"
+                        />
+                      </div>
+                      {errors.description && touched.description && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.description}
+                        </p>
+                      )}
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      İyi bir açıklama şunları içerir: Sunduğunuz hizmetin
+                      detayları, deneyiminiz, müşterilerinize sağladığınız
+                      faydalar ve sizi farklı kılan özellikler.
+                    </p>
+                  </div>
+                  <div className="flex justify-end mt-8">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        step1Schema
+                          .validate(
+                            {
+                              title: values.title,
+                              description: values.description,
+                            },
+                            { abortEarly: false }
+                          )
+                          .then(() => nextStep())
+                          .catch((err) => {
+                            err.inner.forEach((e) =>
+                              dispatch(
+                                showToast({ message: e.message, type: 'error' })
+                              )
+                            );
+                          });
+                      }}
+                      className="flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 ease-in-out font-medium"
                     >
-                      {renderLabel('Açıklama *')}
-                    </label>
-                    <div className="relative">
-                      <Field
-                        as="textarea"
-                        id="description"
-                        name="description"
-                        rows={4}
-                        placeholder="Hizmetinizi detaylı olarak açıklayın"
-                        className="w-full py-2.5 px-2 bg-transparent border-0 border-b-2 border-gray-200 
-                          focus:border-indigo-600 outline-none focus:outline-none
-                          transition-all duration-300
-                          text-gray-800 placeholder-gray-400 resize-none"
+                      Devam Et
+                    </button>
+                  </div>
+                </div>
+              )}
+              {currentStep === 2 && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100 mb-6">
+                    <h3 className="text-lg font-medium text-indigo-800 flex items-center mb-2">
+                      <FiGrid className="mr-2" /> Kategori ve Fiyat Bilgileri
+                    </h3>
+                    <p className="text-sm text-indigo-700">
+                      Doğru kategori seçimi, ilanınızın ilgili müşterilere
+                      ulaşmasını sağlar.
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div>
+                      <SelectField
+                        label={renderLabel('Kategori *', <FiList />)}
+                        name="category"
+                        options={categories}
+                        onChange={(e) => {
+                          handleCategoryChange(e.target.value, setFieldValue);
+                        }}
+                      />
+                    </div>
+                    <div>
+                      <SelectField
+                        label={renderLabel('Alt Kategori *', <FiList />)}
+                        name="subCategory"
+                        options={
+                          subCategories.length > 0
+                            ? subCategories
+                            : [
+                                {
+                                  name: 'Bu kategoriye ait alt kategori yok',
+                                  value: '',
+                                },
+                              ]
+                        }
+                        onChange={(e) => {
+                          setFieldValue('subCategory', e.target.value);
+                          otherSubCategoryId(e.target.value);
+                        }}
+                        disabled={!selectedCategory}
+                      />
+                    </div>
+                    {selectedSubCategory === 'Diğer' && (
+                      <div className="md:col-span-2">
+                        <InputField
+                          label={renderLabel('Özel Alt Kategori *', <FiTag />)}
+                          name="customSubCategory"
+                          placeholder="Özel alt kategori adını girin"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <SelectField
+                        label={renderLabel('Hizmet Tipi *', <FiTag />)}
+                        name="serviceType"
+                        options={serviceTypeOptions}
+                        placeholder="Hizmet tipini seçin"
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Yüz yüze veya online olarak hizmet verip vermediğinizi
+                        belirtin
+                      </p>
+                    </div>
+                    <div>
+                      <SelectField
+                        label={renderLabel('Şehir *', <FiMapPin />)}
+                        name="city"
+                        options={cities}
+                        placeholder="Şehir seçin"
+                      />
+                    </div>
+                    <div>
+                      <div className="relative">
+                        <InputField
+                          label={renderLabel('Fiyat *', <FiDollarSign />)}
+                          name="price"
+                          type="number"
+                          placeholder="0"
+                        />
+                        <div className="absolute right-3 top-9 text-gray-500">
+                          ₺
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <SelectField
+                        label={renderLabel('Fiyat Tipi *', <FiTag />)}
+                        name="priceType"
+                        options={priceTypeOptions}
+                        placeholder="Fiyat tipini seçin"
                       />
                     </div>
                   </div>
-                </div>
-
-                <div>
-                  <SelectField
-                    label={renderLabel('Kategori *')}
-                    name="category"
-                    options={categories}
-                    onChange={(e) => {
-                      handleCategoryChange(e.target.value, setFieldValue);
-                    }}
-                  />
-                </div>
-
-                <div>
-                  <SelectField
-                    label={renderLabel('Alt Kategori *')}
-                    name="subCategory"
-                    options={
-                      subCategories.length > 0
-                        ? subCategories
-                        : [
-                            {
-                              name: 'Bu kategoriye ait alt kategori yok',
-                              value: '',
-                            },
-                          ]
-                    }
-                    onChange={(e) => {
-                      setFieldValue('subCategory', e.target.value);
-                      otherSubCategoryId(e.target.value);
-                    }}
-                    disabled={!selectedCategory}
-                  />
-                </div>
-
-                {selectedSubCategory === 'Diğer' && (
-                  <div className="md:col-span-2">
-                    <InputField
-                      label={renderLabel('Özel Alt Kategori *')}
-                      name="customSubCategory"
-                      placeholder="Özel alt kategori adını girin"
-                    />
-                  </div>
-                )}
-
-                <div>
-                  <SelectField
-                    label={renderLabel('Hizmet Tipi *')}
-                    name="serviceType"
-                    options={serviceTypeOptions}
-                    placeholder="Hizmet tipini seçin"
-                  />
-                </div>
-
-                <div>
-                  <SelectField
-                    label={renderLabel('Şehir *')}
-                    name="city"
-                    options={cities}
-                    placeholder="Şehir seçin"
-                  />
-                </div>
-
-                <div>
-                  <InputField
-                    label={renderLabel('Fiyat *')}
-                    name="price"
-                    type="number"
-                    placeholder="0"
-                  />
-                </div>
-
-                <div>
-                  <SelectField
-                    label={renderLabel('Fiyat Tipi *')}
-                    name="priceType"
-                    options={priceTypeOptions}
-                    placeholder="Fiyat tipini seçin"
-                  />
-                </div>
-
-                <div className="md:col-span-2 mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
-                    Resimler<span className="text-red-600 font-bold">*</span>
-                  </label>
-                  <div
-                    className="border-2 border-dashed border-indigo-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition duration-300 ease-in-out bg-indigo-50"
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current.click()}
-                  >
-                    <FiUpload className="mx-auto text-5xl text-indigo-500 mb-3" />
-                    <p className="text-indigo-700 font-medium mb-1">
-                      Dosyaları buraya sürükleyin
-                    </p>
-                    <p className="text-indigo-600 text-sm">veya</p>
+                  <div className="flex justify-between mt-8">
                     <button
                       type="button"
-                      className="mt-3 bg-white text-indigo-600 border border-indigo-300 rounded-full px-6 py-2 hover:bg-indigo-100 transition duration-200"
+                      onClick={prevStep}
+                      className="flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition duration-300 ease-in-out font-medium"
                     >
-                      Dosya Seç
+                      <FiArrowLeft className="mr-2" /> Geri
                     </button>
-                    <p className="mt-3 text-xs text-gray-500">
-                      Maksimum {MAX_FILES} görsel, her biri 5MB'dan küçük (JPG,
-                      PNG, WEBP)
+                    <button
+                      type="button"
+                      onClick={() => {
+                        step2Schema
+                          .validate(
+                            {
+                              serviceType: values.serviceType,
+                              city: values.city,
+                              price: values.price,
+                              priceType: values.priceType,
+                              category: values.category,
+                              subCategory: values.subCategory,
+                            },
+                            { abortEarly: false }
+                          )
+                          .then(() => nextStep())
+                          .catch((err) => {
+                            err.inner.forEach((e) =>
+                              dispatch(
+                                showToast({ message: e.message, type: 'error' })
+                              )
+                            );
+                          });
+                      }}
+                      className="flex items-center justify-center bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 transition duration-300 ease-in-out font-medium"
+                    >
+                      Devam Et
+                    </button>
+                  </div>
+                </div>
+              )}
+              {currentStep === 3 && (
+                <div className="space-y-6 animate-fadeIn">
+                  <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-100 mb-6">
+                    <h3 className="text-lg font-medium text-indigo-800 flex items-center mb-2">
+                      <FiImage className="mr-2" /> Görseller
+                    </h3>
+                    <p className="text-sm text-indigo-700">
+                      Kaliteli görseller, ilanınızın dikkat çekmesini sağlar. En
+                      az bir görsel yüklemelisiniz.
                     </p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
                   </div>
 
-                  {selectedFiles.length > 0 && (
-                    <div className="mt-6">
-                      <p className="font-medium mb-3 text-gray-700 flex items-center">
-                        <FiImage className="mr-2" />
-                        Seçilen Görseller ({selectedFiles.length} / {MAX_FILES})
-                      </p>
+                  <UploadFile
+                    selectedFiles={selectedFiles}
+                    setSelectedFiles={setSelectedFiles}
+                    previewUrls={previewUrls}
+                    setPreviewUrls={setPreviewUrls}
+                    isEditMode={false}
+                  />
 
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                        {previewUrls.map((url, index) => (
-                          <div key={index} className="relative group">
-                            <div className="aspect-square rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
-                              <img
-                                src={url || '/placeholder.svg'}
-                                alt={`Preview ${index + 1}`}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => removeFile(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition duration-200"
-                            >
-                              <FiX className="w-4 h-4" />
-                            </button>
-                            <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-60 text-white text-xs p-1 truncate">
-                              {selectedFiles[index].name}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition duration-300 ease-in-out font-medium"
+                    >
+                      <FiArrowLeft className="mr-2" /> Geri
+                    </button>
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => navigate('/dashboard/my-ads')}
+                        className="flex items-center justify-center bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition duration-300 ease-in-out font-medium"
+                      >
+                        İptal
+                      </button>
+                      <button
+                        type="submit"
+                        onClick={customSubmit}
+                        disabled={status === 'loading'}
+                        className="flex items-center justify-center bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+                      >
+                        <FiSave className="mr-2" /> İlanı Yayınla
+                      </button>
                     </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-
-              <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row justify-between gap-4">
-                <button
-                  type="button"
-                  onClick={() => navigate('/dashboard/my-ads')}
-                  className="flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition duration-300 ease-in-out font-medium"
-                >
-                  <FiArrowLeft className="mr-2" /> İptal
-                </button>
-                <button
-                  type="submit"
-                  onClick={customSubmit}
-                  disabled={status === 'loading'}
-                  className="flex items-center justify-center bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
-                >
-                  {status === 'loading' ? (
-                    <>
-                      <Spinner className="w-5 h-5 mr-2" /> Kaydediliyor...
-                    </>
-                  ) : (
-                    <>
-                      <FiSave className="mr-2" /> Kaydet
-                    </>
-                  )}
-                </button>
-              </div>
+              )}
             </Form>
           );
         }}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,21 +5,12 @@ import { Helmet } from 'react-helmet-async';
 import { fetchAdsByCategory, clearCategoryAds } from '../features/ad/adSlice';
 import { fetchCategories, fetchSubCategories } from '../api/categoryApi';
 import { startLoading, stopLoading } from '../features/loading/loadingSlice';
-import {
-  FiSearch,
-  FiFilter,
-  FiGrid,
-  FiList,
-  FiStar,
-  FiMapPin,
-  FiClock,
-  FiChevronDown,
-  FiChevronUp,
-  FiSliders,
-} from 'react-icons/fi';
+import { FiSliders, FiStar, FiMapPin, FiClock, FiSearch } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Header from '../components/Header/Header';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
+import AdCard from '../components/MyAds/AdCard';
+import Filter from '../components/UI/Filter';
 
 const CategoryAds = () => {
   const { categoryId } = useParams();
@@ -39,10 +29,7 @@ const CategoryAds = () => {
   const [sortOption, setSortOption] = useState('newest');
   const [searchTerm, setSearchTerm] = useState('');
   const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-  const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
-  const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -90,6 +77,7 @@ const CategoryAds = () => {
       dispatch(clearCategoryAds());
     };
   }, [categoryId, dispatch]);
+
   useEffect(() => {
     const filters = {
       sort:
@@ -140,8 +128,40 @@ const CategoryAds = () => {
     setCurrentPage(1);
   };
 
-  const toggleFilters = () => {
-    setShowFilters(!showFilters);
+  const activeFilters = [];
+
+  if (selectedSubCategory !== 'all') {
+    const subCategoryName =
+      subCategories.find((sc) => sc._id === selectedSubCategory)?.name ||
+      'Alt Kategori';
+    activeFilters.push({ id: 'subCategory', label: subCategoryName });
+  }
+
+  if (priceRange.min || priceRange.max) {
+    activeFilters.push({
+      id: 'price',
+      label: `Fiyat: ${priceRange.min || '0'}₺ - ${priceRange.max || '∞'}₺`,
+    });
+  }
+
+  if (searchTerm) {
+    activeFilters.push({ id: 'search', label: `Arama: ${searchTerm}` });
+  }
+
+  const handleClearFilter = (filterId) => {
+    if (filterId === 'subCategory') {
+      setSelectedSubCategory('all');
+    } else if (filterId === 'price') {
+      setPriceRange({ min: '', max: '' });
+    } else if (filterId === 'search') {
+      setSearchTerm('');
+    }
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedSubCategory('all');
+    setPriceRange({ min: '', max: '' });
+    setSearchTerm('');
   };
 
   const totalPages = Math.ceil(totalAds / itemsPerPage);
@@ -243,284 +263,35 @@ const CategoryAds = () => {
 
         <div className="bg-white border-b shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="w-full md:w-auto md:flex-1 max-w-2xl">
-                <form onSubmit={handleSearch} className="relative">
-                  <input
-                    type="text"
-                    placeholder="İlan ara..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-                  />
-                  <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-700"
-                  >
-                    Ara
-                  </button>
-                </form>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2 md:mt-0">
-                <div className="relative">
-                  <button
-                    onClick={() => setIsFilterMenuOpen(!isFilterMenuOpen)}
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-                  >
-                    <FiFilter className="mr-2 text-gray-500" />
-                    <span>Filtrele</span>
-                  </button>
-
-                  {isFilterMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="p-4">
-                        <h3 className="font-medium text-gray-900 mb-3">
-                          Fiyat Aralığı
-                        </h3>
-                        <form
-                          onSubmit={handlePriceFilter}
-                          className="space-y-3"
-                        >
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="number"
-                              placeholder="Min"
-                              value={priceRange.min}
-                              onChange={(e) =>
-                                setPriceRange({
-                                  ...priceRange,
-                                  min: e.target.value,
-                                })
-                              }
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                            />
-                            <span className="text-gray-500">-</span>
-                            <input
-                              type="number"
-                              placeholder="Max"
-                              value={priceRange.max}
-                              onChange={(e) =>
-                                setPriceRange({
-                                  ...priceRange,
-                                  max: e.target.value,
-                                })
-                              }
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                            />
-                          </div>
-                          <button
-                            type="submit"
-                            className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                          >
-                            Uygula
-                          </button>
-                        </form>
-
-                        <div className="mt-4 pt-4 border-t border-gray-100">
-                          <h3 className="font-medium text-gray-900 mb-3">
-                            Alt Kategoriler
-                          </h3>
-                          <div className="space-y-2 max-h-48 overflow-y-auto">
-                            <div
-                              className={`px-3 py-2 rounded-md cursor-pointer ${
-                                selectedSubCategory === 'all'
-                                  ? 'bg-blue-50 text-blue-700'
-                                  : 'hover:bg-gray-50'
-                              }`}
-                              onClick={() => {
-                                setSelectedSubCategory('all');
-                                setIsFilterMenuOpen(false);
-                              }}
-                            >
-                              Tümü
-                            </div>
-                            {subCategories.map((subCat) => (
-                              <div
-                                key={subCat._id}
-                                className={`px-3 py-2 rounded-md cursor-pointer ${
-                                  selectedSubCategory === subCat._id
-                                    ? 'bg-blue-50 text-blue-700'
-                                    : 'hover:bg-gray-50'
-                                }`}
-                                onClick={() => {
-                                  setSelectedSubCategory(subCat._id);
-                                  setIsFilterMenuOpen(false);
-                                }}
-                              >
-                                {subCat.name}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="relative">
-                  <button
-                    onClick={() => setIsSortMenuOpen(!isSortMenuOpen)}
-                    className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-                  >
-                    <FiSliders className="mr-2 text-gray-500" />
-                    <span>Sırala</span>
-                  </button>
-                  {isSortMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                      <div className="py-1">
-                        <button
-                          onClick={() => {
-                            setSortOption('newest');
-                            setIsSortMenuOpen(false);
-                          }}
-                          className={`block px-4 py-2 text-sm w-full text-left ${
-                            sortOption === 'newest'
-                              ? 'bg-blue-50 text-blue-700'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          En Yeni
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortOption('price-low');
-                            setIsSortMenuOpen(false);
-                          }}
-                          className={`block px-4 py-2 text-sm w-full text-left ${
-                            sortOption === 'price-low'
-                              ? 'bg-blue-50 text-blue-700'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          Fiyat (Düşükten Yükseğe)
-                        </button>
-                        <button
-                          onClick={() => {
-                            setSortOption('price-high');
-                            setIsSortMenuOpen(false);
-                          }}
-                          className={`block px-4 py-2 text-sm w-full text-left ${
-                            sortOption === 'price-high'
-                              ? 'bg-blue-50 text-blue-700'
-                              : 'text-gray-700 hover:bg-gray-50'
-                          }`}
-                        >
-                          Fiyat (Yüksekten Düşüğe)
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <button
-                  onClick={() =>
-                    setViewMode(viewMode === 'grid' ? 'list' : 'grid')
-                  }
-                  className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-                >
-                  {viewMode === 'grid' ? (
-                    <FiList className="text-gray-500" />
-                  ) : (
-                    <FiGrid className="text-gray-500" />
-                  )}
-                </button>
-              </div>
-            </div>
-            {(selectedSubCategory !== 'all' ||
-              priceRange.min ||
-              priceRange.max ||
-              searchTerm) && (
-              <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                <span className="text-sm text-gray-500">Aktif Filtreler:</span>
-
-                {selectedSubCategory !== 'all' && (
-                  <div className="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    <span>
-                      {subCategories.find(
-                        (sc) => sc._id === selectedSubCategory
-                      )?.name || 'Alt Kategori'}
-                    </span>
-                    <button
-                      onClick={() => setSelectedSubCategory('all')}
-                      className="ml-2 text-blue-500 hover:text-blue-700"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                )}
-
-                {(priceRange.min || priceRange.max) && (
-                  <div className="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    <span>
-                      Fiyat: {priceRange.min || '0'}₺ - {priceRange.max || '∞'}₺
-                    </span>
-                    <button
-                      onClick={() => setPriceRange({ min: '', max: '' })}
-                      className="ml-2 text-blue-500 hover:text-blue-700"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                )}
-
-                {searchTerm && (
-                  <div className="flex items-center bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-sm">
-                    <span>Arama: {searchTerm}</span>
-                    <button
-                      onClick={() => setSearchTerm('')}
-                      className="ml-2 text-blue-500 hover:text-blue-700"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                )}
-
-                <button
-                  onClick={() => {
-                    setSelectedSubCategory('all');
-                    setPriceRange({ min: '', max: '' });
-                    setSearchTerm('');
-                  }}
-                  className="text-sm text-blue-600 hover:text-blue-800 ml-auto"
-                >
-                  Tüm Filtreleri Temizle
-                </button>
-              </div>
-            )}
+            <Filter
+              searchTerm={searchTerm}
+              onSearchChange={setSearchTerm}
+              onSearchSubmit={handleSearch}
+              searchPlaceholder="İlan ara..."
+              viewMode={viewMode}
+              onViewModeChange={setViewMode}
+              sortOption={sortOption}
+              onSortChange={setSortOption}
+              sortOptions={[
+                { id: 'newest', label: 'En Yeni' },
+                { id: 'price-low', label: 'Fiyat (Düşükten Yükseğe)' },
+                { id: 'price-high', label: 'Fiyat (Yüksekten Düşüğe)' },
+              ]}
+              priceRange={priceRange}
+              onPriceRangeChange={setPriceRange}
+              onPriceFilterSubmit={handlePriceFilter}
+              categories={subCategories}
+              selectedCategory={selectedSubCategory}
+              onCategoryChange={setSelectedSubCategory}
+              categoryAllLabel={`Tüm ${category?.name || 'Kategoriler'}`}
+              activeFilters={activeFilters}
+              onClearFilter={handleClearFilter}
+              onClearAllFilters={handleClearAllFilters}
+              layout="expanded"
+            />
           </div>
         </div>
-        {subCategories.length > 0 && (
-          <div className="bg-white border-b shadow-sm hidden md:block">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex items-center overflow-x-auto py-3 space-x-4">
-                <button
-                  onClick={() => setSelectedSubCategory('all')}
-                  className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                    selectedSubCategory === 'all'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  Tüm {category?.name}
-                </button>
 
-                {subCategories.map((subCat) => (
-                  <button
-                    key={subCat._id}
-                    onClick={() => setSelectedSubCategory(subCat._id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
-                      selectedSubCategory === subCat._id
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {subCat.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {loading && (
             <div className="flex justify-center my-8">
@@ -544,11 +315,7 @@ const CategoryAds = () => {
                 filtreler deneyiniz.
               </p>
               <button
-                onClick={() => {
-                  setSelectedSubCategory('all');
-                  setPriceRange({ min: '', max: '' });
-                  setSearchTerm('');
-                }}
+                onClick={handleClearAllFilters}
                 className="inline-flex items-center px-4 py-2 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
               >
                 Tüm Filtreleri Temizle
@@ -560,71 +327,16 @@ const CategoryAds = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   <AnimatePresence>
                     {ads.map((ad) => (
-                      <motion.div
-                        key={ad._id}
-                        layout
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        whileHover={{
-                          y: -5,
-                          boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)',
-                        }}
-                        transition={{ duration: 0.2 }}
-                        className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300"
-                      >
-                        <Link to={`/ad/${ad._id}`} className="block">
-                          <div className="relative h-48 overflow-hidden">
-                            <img
-                              src={
-                                ad.images?.length
-                                  ? ad.images[0]
-                                  : 'https://via.placeholder.com/300x200?text=Resim+Yok'
-                              }
-                              alt={ad.title}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-                            />
-                            {ad.featured && (
-                              <div className="absolute top-2 left-2 bg-yellow-400 text-yellow-800 text-xs font-bold px-2 py-1 rounded">
-                                <FiStar className="inline mr-1" />
-                                Öne Çıkan
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-5">
-                            <h3 className="font-bold text-lg text-gray-900 line-clamp-1 mb-2">
-                              {ad.title}
-                            </h3>
-                            <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-                              {ad.description || 'Açıklama bulunmuyor'}
-                            </p>
-                            <div className="flex justify-between items-center">
-                              <span className="text-lg font-bold text-blue-600">
-                                {ad.price
-                                  ? `${ad.price}₺`
-                                  : 'Fiyat Belirtilmedi'}
-                              </span>
-                              <span className="text-xs text-gray-500">
-                                {ad.priceType || 'saatlik'}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="border-t border-gray-100 p-4 bg-gray-50">
-                            <div className="flex justify-between text-xs text-gray-500">
-                              <div className="flex items-center">
-                                <FiMapPin className="mr-1" />
-                                {ad.location || 'Konum belirtilmedi'}
-                              </div>
-                              <div className="flex items-center">
-                                <FiClock className="mr-1" />
-                                {new Date(ad.createdAt).toLocaleDateString(
-                                  'tr-TR'
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </motion.div>
+                      <Link key={ad._id} to={`/ad/${ad._id}`}>
+                        <AdCard
+                          ad={ad}
+                          isManageable={false}
+                          isFeatured={true}
+                          showLocation={true}
+                          showDate={true}
+                          linkTo={`/ad/${ad._id}`}
+                        />
+                      </Link>
                     ))}
                   </AnimatePresence>
                 </div>
@@ -671,7 +383,7 @@ const CategoryAds = () => {
                             <div className="flex flex-wrap items-center justify-between mt-auto">
                               <div className="flex items-center text-gray-500 text-sm mb-2 sm:mb-0">
                                 <FiMapPin className="mr-1" />
-                                {ad.location || 'Konum belirtilmedi'}
+                                {ad.location || ad.city || 'Konum belirtilmedi'}
                               </div>
                               <div className="flex items-center text-gray-500 text-sm">
                                 <FiClock className="mr-1" />
@@ -713,7 +425,7 @@ const CategoryAds = () => {
                       }`}
                     >
                       <span className="sr-only">Önceki</span>
-                      <FiChevronUp className="rotate-90" />
+                      &lt;
                     </button>
 
                     {pagination.map((page, index) => (
@@ -747,7 +459,7 @@ const CategoryAds = () => {
                       }`}
                     >
                       <span className="sr-only">Sonraki</span>
-                      <FiChevronDown className="rotate-90" />
+                      &gt;
                     </button>
                   </nav>
                 </div>

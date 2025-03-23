@@ -8,188 +8,25 @@ import {
 } from '../../features/ad/adSlice';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
 import { FaRegTrashCan } from 'react-icons/fa6';
-import { FaEdit, FaEye, FaSearch, FaFilter } from 'react-icons/fa';
-import { FaSortAmountDown, FaSortAmountUp } from 'react-icons/fa';
+import {
+  FaEdit,
+  FaEye,
+  FaSortAmountUp,
+  FaSortAmountDown,
+} from 'react-icons/fa';
 import {
   FiPlus,
   FiAlertCircle,
-  FiCheckCircle,
-  FiClock,
-  FiGrid,
-  FiList,
-  FiSearch as FiSearchIcon,
-  FiEye,
+  FiSearch, 
   FiEyeOff,
-  FiXCircle,
+  FiEye,
+  FiGrid,
 } from 'react-icons/fi';
 import DeleteConfirmationModal from '../../components/UI/DeleteConfirmationModal';
 import { emailSend } from '../../api/authApi';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const AdStatusBadge = ({ status }) => {
-  const statusConfig = {
-    active: {
-      color: 'bg-green-100 text-green-800',
-      icon: <FiCheckCircle className="mr-1" />,
-    },
-    pending: {
-      color: 'bg-yellow-100 text-yellow-800',
-      icon: <FiClock className="mr-1" />,
-    },
-    pasif: {
-      color: 'bg-red-100 text-red-800',
-      icon: <FiXCircle className="mr-1" />,
-    },
-  };
-
-  const config = statusConfig[status] || statusConfig.active;
-
-  return (
-    <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.color}`}
-    >
-      {config.icon}
-      {status === 'active'
-        ? 'Aktif'
-        : status === 'pending'
-        ? 'Onay Bekliyor'
-        : 'Pasif'}
-    </span>
-  );
-};
-const AdCard = ({ ad, onView, onEdit, onDelete, changeStatus, isLoading }) => (
-  <motion.div
-    layout
-    initial={{ opacity: 0, scale: 0.9 }}
-    animate={{ opacity: 1, scale: 1 }}
-    exit={{ opacity: 0, scale: 0.9 }}
-    whileHover={{ y: -5, boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1)' }}
-    transition={{ duration: 0.2 }}
-    className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer"
-    onClick={() => onView(ad._id)}
-  >
-    <div className="relative h-48 overflow-hidden">
-      <img
-        src={
-          ad.images?.length
-            ? ad.images[0]
-            : 'https://media.istockphoto.com/id/1324356458/tr/vekt%C3%B6r/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=khO1-2i1TZ67Nak9JQWmDx7Slai72lbl6SEp2gDOaV8='
-        }
-        alt={ad.title}
-        className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
-      />
-      <div className="absolute top-2 right-2">
-        <AdStatusBadge status={ad.status} />
-      </div>
-    </div>
-    <div className="p-5">
-      <h3 className="font-bold text-lg text-gray-900 line-clamp-1 mb-2">
-        {ad.title}
-      </h3>
-      <p className="text-gray-600 text-sm line-clamp-2 mb-3">
-        {ad.description || 'Açıklama bulunmuyor'}
-      </p>
-      <div className="flex justify-between items-center">
-        <span className="text-lg font-bold text-blue-600">
-          {ad.price ? `${ad.price}₺` : 'Fiyat Belirtilmedi'}
-        </span>
-        <span className="text-xs text-gray-500">
-          {ad.priceType || 'saatlik'}
-        </span>
-      </div>
-    </div>
-    <div
-      className="border-t border-gray-100 p-4 bg-gray-50"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="flex justify-between">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onView(ad._id);
-          }}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors"
-          title="Görüntüle"
-        >
-          <FaEye />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(ad._id);
-          }}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 text-green-600 hover:bg-green-100 transition-colors"
-          title="Düzenle"
-        >
-          <FaEdit />
-        </button>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(ad._id);
-          }}
-          className="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 text-red-600 hover:bg-red-100 transition-colors"
-          title="Sil"
-        >
-          <FaRegTrashCan />
-        </button>
-      </div>
-    </div>
-
-    <div className="px-4 pb-4 pt-1" onClick={(e) => e.stopPropagation()}>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          changeStatus(ad._id, ad.status);
-        }}
-        disabled={isLoading}
-        className={`w-full py-2.5 rounded-md flex items-center justify-center gap-2 text-sm font-medium transition-all duration-200 ${
-          isLoading
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-            : ad.status === 'active'
-            ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 hover:border-red-300 hover:shadow-md'
-            : 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 hover:border-green-300 hover:shadow-md'
-        }`}
-      >
-        {isLoading ? (
-          <>
-            <svg
-              className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-400"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              ></circle>
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            <span>İşleniyor...</span>
-          </>
-        ) : ad.status === 'active' ? (
-          <>
-            <FiEyeOff className="h-4 w-4" />
-            <span className="font-medium">Yayından Kaldır</span>
-          </>
-        ) : (
-          <>
-            <FiEye className="h-4 w-4" />
-            <span className="font-medium">Yayınla</span>
-          </>
-        )}
-      </button>
-    </div>
-  </motion.div>
-);
+import AdCard from '../../components/MyAds/AdCard';
+import Filter from '../../components/UI/Filter';
 
 const EmptyState = ({ onAddNew }) => (
   <motion.div
@@ -246,6 +83,25 @@ const ErrorState = ({ error }) => (
   </motion.div>
 );
 
+const AdStatusBadge = ({ status }) => {
+  let color = 'bg-gray-100 text-gray-500';
+  if (status === 'active') {
+    color = 'bg-green-100 text-green-500';
+  } else if (status === 'pending') {
+    color = 'bg-yellow-100 text-yellow-500';
+  } else if (status === 'pasif') {
+    color = 'bg-red-100 text-red-500';
+  }
+
+  return (
+    <span
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}
+    >
+      {status}
+    </span>
+  );
+};
+
 const MyAdsList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -263,7 +119,6 @@ const MyAdsList = () => {
   const [sortDirection, setSortDirection] = useState('desc');
   const [viewMode, setViewMode] = useState('grid');
   const [selectedFilter, setSelectedFilter] = useState('all');
-  const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchUserAds());
@@ -287,9 +142,9 @@ const MyAdsList = () => {
     if (adToDelete) {
       try {
         await dispatch(deleteAd(adToDelete)).unwrap();
-        // Add success toast
+        // add success toast
       } catch (error) {
-        // Add error toast
+        // add error toast
       } finally {
         setIsDeleteModalOpen(false);
         setAdToDelete(null);
@@ -321,21 +176,65 @@ const MyAdsList = () => {
     navigate(`/dashboard/my-ads/${adId}/edit`);
   };
 
-  const toggleSort = (field) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
+  const handleSearch = (e) => {
+    e.preventDefault();
+  };
+  const statusOptions = [
+    { _id: 'all', name: 'Tümü' },
+    { _id: 'active', name: 'Aktif İlanlar' },
+    { _id: 'pending', name: 'Onay Bekleyenler' },
+    { _id: 'pasif', name: 'Pasif İlanlar' },
+  ];
+
+  const activeFilters = [];
+  if (selectedFilter !== 'all') {
+    const statusName =
+      statusOptions.find((s) => s._id === selectedFilter)?.name || 'Durum';
+    activeFilters.push({ id: 'status', label: statusName });
+  }
+  if (searchTerm) {
+    activeFilters.push({ id: 'search', label: `Arama: ${searchTerm}` });
+  }
+
+  const handleClearFilter = (filterId) => {
+    if (filterId === 'status') {
+      setSelectedFilter('all');
+    } else if (filterId === 'search') {
+      setSearchTerm('');
     }
+  };
+
+  const handleClearAllFilters = () => {
+    setSelectedFilter('all');
+    setSearchTerm('');
+  };
+
+  const handleSortChange = (option) => {
+    if (option === 'newest') {
+      setSortField('createdAt');
+      setSortDirection('desc');
+    } else if (option === 'price-low') {
+      setSortField('price');
+      setSortDirection('asc');
+    } else if (option === 'price-high') {
+      setSortField('price');
+      setSortDirection('desc');
+    }
+  };
+
+  const getCurrentSortOption = () => {
+    if (sortField === 'createdAt' && sortDirection === 'desc') {
+      return 'newest';
+    } else if (sortField === 'price' && sortDirection === 'asc') {
+      return 'price-low';
+    } else if (sortField === 'price' && sortDirection === 'desc') {
+      return 'price-high';
+    }
+    return 'newest';
   };
 
   const toggleViewMode = () => {
     setViewMode(viewMode === 'grid' ? 'list' : 'grid');
-  };
-
-  const toggleFilterMenu = () => {
-    setIsFilterMenuOpen(!isFilterMenuOpen);
   };
 
   const filteredAds = useMemo(() => {
@@ -410,119 +309,35 @@ const MyAdsList = () => {
         </div>
 
         <div className="p-4 border-b border-gray-200 bg-gray-50">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-grow">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <FaSearch className="text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="İlan ara..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <div className="relative">
-                <button
-                  onClick={toggleFilterMenu}
-                  className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-                >
-                  <FaFilter className="mr-2 text-gray-500" />
-                  <span>Filtrele</span>
-                </button>
-
-                {isFilterMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
-                    <div className="py-1">
-                      <button
-                        onClick={() => {
-                          setSelectedFilter('all');
-                          setIsFilterMenuOpen(false);
-                        }}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
-                          selectedFilter === 'all'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        Tümü
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedFilter('active');
-                          setIsFilterMenuOpen(false);
-                        }}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
-                          selectedFilter === 'active'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        Aktif İlanlar
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedFilter('pending');
-                          setIsFilterMenuOpen(false);
-                        }}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
-                          selectedFilter === 'pending'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        Onay Bekleyenler
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelectedFilter('pasif');
-                          setIsFilterMenuOpen(false);
-                        }}
-                        className={`block px-4 py-2 text-sm w-full text-left ${
-                          selectedFilter === 'pasif'
-                            ? 'bg-blue-50 text-blue-700'
-                            : 'text-gray-700'
-                        }`}
-                      >
-                        Pasif İlanlar
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <button
-                onClick={() => toggleSort('price')}
-                className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-              >
-                {sortDirection === 'asc' ? (
-                  <FaSortAmountUp className="mr-2 text-gray-500" />
-                ) : (
-                  <FaSortAmountDown className="mr-2 text-gray-500" />
-                )}
-                <span>Fiyat</span>
-              </button>
-
-              <button
-                onClick={toggleViewMode}
-                className="flex items-center justify-center w-10 h-10 border border-gray-300 rounded-lg bg-white hover:bg-gray-50"
-              >
-                {viewMode === 'grid' ? (
-                  <FiList className="text-gray-500" />
-                ) : (
-                  <FiGrid className="text-gray-500" />
-                )}
-              </button>
-            </div>
-          </div>
+          <Filter
+            searchTerm={searchTerm}
+            onSearchChange={setSearchTerm}
+            onSearchSubmit={handleSearch}
+            searchPlaceholder="İlan ara..."
+            viewMode={viewMode}
+            onViewModeChange={toggleViewMode}
+            sortOption={getCurrentSortOption()}
+            onSortChange={handleSortChange}
+            sortOptions={[
+              { id: 'newest', label: 'En Yeni' },
+              { id: 'price-low', label: 'Fiyat (Düşükten Yükseğe)' },
+              { id: 'price-high', label: 'Fiyat (Yüksekten Düşüğe)' },
+            ]}
+            showFilters={true}
+            categories={statusOptions}
+            selectedCategory={selectedFilter}
+            onCategoryChange={setSelectedFilter}
+            categoryAllLabel="Tümü"
+            activeFilters={activeFilters}
+            onClearFilter={handleClearFilter}
+            onClearAllFilters={handleClearAllFilters}
+            layout="compact"
+          />
         </div>
 
         {filteredAds.length === 0 ? (
           <div className="p-12 text-center">
-            <FiSearchIcon className="mx-auto text-4xl text-gray-300 mb-4" />
+            <FiSearch className="mx-auto text-4xl text-gray-300 mb-4" />
             <h3 className="text-lg font-medium text-gray-900">
               Sonuç bulunamadı
             </h3>
@@ -543,6 +358,7 @@ const MyAdsList = () => {
                     onDelete={handleDeleteClick}
                     changeStatus={handleChangeStatus}
                     isLoading={statusChangeLoading}
+                    isManageable={true}
                   />
                 ))}
               </AnimatePresence>
@@ -558,7 +374,12 @@ const MyAdsList = () => {
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
-                      onClick={() => toggleSort('title')}
+                      onClick={() => {
+                        setSortField('title');
+                        setSortDirection(
+                          sortDirection === 'asc' ? 'desc' : 'asc'
+                        );
+                      }}
                       className="flex items-center focus:outline-none"
                     >
                       Başlık
@@ -575,7 +396,12 @@ const MyAdsList = () => {
                   </th>
                   <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     <button
-                      onClick={() => toggleSort('price')}
+                      onClick={() => {
+                        setSortField('price');
+                        setSortDirection(
+                          sortDirection === 'asc' ? 'desc' : 'asc'
+                        );
+                      }}
                       className="flex items-center focus:outline-none"
                     >
                       Fiyat
@@ -615,7 +441,7 @@ const MyAdsList = () => {
                             src={
                               ad.images?.length
                                 ? ad.images[0]
-                                : 'https://media.istockphoto.com/id/1324356458/tr/vekt%C3%B6r/picture-icon-photo-frame-symbol-landscape-sign-photograph-gallery-logo-web-interface-and.jpg?s=612x612&w=0&k=20&c=khO1-2i1TZ67Nak9JQWmDx7Slai72lbl6SEp2gDOaV8='
+                                : 'https://via.placeholder.com/300x200?text=Resim+Yok'
                             }
                             alt={ad.title}
                             className="w-full h-full object-cover"
