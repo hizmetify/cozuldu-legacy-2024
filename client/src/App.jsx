@@ -42,7 +42,6 @@ import StepTwo from './components/Register/StepTwo';
 import StepThree from './components/Register/StepThree';
 import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
-import IlanListesi from './pages/TestPage/test';
 import LoadingOverlay from './components/UI/LoadingOverlay';
 import LoadingSpinner from './components/UI/LoadingSpinner';
 
@@ -77,8 +76,6 @@ const App = () => {
           }
         >
           <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/test" element={<IlanListesi />} />
             <Route
               path="/dashboard"
               element={
@@ -98,32 +95,20 @@ const App = () => {
               <Route path="statistics" element={<Statistics />} />
               <Route path="favorites" element={<Favorites />} />
             </Route>
-
-            <Route path="/category/:categoryId" element={<CategoryAds />} />
-            <Route path="/contact" element={<Contact />} />
-
-            <Route
-              path="/login"
-              element={
-                <PublicRoute restricted={true}>
-                  <Login />
-                </PublicRoute>
-              }
-            />
             <Route path="/emailverify" element={<EmailVerify />} />
             <Route path="/resetPassword/:email" element={<ResetPassword />} />
-            <Route
-              path="/register"
-              element={
-                <PublicRoute restricted={true}>
-                  <RegisterLayout />
-                </PublicRoute>
-              }
-            >
-              <Route index element={<Navigate to="step-1" />} />
-              <Route path="step-1" element={<StepOne />} />
-              <Route path="step-2" element={<StepTwo />} />
-              <Route path="step-3" element={<StepThree />} />
+
+            <Route element={<PublicRoute restricted={true} />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/category/:categoryId" element={<CategoryAds />} />
+              <Route path="/register" element={<RegisterLayout />}>
+                <Route index element={<Navigate to="step-1" />} />
+                <Route path="step-1" element={<StepOne />} />
+                <Route path="step-2" element={<StepTwo />} />
+                <Route path="step-3" element={<StepThree />} />
+              </Route>
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>

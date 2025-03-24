@@ -1,4 +1,3 @@
-import Header from '../../components/Header/Header';
 import Hero from '../../components/Hero/Hero';
 import CallToAction from '../../components/Hero/CTA';
 import HowItWorks from '../../components/Hero/HowItWorks';
@@ -14,7 +13,6 @@ const Home = () => {
         canonical="https://xn--zld-1la9esbc.com/"
         ogImage="https://xn--zld-1la9esbc.com/og-image.jpg"
       />
-      <Header />
       <Hero />
       <HowItWorks />
       <CallToAction />

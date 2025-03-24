@@ -8,7 +8,6 @@ import { login } from '../../features/auth/authSlice';
 import { showToast } from '../../features/toast/toastSlice';
 import InputField from '../../components/UI/InputField';
 import { passwordSend } from '../../api/authApi';
-import Header from '../../components/Header/Header';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -90,7 +89,6 @@ const Login = () => {
 
   return (
     <>
-      <Header />
       <div className="min-h-screen flex items-center justify-center bg-white p-4">
         <div className="w-full max-w-md">
           <Formik

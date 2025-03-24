@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import FAQ from '../components/Hero/FAQ';
 import ContactUs from '../components/Hero/ContactUs';
-import Header from '../components/Header/Header';
 import { useDispatch } from 'react-redux';
 
 import { MdHeadsetMic, MdQuestionAnswer, MdSupportAgent } from 'react-icons/md';
@@ -32,8 +31,7 @@ const Contact = () => {
   }, [activeTab]);
 
   return (
-    <>
-      <Header />
+
       <div className="bg-gradient-to-b from-blue-50 via-white to-gray-50 min-h-screen">
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
@@ -141,7 +139,6 @@ const Contact = () => {
           </div>
         </div>
       </div>
-    </>
   );
 };
 

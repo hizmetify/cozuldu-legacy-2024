@@ -6,7 +6,6 @@ import { fetchCategories, fetchSubCategories } from '../api/categoryApi';
 import { startLoading, stopLoading } from '../features/loading/loadingSlice';
 import { FiSliders, FiStar, FiMapPin, FiClock, FiSearch } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
-import Header from '../components/Header/Header';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import AdCard from '../components/MyAds/AdCard';
 import Filter from '../components/UI/Filter';
@@ -206,7 +205,6 @@ const CategoryAds = () => {
     return pages;
   }, [currentPage, totalPages]);
 
-  // Meta bilgileri için dinamik değerler oluştur
   const metaTitle = `${category?.name || 'Kategori'} İlanları - Çözüldü`;
   const metaDescription = `${
     category?.name || 'Kategori'
@@ -230,7 +228,6 @@ const CategoryAds = () => {
           keywords={metaKeywords}
           canonical={canonical}
         />
-        <Header />
       </>
     );
   }
@@ -244,7 +241,6 @@ const CategoryAds = () => {
           keywords={metaKeywords}
           canonical={canonical}
         />
-        <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md">
             <div className="flex items-center">
@@ -281,8 +277,6 @@ const CategoryAds = () => {
             : undefined
         }
       />
-
-      <Header />
 
       <main className="bg-gray-50 min-h-screen">
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
