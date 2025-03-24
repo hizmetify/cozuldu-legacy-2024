@@ -28,6 +28,7 @@ import {
   FiEdit,
   FiX,
 } from 'react-icons/fi';
+import MetaHelmet from '../../utils/MetaHelmet';
 
 const serviceTypeOptions = [
   { name: 'Yüz Yüze', value: 'yüz yüze' },
@@ -264,6 +265,14 @@ const MyAdsEdit = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <MetaHelmet
+        title={`${ad.title} Düzenle`}
+        description="İlanınızı düzenleyerek daha fazla müşteriye ulaşın. Başlık, açıklama, fiyat ve görselleri güncelleyin."
+        keywords={`ilan düzenle, ${ad.category?.name || 'hizmet'}, ${
+          ad.subCategory?.name || ''
+        }, düzenleme`}
+        canonical={`${window.location.origin}/dashboard/my-ads/${adId}/edit`}
+      />
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-blue-600 opacity-90"></div>
         <div className="relative px-6 py-8">

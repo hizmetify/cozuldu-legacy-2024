@@ -8,7 +8,7 @@ import {
   removeUserAccount,
   fetchUserDetails,
 } from '../../features/user/userSlice';
-
+import MetaHelmet from '../../utils/MetaHelmet';
 import {
   FaTrash,
   FaEnvelope,
@@ -514,6 +514,12 @@ const Settings = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <MetaHelmet
+        title="Hesap Ayarları"
+        description="Hesap bilgilerinizi güncelleyin, güvenlik ayarlarınızı yönetin ve bildirim tercihlerinizi değiştirin."
+        keywords="hesap ayarları, profil, güvenlik, bildirimler, hesap yönetimi"
+        canonical={`${window.location.origin}/dashboard/settings`}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
           <div className="space-y-1">

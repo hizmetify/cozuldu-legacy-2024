@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Helmet } from 'react-helmet-async';
 import { fetchAdsByCategory, clearCategoryAds } from '../features/ad/adSlice';
 import { fetchCategories, fetchSubCategories } from '../api/categoryApi';
 import { startLoading, stopLoading } from '../features/loading/loadingSlice';
@@ -11,6 +10,7 @@ import Header from '../components/Header/Header';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import AdCard from '../components/MyAds/AdCard';
 import Filter from '../components/UI/Filter';
+import MetaHelmet from '../utils/MetaHelmet';
 
 const CategoryAds = () => {
   const { categoryId } = useParams();
@@ -206,9 +206,30 @@ const CategoryAds = () => {
     return pages;
   }, [currentPage, totalPages]);
 
+  // Meta bilgileri için dinamik değerler oluştur
+  const metaTitle = `${category?.name || 'Kategori'} İlanları - Çözüldü`;
+  const metaDescription = `${
+    category?.name || 'Kategori'
+  } kategorisindeki en güncel hizmet ilanlarını keşfedin. ${
+    totalAds || ''
+  } ilan arasından size uygun hizmeti bulun.`;
+  const metaKeywords = `${
+    category?.name || 'kategori'
+  }, hizmet ilanları, ${subCategories
+    .slice(0, 3)
+    .map((sc) => sc.name)
+    .join(', ')}`;
+  const canonical = `https://xn--zld-1la9esbc.com/category/${categoryId}`;
+
   if (loading && !ads.length) {
     return (
       <>
+        <MetaHelmet
+          title={metaTitle}
+          description={metaDescription}
+          keywords={metaKeywords}
+          canonical={canonical}
+        />
         <Header />
       </>
     );
@@ -217,6 +238,12 @@ const CategoryAds = () => {
   if (error) {
     return (
       <>
+        <MetaHelmet
+          title={metaTitle}
+          description={metaDescription}
+          keywords={metaKeywords}
+          canonical={canonical}
+        />
         <Header />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md">
@@ -243,13 +270,17 @@ const CategoryAds = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{category?.name || 'Kategori'} İlanları - Çözüldü</title>
-        <meta
-          name="description"
-          content={`${category?.name || 'Kategori'} ile ilgili hizmet ilanları`}
-        />
-      </Helmet>
+      <MetaHelmet
+        title={metaTitle}
+        description={metaDescription}
+        keywords={metaKeywords}
+        canonical={canonical}
+        ogImage={
+          ads.length > 0 && ads[0].images?.length > 0
+            ? ads[0].images[0]
+            : undefined
+        }
+      />
 
       <Header />
 

@@ -14,6 +14,7 @@ import { fetchUserAds } from '../../features/ad/adSlice';
 import { fetchStats } from '../../api/statsApi';
 import { countFav } from '../../api/userApi';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
+import MetaHelmet from '../../utils/MetaHelmet';
 
 const COLORS = {
   views: ['#0082F6', '#E2F0FF'],
@@ -57,7 +58,7 @@ const StatCard = memo(({ title, value, icon: Icon, color }) => (
   </div>
 ));
 
-const AdStatCard = React.memo(({ ad, totalUsers, favCounts, index }) => {
+const AdStatCard = memo(({ ad, totalUsers, favCounts, index }) => {
   const totalViewers = ad.viewing?.length || 0;
   const totalFavorites = favCounts;
 
@@ -404,38 +405,54 @@ const Statistics = () => {
 
   if (status === 'failed') {
     return (
-      <div className="max-w-3xl mx-auto my-12 bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md fade-in">
-        <div className="flex items-center">
-          <svg
-            className="h-6 w-6 text-red-500 mr-4"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-          >
-            <path
-              fillRule="evenodd"
-              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <p className="font-bold">İstatistikler yüklenirken bir hata oluştu</p>
+      <>
+        <MetaHelmet
+          title="İstatistikler"
+          description="İlanlarınızın performans istatistiklerini görüntüleyin ve analiz edin."
+          keywords="istatistikler, ilan performansı, görüntülenme, favorileme"
+          canonical={`${window.location.origin}/dashboard/statistics`}
+        />
+        <div className="max-w-3xl mx-auto my-12 bg-red-50 border-l-4 border-red-500 text-red-700 p-6 rounded-md shadow-md fade-in">
+          <div className="flex items-center">
+            <svg
+              className="h-6 w-6 text-red-500 mr-4"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <p className="font-bold">
+              İstatistikler yüklenirken bir hata oluştu
+            </p>
+          </div>
+          <p className="mt-2">{error}</p>
+          <div className="mt-4">
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Yeniden Dene
+            </button>
+          </div>
         </div>
-        <p className="mt-2">{error}</p>
-        <div className="mt-4">
-          <button
-            onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-          >
-            Yeniden Dene
-          </button>
-        </div>
-      </div>
+      </>
     );
   }
 
   return (
     <>
       <style>{animationStyles}</style>
+      <MetaHelmet
+        title="İstatistikler"
+        description="İlanlarınızın performans istatistiklerini görüntüleyin ve analiz edin."
+        keywords="istatistikler, ilan performansı, görüntülenme, favorileme"
+        canonical={`${window.location.origin}/dashboard/statistics`}
+      />
       {!filteredAds.length ? (
         <div className="max-w-3xl mx-auto my-12 text-center p-12 bg-white shadow-md rounded-lg fade-in">
           <div className="mx-auto w-24 h-24 bg-blue-50 rounded-full flex items-center justify-center mb-6">

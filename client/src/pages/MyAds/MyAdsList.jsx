@@ -28,6 +28,7 @@ import { emailSend } from '../../api/authApi';
 import { motion, AnimatePresence } from 'framer-motion';
 import AdCard from '../../components/MyAds/AdCard';
 import Filter from '../../components/UI/Filter';
+import MetaHelmet from '../../utils/MetaHelmet';
 
 const EmptyState = ({ onAddNew }) => (
   <motion.div
@@ -532,11 +533,27 @@ const MyAdsList = () => {
     !userAds ||
     (Array.isArray(userAds?.data) ? userAds.data.length === 0 : !userAds.length)
   ) {
-    return <EmptyState onAddNew={sendMailVerification} />;
+    return (
+      <>
+        <MetaHelmet
+          title="İlanlarım"
+          description="Yayınladığınız ilanları görüntüleyin, düzenleyin ve yönetin."
+          keywords="ilanlarım, hizmet ilanları, ilan yönetimi"
+          canonical={`${window.location.origin}/dashboard/my-ads`}
+        />
+        <EmptyState onAddNew={sendMailVerification} />
+      </>
+    );
   }
 
   return (
     <div className="p-3 md:p-8 bg-gray-50 min-h-screen">
+      <MetaHelmet
+        title="İlanlarım"
+        description="Yayınladığınız ilanları görüntüleyin, düzenleyin ve yönetin."
+        keywords="ilanlarım, hizmet ilanları, ilan yönetimi"
+        canonical={`${window.location.origin}/dashboard/my-ads`}
+      />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}

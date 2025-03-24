@@ -34,6 +34,7 @@ import {
   FiEdit,
 } from 'react-icons/fi';
 import UploadFile from '../../components/MyAds/UploadFile';
+import MetaHelmet from '../../utils/MetaHelmet';
 
 const serviceTypeOptions = [
   { name: 'Yüz Yüze', value: 'yüz yüze' },
@@ -260,6 +261,12 @@ const MyAdsNew = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <MetaHelmet
+        title="Yeni İlan Oluştur"
+        description="Hizmetlerinizi potansiyel müşterilerinize tanıtmak için yeni bir ilan oluşturun."
+        keywords="yeni ilan, ilan oluştur, hizmet ilanı, ilan yayınla"
+        canonical={`${window.location.origin}/dashboard/my-ads/new`}
+      />
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-indigo-700 to-blue-600 opacity-90"></div>
         <div className="relative px-6 py-8">
