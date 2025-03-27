@@ -16,8 +16,6 @@ const register = async (req, res) => {
       password,
       phone,
       city,
-      profilePic,
-      portfolioLink,
     } = req.body;
 
     const { error } = registerSchema.validate({

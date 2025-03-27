@@ -400,7 +400,7 @@ const CategoryAds = () => {
                           </div>
                           <div className="flex-1 p-5">
                             <h3 className="font-bold text-xl text-gray-900 mb-2">
-                              {ad.title}
+                              {ad.title || 'Başlık yok'}
                             </h3>
                             <p className="text-gray-600 mb-4 line-clamp-2">
                               {ad.description || 'Açıklama bulunmuyor'}
@@ -408,7 +408,7 @@ const CategoryAds = () => {
                             <div className="flex flex-wrap items-center justify-between mt-auto">
                               <div className="flex items-center text-gray-500 text-sm mb-2 sm:mb-0">
                                 <FiMapPin className="mr-1" />
-                                {ad.location || ad.city || 'Konum belirtilmedi'}
+                                {ad.city || 'Konum belirtilmedi'}
                               </div>
                               <div className="flex items-center text-gray-500 text-sm">
                                 <FiClock className="mr-1" />
@@ -434,7 +434,6 @@ const CategoryAds = () => {
                   </AnimatePresence>
                 </div>
               )}
-
               {totalPages > 1 && (
                 <div className="flex justify-center mt-8">
                   <nav className="flex items-center space-x-1">

@@ -19,6 +19,8 @@ const adSchema = new mongoose.Schema({
   },
   city: {
     type: String,
+    ref: 'City',
+    autopopulate: true,
     required: true,
   },
   price: { type: Number, required: true },
@@ -36,10 +38,10 @@ const adSchema = new mongoose.Schema({
       ref: 'User',
     },
   ],
-  status:{
-    type:String,
-    default:'active',
-    enum:['active','pending','pasif']
+  status: {
+    type: String,
+    default: 'active',
+    enum: ['active', 'pending', 'pasif'],
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },

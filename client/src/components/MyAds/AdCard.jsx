@@ -196,7 +196,7 @@ const AdCard = ({
             {showLocation && (
               <div className="flex items-center">
                 <FiMapPin className="mr-1" />
-                {ad.location || ad.city || "Konum belirtilmedi"}
+                {ad.city?.name || "Konum belirtilmedi"}
               </div>
             )}
             {showDate && (

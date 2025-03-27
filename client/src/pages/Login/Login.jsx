@@ -116,12 +116,9 @@ const Login = () => {
               return (
                 <Form onSubmit={customSubmit} className="space-y-6">
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-blue-600">
+                    <h2 className="text-2xl text-center py-1.5 border-b-2 border-gray-400 font-bold text-neutral-900">
                       Giriş Yap
                     </h2>
-                    <p className="mt-2 text-sm text-gray-600">
-                      Hesabınıza erişmek için giriş yapın
-                    </p>
                   </div>
 
                   <div className="space-y-4">

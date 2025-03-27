@@ -34,19 +34,27 @@ const adValidationSchema = Joi.object({
     .messages({
       'any.only': 'Geçerli bir fiyat türü seçin (saatlik, günlük, iş başı)',
     }),
-  category: Joi.string().pattern(objectIdRegex).required().messages({
-    'string.empty': 'Kategori seçilmelidir',
-    'string.pattern.base': 'Geçersiz kategori ID',
-  }),
 
-  subCategory: Joi.string().pattern(objectIdRegex).required().messages({
-    'string.empty': 'Alt kategori seçilmelidir',
-    'string.pattern.base': 'Geçersiz alt kategori ID',
-  }),
+  category: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      'string.empty': 'Kategori seçilmelidir',
+      'string.pattern.base': 'Geçersiz kategori ID',
+    }),
+
+  subCategory: Joi.string()
+    .pattern(/^[0-9a-fA-F]{24}$/)
+    .required()
+    .messages({
+      'string.empty': 'Alt kategori seçilmelidir',
+      'string.pattern.base': 'Geçersiz alt kategori ID',
+    }),
 
   images: Joi.array().items(Joi.string()).optional().messages({
     'array.base': 'Resimler geçerli bir dizi olmalıdır',
   }),
+  imagesToDelete: Joi.array().items(Joi.string()).optional(),
 });
 
 module.exports = adValidationSchema;

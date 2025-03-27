@@ -78,7 +78,7 @@ const updateAd = async (req, res) => {
 
     const { title, description, category, subCategory, price, status } =
       req.body;
-
+    const imagesToDelete = req.body.imagesToDelete || [];
     const newImages = req.files ? req.files.map((file) => file.path) : [];
 
     const existingAd = await Ad.findById(adId);
@@ -91,7 +91,46 @@ const updateAd = async (req, res) => {
         .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
     }
 
-    const updatedImages = [...existingAd.images, ...newImages];
+    const normalizeImagePath = (originalPath) => {
+      if (!originalPath) return '';
+
+      let normalized = originalPath.toLowerCase();
+      normalized = normalized.replace(/\\/g, '/');
+      if (
+        normalized.startsWith('http://') ||
+        normalized.startsWith('https://')
+      ) {
+        try {
+          const url = new URL(normalized);
+          normalized = url.pathname;
+        } catch (err) {}
+      }
+
+      const index = normalized.indexOf('uploads/');
+      if (index !== -1) {
+        normalized = normalized.substring(index);
+      }
+      normalized = normalized.replace(/^\/+/, '');
+
+      return normalized;
+    };
+    console.log('DB resimleri:');
+    existingAd.images.forEach((img) => {
+      console.log('  ', img, '=>', normalizeImagePath(img));
+    });
+    console.log('Silinecek resimler:');
+    imagesToDelete.forEach((img) => {
+      console.log('  ', img, '=>', normalizeImagePath(img));
+    });
+    let updatedImages = existingAd.images.filter((image) => {
+      const normalizedImage = normalizeImagePath(image);
+      return !imagesToDelete.some((del) => {
+        const normalizedDel = normalizeImagePath(del);
+        return normalizedImage === normalizedDel;
+      });
+    });
+    updatedImages = [...updatedImages, ...newImages];
+    console.log('Güncellenecek resim listesi:', updatedImages);
 
     existingAd.title = title || existingAd.title;
     existingAd.description = description || existingAd.description;
@@ -100,6 +139,7 @@ const updateAd = async (req, res) => {
     existingAd.price = price || existingAd.price;
     existingAd.images = updatedImages;
     existingAd.status = status || existingAd.status;
+
     await existingAd.save();
 
     return res.status(200).json({
@@ -117,12 +157,14 @@ const updateAd = async (req, res) => {
     });
   }
 };
+
 const getAllAds = async (req, res) => {
   try {
     const ads = await Ad.find
       .populate('user', 'name avatar')
       .populate('category', 'name')
       .populate('subCategory', 'name')
+      .populate('city', 'name')
       .sort({ createdAt: -1 });
 
     const formattedAds = ads.map((ad) => ({
@@ -183,7 +225,8 @@ const getSingleAd = async (req, res) => {
     const ad = await Ad.findById(adId)
       .populate('user', 'name avatar')
       .populate('category', 'name')
-      .populate('subCategory', 'name');
+      .populate('subCategory', 'name')
+      .populate('city', 'name');
 
     if (!ad) {
       return res.status(404).json({ message: 'İlan bulunamadı' });

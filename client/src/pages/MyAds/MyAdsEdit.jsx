@@ -68,7 +68,6 @@ const MyAdsEdit = () => {
           fetchCities(),
           fetchCategories(),
         ]);
-
         const mappedCities = cityData.map((c) => ({
           name: c.name,
           value: c._id,
@@ -97,12 +96,11 @@ const MyAdsEdit = () => {
   useEffect(() => {
     if (selectedAd?.data) {
       const ad = selectedAd.data;
-
-      if (ad.category) {
-        handleCategoryChange(ad.category, () => {});
-        setSelectedCategory(ad.category);
+      const categoryId = ad.category?._id || ad.category;
+      if (categoryId) {
+        handleCategoryChange(categoryId, () => {});
+        setSelectedCategory(categoryId);
       }
-
       if (ad.images && ad.images.length > 0) {
         setExistingImages(ad.images);
       }
@@ -121,19 +119,22 @@ const MyAdsEdit = () => {
   }, [selectedFiles]);
 
   const handleCategoryChange = async (categoryId, setFieldValue) => {
+    if (typeof categoryId === 'object') {
+      categoryId = categoryId._id;
+    }
     if (!categoryId || categoryId.length < 24) {
       setSubCategories([]);
       if (setFieldValue) setFieldValue('subCategory', '');
       return;
     }
-
     setSelectedCategory(categoryId);
-    if (setFieldValue) setFieldValue('category', categoryId);
-    if (setFieldValue) setFieldValue('subCategory', '');
+    if (setFieldValue) {
+      setFieldValue('category', categoryId);
+      setFieldValue('subCategory', '');
+    }
 
     try {
       const subCategoryData = await fetchSubCategories(categoryId);
-
       const mappedSubs = subCategoryData.map((sub) => ({
         name: sub.name,
         value: sub._id,
@@ -187,16 +188,15 @@ const MyAdsEdit = () => {
   }
 
   const ad = selectedAd.data;
-
   const initialValues = {
     title: ad.title || '',
     description: ad.description || '',
     serviceType: ad.serviceType || '',
-    city: ad.city || '',
+    city: ad.city?._id || ad.city || '',
     price: ad.price || '',
     priceType: ad.priceType || '',
-    category: ad.category || '',
-    subCategory: ad.subCategory || '',
+    category: ad.category?._id || ad.category || '',
+    subCategory: ad.subCategory?._id || ad.subCategory || '',
     customSubCategory: '',
   };
 
@@ -225,9 +225,7 @@ const MyAdsEdit = () => {
           subCategory: addSubCategoryByCategoryClient.data,
         });
       }
-
       delete values.customSubCategory;
-
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
         formData.append(key, value);
@@ -238,9 +236,7 @@ const MyAdsEdit = () => {
       if (imagesToDelete.length > 0) {
         formData.append('imagesToDelete', JSON.stringify(imagesToDelete));
       }
-
       await dispatch(updateAd({ adId, adData: formData })).unwrap();
-
       dispatch(
         showToast({
           message: 'İlan başarıyla güncellendi!',
@@ -250,7 +246,6 @@ const MyAdsEdit = () => {
       navigate('/dashboard/my-ads');
     } catch (error) {
       console.error('API Hatası:', error);
-
       dispatch(
         showToast({
           message: error.message || 'Bir hata oluştu',
