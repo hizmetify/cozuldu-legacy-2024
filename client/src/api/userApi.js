@@ -23,9 +23,7 @@ export const updateNameInfo = async (name, lastname) => {
 
 export const deleteAccount = async (password) => {
   try {
-    const response = await axiosInstance.delete('/user/deleteAccount', {
-      data: password,
-    });
+    const response = await axiosInstance.delete(`/user/deleteAccount/${password}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || 'Bir hata oluştu';
