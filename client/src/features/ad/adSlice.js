@@ -57,7 +57,8 @@ export const fetchSingleAd = createAsyncThunk(
   async (adId, thunkAPI) => {
     try {
       const response = await getSingleAdRequest(adId);
-      return response;
+      console.log('fetchSingleAd response:', response);
+      return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }

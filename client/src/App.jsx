@@ -36,6 +36,7 @@ const ResetPassword = lazyLoad(() =>
 const Statistics = lazyLoad(() => import('./pages/Statistics/Statistics'));
 const Favorites = lazyLoad(() => import('./pages/Favorites/Favorites'));
 const Contact = lazyLoad(() => import('./pages/Contact'));
+const ViewAd = lazyLoad(() => import('./pages/ViewAd'));
 
 import StepOne from './components/Register/StepOne';
 import StepTwo from './components/Register/StepTwo';
@@ -103,6 +104,7 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/category/:categoryId" element={<CategoryAds />} />
+              <Route path="/ad/:adId" element={<ViewAd />} />
               <Route path="/register" element={<RegisterLayout />}>
                 <Route index element={<Navigate to="step-1" />} />
                 <Route path="step-1" element={<StepOne />} />

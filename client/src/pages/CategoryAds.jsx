@@ -1,10 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAdsByCategory, clearCategoryAds } from '../features/ad/adSlice';
 import { fetchCategories, fetchSubCategories } from '../api/categoryApi';
 import { startLoading, stopLoading } from '../features/loading/loadingSlice';
-import { FiSliders, FiStar, FiMapPin, FiClock, FiSearch } from 'react-icons/fi';
+import { FiSliders, FiSearch } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import AdCard from '../components/MyAds/AdCard';
@@ -352,7 +352,7 @@ const CategoryAds = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   <AnimatePresence>
                     {ads.map((ad) => (
-                      <Link key={ad._id} to={`/ad/${ad._id}`}>
+                      <div key={ad._id}>
                         <AdCard
                           ad={ad}
                           isManageable={false}
@@ -361,7 +361,7 @@ const CategoryAds = () => {
                           showDate={true}
                           linkTo={`/ad/${ad._id}`}
                         />
-                      </Link>
+                      </div>
                     ))}
                   </AnimatePresence>
                 </div>
@@ -375,60 +375,15 @@ const CategoryAds = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -20 }}
-                        className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
                       >
-                        <Link
-                          to={`/ad/${ad._id}`}
-                          className="flex flex-col sm:flex-row"
-                        >
-                          <div className="sm:w-48 md:w-64 h-48 sm:h-auto relative">
-                            <img
-                              src={
-                                ad.images?.length
-                                  ? ad.images[0]
-                                  : 'https://via.placeholder.com/300x200?text=Resim+Yok'
-                              }
-                              alt={ad.title}
-                              className="w-full h-full object-cover"
-                            />
-                            {ad.featured && (
-                              <div className="absolute top-2 left-2 bg-yellow-400 text-yellow-800 text-xs font-bold px-2 py-1 rounded">
-                                <FiStar className="inline mr-1" />
-                                Öne Çıkan
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 p-5">
-                            <h3 className="font-bold text-xl text-gray-900 mb-2">
-                              {ad.title || 'Başlık yok'}
-                            </h3>
-                            <p className="text-gray-600 mb-4 line-clamp-2">
-                              {ad.description || 'Açıklama bulunmuyor'}
-                            </p>
-                            <div className="flex flex-wrap items-center justify-between mt-auto">
-                              <div className="flex items-center text-gray-500 text-sm mb-2 sm:mb-0">
-                                <FiMapPin className="mr-1" />
-                                {ad.city || 'Konum belirtilmedi'}
-                              </div>
-                              <div className="flex items-center text-gray-500 text-sm">
-                                <FiClock className="mr-1" />
-                                {new Date(ad.createdAt).toLocaleDateString(
-                                  'tr-TR'
-                                )}
-                              </div>
-                              <div className="w-full sm:w-auto mt-3 sm:mt-0">
-                                <span className="text-xl font-bold text-blue-600 block">
-                                  {ad.price
-                                    ? `${ad.price}₺`
-                                    : 'Fiyat Belirtilmedi'}
-                                  <span className="text-xs text-gray-500 ml-1">
-                                    {ad.priceType || 'saatlik'}
-                                  </span>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
+                        <AdCard
+                          ad={ad}
+                          isManageable={false}
+                          isFeatured={true}
+                          showLocation={true}
+                          showDate={true}
+                          linkTo={`/ad/${ad._id}`}
+                        />
                       </motion.div>
                     ))}
                   </AnimatePresence>
