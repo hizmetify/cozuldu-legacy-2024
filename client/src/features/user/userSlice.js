@@ -42,7 +42,8 @@ export const updateUserName = createAsyncThunk(
 export const removeUserAccount = createAsyncThunk(
   'user/deleteAccount',
   async (password, { rejectWithValue }) => {
-    try {
+    try { 
+      
       return await deleteAccount(password);
     } catch (error) {
       return rejectWithValue(error);

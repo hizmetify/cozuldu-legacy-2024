@@ -62,12 +62,12 @@ const nameInfoUpdate = async (req, res) => {
 
 const deleteAccount = async (req, res) => {
   try{
-  let { password } = req.body;
+  let { password } = req.params;  
   let decoded = await decodedId(req);
-  const user = await User.findById(decoded).select('-password');
+  const user = await User.findById(decoded);
   if (!user) {
     return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
-  }
+  } 
   const isMatch = await bcrypt.compare(password, user?.password);
   if (isMatch) {
     let response = await User.findByIdAndDelete(user?._id);
@@ -75,7 +75,8 @@ const deleteAccount = async (req, res) => {
       return res
         .status(404)
         .json({ message: 'Hesap silinemedi daha sonra tekrar deneyiniz...' });
-    return res.status(200).json({ message: 'Hesap silindi.' });
+        res.clearCookie('token', { path: '/' });   
+        return res.status(200).json({ message: 'Hesap silindi.' });
   } else {
     return res.status(401).json({ message: 'Şifre doğru değil.' });
   }

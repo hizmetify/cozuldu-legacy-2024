@@ -26,7 +26,7 @@ const protect = async (req, res, next) => {
       return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
     }
 
-    req.user = user;
+    req.user = user._id;
 
     next();
   } catch (err) {

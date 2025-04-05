@@ -490,7 +490,8 @@ const Settings = () => {
                       ) {
                         const password = window.prompt(
                           'Hesabınızı silmek için şifrenizi girin:'
-                        );
+                        ); 
+                        
                         if (password) {
                           dispatch(removeUserAccount(password));
                         }

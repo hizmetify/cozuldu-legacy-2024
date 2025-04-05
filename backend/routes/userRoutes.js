@@ -17,7 +17,7 @@ const {
 router.post('/favoriAction', favoriPostAndDelete);
 router.put('/emailUpdate', emailUpdate);
 router.put('/nameInfoUpdate', nameInfoUpdate);
-router.delete('/deleteAccount', deleteAccount);
+router.delete('/deleteAccount/:password', deleteAccount);
 router.get('/favori/get', favoriGet);
 router.post('/favori/is', isFavori);
 router.post('/isViewing', isViewing);

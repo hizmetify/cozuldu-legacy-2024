@@ -1,9 +1,34 @@
 const mongoose = require('mongoose');
 const Ad = require('../models/ad');
 const Category = require('../models/category');
-
+const fs = require('fs');
+const path=require('path')
 const BASE_URL = 'http://localhost:5000';
 
+
+const normalizeImagePath = (originalPath) => {
+  if (!originalPath) return '';
+
+  let normalized = originalPath.toLowerCase();
+  normalized = normalized.replace(/\\/g, '/');
+  if (
+    normalized.startsWith('http://') ||
+    normalized.startsWith('https://')
+  ) {
+    try {
+      const url = new URL(normalized);
+      normalized = url.pathname;
+    } catch (err) {}
+  }
+
+  const index = normalized.indexOf('uploads/');
+  if (index !== -1) {
+    normalized = normalized.substring(index);
+  }
+  normalized = normalized.replace(/^\/+/, '');
+  
+  return normalized;
+};
 const formatImagePath = (imgPath) => {
   if (!imgPath) return '';
   if (imgPath.startsWith('http')) return imgPath;
@@ -91,36 +116,28 @@ const updateAd = async (req, res) => {
         .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
     }
 
-    const normalizeImagePath = (originalPath) => {
-      if (!originalPath) return '';
-
-      let normalized = originalPath.toLowerCase();
-      normalized = normalized.replace(/\\/g, '/');
-      if (
-        normalized.startsWith('http://') ||
-        normalized.startsWith('https://')
-      ) {
-        try {
-          const url = new URL(normalized);
-          normalized = url.pathname;
-        } catch (err) {}
-      }
-
-      const index = normalized.indexOf('uploads/');
-      if (index !== -1) {
-        normalized = normalized.substring(index);
-      }
-      normalized = normalized.replace(/^\/+/, '');
-
-      return normalized;
-    };
+    
     console.log('DB resimleri:');
     existingAd.images.forEach((img) => {
       console.log('  ', img, '=>', normalizeImagePath(img));
     });
     console.log('Silinecek resimler:');
     imagesToDelete.forEach((img) => {
-      console.log('  ', img, '=>', normalizeImagePath(img));
+      console.log('  ', img, '=>', normalizeImagePath(img)); 
+      const pathDeleteImage= normalizeImagePath(img)
+      const imagePath = path.join(pathDeleteImage); // imageUrl, uploads/altındaki dosya yolu olmalı
+      fs.access(imagePath, fs.constants.F_OK, (err) => {
+        if (err) {
+          return console.log('File not found.');
+        }
+    
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error("Resim silinirken bir hata oluştu:", err);
+            return 
+          } 
+        });
+      });
     });
     let updatedImages = existingAd.images.filter((image) => {
       const normalizedImage = normalizeImagePath(image);
@@ -187,20 +204,20 @@ const getAllAds = async (req, res) => {
 
 const getUserAds = async (req, res) => {
   try {
-    const userId = req.user._id;
-    if (!userId) {
+    const user= req.user._id; 
+    const objectId = mongoose.Types.ObjectId.isValid(user) ? new mongoose.Types.ObjectId(user) : null;
+    if (!user || !objectId) {
       return res.status(401).json({ message: 'Kullanıcı girişi gerekli' });
-    }
-    const ads = await Ad.find({ user: userId })
+    } 
+    
+    const ads = await Ad.find({ user:objectId })
       .populate('category', 'name')
       .populate('subCategory', 'name')
-      .sort({ createdAt: -1 });
-
+      .sort({ createdAt: -1 }); 
     const formattedAds = ads.map((ad) => ({
       ...ad._doc,
       images: ad.images.map(formatImagePath),
-    }));
-
+    })); 
     return res.status(200).json({
       message: 'Kullanıcının ilanları başarıyla getirildi',
       data: formattedAds,
@@ -264,9 +281,25 @@ const deleteAd = async (req, res) => {
     if (ad.user.toString() !== userId.toString()) {
       return res.status(403).json({ message: 'Bu ilanı silmeye yetkiniz yok' });
     }
-
+    const imagesToDelete=ad?.images
+    imagesToDelete.forEach((img) => { 
+      const pathDeleteImage= normalizeImagePath(img)
+      const imagePath = path.join(pathDeleteImage); // imageUrl, uploads/altındaki dosya yolu olmalı
+      fs.access(imagePath, fs.constants.F_OK, (err) => {
+        if (err) {
+          return console.log('File not found.');
+        }
+    
+        fs.unlink(imagePath, (err) => {
+          if (err) {
+            console.error("Resim silinirken bir hata oluştu:", err);
+            return 
+          } 
+        });
+      });
+    });
     await Ad.findByIdAndDelete(adId);
-
+    
     return res.status(200).json({
       message: 'İlan başarıyla silindi',
     });
