@@ -317,7 +317,7 @@ const Settings = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            {/*             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-6 flex items-start gap-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
                   <FaShieldAlt className="text-blue-500 text-xl" />
@@ -349,11 +349,11 @@ const Settings = () => {
                   </label>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         );
 
-      case 'notifications':
+      /*       case 'notifications':
         return (
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -428,6 +428,8 @@ const Settings = () => {
             </div>
           </div>
         );
+       */
+
       case 'danger':
         return (
           <div className="space-y-6">
@@ -490,8 +492,8 @@ const Settings = () => {
                       ) {
                         const password = window.prompt(
                           'Hesabınızı silmek için şifrenizi girin:'
-                        ); 
-                        
+                        );
+
                         if (password) {
                           dispatch(removeUserAccount(password));
                         }
@@ -546,12 +548,6 @@ const Settings = () => {
                   icon={FaLock}
                   label="Güvenlik"
                   onClick={() => setActiveTab('security')}
-                />
-                <TabButton
-                  active={activeTab === 'notifications'}
-                  icon={FaBell}
-                  label="Bildirimler"
-                  onClick={() => setActiveTab('notifications')}
                 />
                 <TabButton
                   active={activeTab === 'danger'}
