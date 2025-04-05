@@ -71,16 +71,16 @@ const Header = () => {
               <CategoryDropdown />
             </div>
           </div>
-          <div className="hidden md:flex items-center max-w-md w-full mx-4 relative">
-            <div className="relative w-full">
-              <input
-                type="text"
-                placeholder="Hizmet ara..."
-                className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 outline-none text-sm"
-              />
-              <IoSearchOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
-            </div>
-          </div>
+  {/*           <div className="hidden md:flex items-center max-w-md w-full mx-4 relative">
+              <div className="relative w-full">
+                <input
+                  type="text"
+                  placeholder="Hizmet ara..."
+                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all duration-200 outline-none text-sm"
+                />
+                <IoSearchOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
+              </div>
+            </div> */}
           <nav className="hidden md:block">
             <ul className="flex items-center space-x-1">
               <li>
