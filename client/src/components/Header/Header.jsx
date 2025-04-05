@@ -169,7 +169,7 @@ const Header = () => {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
           >
-            <div className="px-4 pt-4 pb-2">
+{/*             <div className="px-4 pt-4 pb-2">
               <div className="relative">
                 <input
                   type="text"
@@ -178,7 +178,7 @@ const Header = () => {
                 />
                 <IoSearchOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg" />
               </div>
-            </div>
+            </div> */}
 
             <div className="px-4 pt-2 pb-5 space-y-3">
               <MobileCategoryAccordion />

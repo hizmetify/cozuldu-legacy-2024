@@ -26,16 +26,6 @@ const FAQ = () => {
         'Platformumuzda yer alan tüm hizmet verenler detaylı bir onay sürecinden geçmektedir. Ayrıca, her hizmet sonrası müşteriler tarafından yapılan değerlendirmeler ve puanlamalar sayesinde hizmet kalitesi sürekli olarak denetlenmektedir. Herhangi bir sorun yaşanması durumunda müşteri hizmetlerimiz devreye girerek çözüm sunmaktadır.',
     },
     {
-      question: 'Ödeme nasıl yapılır?',
-      answer:
-        'Platformumuzda ödemeler güvenli ödeme altyapımız üzerinden yapılmaktadır. Kredi kartı, banka kartı veya havale/EFT yöntemleriyle ödeme yapabilirsiniz. Ödemeniz, hizmet tamamlanıp onayınız alındıktan sonra hizmet verene aktarılır, böylece güvenli bir alışveriş deneyimi sağlanır.',
-    },
-    {
-      question: 'Hizmet iptali nasıl yapılır?',
-      answer:
-        'Aldığınız hizmeti iptal etmek için, hizmet başlamadan en az 24 saat önce hesabınızdan veya müşteri hizmetlerimizi arayarak iptal talebinde bulunabilirsiniz. İptal koşulları hizmet türüne göre değişiklik gösterebilir, detaylı bilgi için kullanım koşullarımızı inceleyebilirsiniz.',
-    },
-    {
       question: 'Platformda hangi hizmet kategorileri bulunuyor?',
       answer:
         'Platformumuzda temizlik, tadilat, nakliyat, özel ders, bakım, taşıma, montaj gibi birçok kategoride hizmet sunulmaktadır. Ana sayfamızdan tüm kategorileri görüntüleyebilir veya arama çubuğunu kullanarak ihtiyacınız olan spesifik hizmeti bulabilirsiniz.',
@@ -102,17 +92,6 @@ const FAQ = () => {
                 </div>
               </div>
             ))}
-          </div>
-
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">Başka sorularınız mı var?</p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors duration-300"
-            >
-              <MdQuestionAnswer className="mr-2" />
-              Bize Ulaşın
-            </Link>
           </div>
         </div>
       </div>
