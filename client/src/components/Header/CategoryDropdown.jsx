@@ -375,13 +375,12 @@ const CategoryDropdown = () => {
                     <span className="w-1 h-1 rounded-full bg-gray-400 group-hover:bg-blue-500 mr-2 transition-colors duration-200"></span>
                     {subCategory.name}
                   </div>
-
+{/* 
                   <div className="absolute right-4 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                     <span className="text-xs px-1.5 py-0.5 bg-blue-100 text-blue-700 rounded-full">
-                      {/* This will come from backend */}
                       {Math.floor(Math.random() * 50) + 5}
                     </span>
-                  </div>
+                  </div> */}
                 </li>
               ))}
             </ul>

@@ -26,7 +26,7 @@ const MobileCategoryAccordion = () => {
     getCategories();
   }, []);
 
-  const handleCategoryClick = async (categoryId) => {
+  const handleChevronClick = async (categoryId) => {
     if (expandedCategory === categoryId) {
       setExpandedCategory(null);
       return;
@@ -70,12 +70,20 @@ const MobileCategoryAccordion = () => {
             key={category._id}
             className="border-b border-gray-100 last:border-b-0"
           >
-            <button
-              onClick={() => handleCategoryClick(category._id)}
-              className="w-full flex items-center justify-between px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150"
-            >
-              <span>{category.name}</span>
-              <div className="flex items-center">
+            <div className="w-full flex items-center justify-between px-3 py-3 text-left text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150">
+              <span
+                onClick={() => navigateToCategory(category._id)}
+                className="cursor-pointer"
+              >
+                {category.name}
+              </span>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleChevronClick(category._id);
+                }}
+                className="flex items-center"
+              >
                 {loadingStates[category._id] ? (
                   <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mr-1"></div>
                 ) : expandedCategory === category._id ? (
@@ -83,8 +91,8 @@ const MobileCategoryAccordion = () => {
                 ) : (
                   <MdKeyboardArrowDown className="text-gray-400 text-xl" />
                 )}
-              </div>
-            </button>
+              </button>
+            </div>
             {expandedCategory === category._id && (
               <div className="bg-blue-50 rounded-md mx-2 mb-2 overflow-hidden transition-all duration-300 ease-in-out">
                 {categorySubcategories[category._id]?.length > 0 ? (

@@ -295,23 +295,8 @@ const ContactOptions = memo(function ContactOptions() {
         İletişim Seçenekleri
       </h3>
 
-      {!isContactVisible ? (
-        <motion.button
-          whileHover={{ y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            if (!isAuthenticated) {
-              navigate('/login', { state: { from: window.location.pathname } });
-              return;
-            }
-            setIsContactVisible(true);
-          }}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 p-4 text-white transition-all duration-300 hover:bg-blue-700"
-        >
-          <FaPhone className="h-5 w-5" />
-          <span className="font-medium">İletişim Bilgilerini Göster</span>
-        </motion.button>
-      ) : (
+
+      
         <motion.div
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -342,7 +327,7 @@ const ContactOptions = memo(function ContactOptions() {
             <span className="font-medium">E-posta Gönder</span>
           </a>
         </motion.div>
-      )}
+
 
       <div className="mt-4 rounded-lg bg-blue-50 p-3">
         <p className="text-sm text-blue-800">

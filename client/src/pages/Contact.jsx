@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import FAQ from '../components/Hero/FAQ';
-import ContactUs from '../components/Hero/ContactUs';
 import { useDispatch } from 'react-redux';
 
 import { MdHeadsetMic, MdQuestionAnswer, MdSupportAgent } from 'react-icons/md';
@@ -47,45 +46,19 @@ const Contact = () => {
               <div className="inline-flex bg-white/10 backdrop-blur-sm rounded-lg p-1.5 shadow-lg">
                 <button
                   onClick={() => setActiveTab('faq')}
-                  className={`px-6 py-3 rounded-md font-medium text-sm md:text-base transition-all duration-200 flex items-center ${
-                    activeTab === 'faq'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-white hover:bg-white/10'
-                  }`}
+                  className="px-6 py-3 rounded-md font-medium text-sm md:text-base transition-all duration-200 flex items-center bg-white text-blue-700 shadow-sm"
                 >
                   <MdQuestionAnswer className="mr-2 text-lg" />
                   Sık Sorulan Sorular
-                </button>
-                <button
-                  onClick={() => setActiveTab('contact')}
-                  className={`px-6 py-3 rounded-md font-medium text-sm md:text-base transition-all duration-200 flex items-center ${
-                    activeTab === 'contact'
-                      ? 'bg-white text-blue-700 shadow-sm'
-                      : 'text-white hover:bg-white/10'
-                  }`}
-                >
-                  <MdHeadsetMic className="mr-2 text-lg" />
-                  Bize Ulaşın
                 </button>
               </div>
             </div>
           </div>
         </div>
-
-        <div className="fixed bottom-8 right-8 z-50">
-          <button
-            onClick={() => setActiveTab('contact')}
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all duration-300 hover:scale-110 group"
-          >
-            <MdSupportAgent className="text-2xl" />
-            <span className="absolute right-full mr-3 top-1/2 transform -translate-y-1/2 bg-gray-900 text-white px-3 py-1.5 rounded text-sm whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              Destek Alın
-            </span>
-          </button>
-        </div>
+    
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 relative">
           <div className="absolute top-0 left-0 w-64 h-64 bg-blue-100 rounded-full opacity-20 -translate-x-1/2 -translate-y-1/2 blur-3xl"></div>
-          <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-200 rounded-full opacity-20 translate-x-1/3 translate-y-1/3 blur-3xl"></div>
+
           <div className="relative">
             <div
               className={`transition-all duration-500 ${
@@ -96,18 +69,17 @@ const Contact = () => {
             >
               <FAQ />
             </div>
-            <div
+{/*             <div
               className={`transition-all duration-500 ${
                 activeTab === 'contact'
                   ? 'opacity-100'
                   : 'opacity-0 absolute inset-0 pointer-events-none'
               }`}
             >
-              <ContactUs />
-            </div>
+            </div> */}
           </div>
         </div>
-        <div className="bg-white py-16 border-t border-gray-100">
+{/*         <div className="bg-white py-16 border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900">
@@ -137,7 +109,7 @@ const Contact = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
   );
 };
