@@ -14,6 +14,7 @@ const SidebarLink = ({ href, label, icon: Icon, isLogout }) => {
   const handleLogout = async () => {
     try {
       await dispatch(logout()).unwrap();
+      localStorage.removeItem('isLogin');
       navigate('/');
     } catch (error) {
       console.error(error);

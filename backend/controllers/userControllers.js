@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const Favori = require('../models/favori');
 const Ad = require('../models/ad');
 const { default: mongoose } = require('mongoose');
+const { errorMessages } = require('../middlewares/errorMessageMiddleware');
 
 const decodedId = async (req) => {
   const token = req.cookies.token;
@@ -28,7 +29,7 @@ const emailUpdate = async (req, res) => {
     response = await User.findByIdAndUpdate(  user, { email } , { new: true } );
 }
     if (!response) {
-      return res.status(404).json({ message: 'Mail Güncellenmedi' });
+      return res.json({ message: errorMessages.EMAIL_UPDATE_FAILED });
     } 
     return res.status(200).json({
       success: true,
@@ -50,7 +51,7 @@ const nameInfoUpdate = async (req, res) => {
     { new: true }
   ); 
   if (!response) {
-    return res.status(404).json({ message: 'Ad soyad güncellenmedi' });
+    return res.json({ message: errorMessages.UPDATED_FAILED });
   }
   return res.status(200).json({ message: 'Ad soyad güncellendi' });
 } catch (error) {
@@ -66,19 +67,18 @@ const deleteAccount = async (req, res) => {
   let decoded = await decodedId(req);
   const user = await User.findById(decoded);
   if (!user) {
-    return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+    return res.json({ message: errorMessages.USER_NOT_FOUND });
   } 
   const isMatch = await bcrypt.compare(password, user?.password);
   if (isMatch) {
     let response = await User.findByIdAndDelete(user?._id);
     if (!response)
-      return res
-        .status(404)
-        .json({ message: 'Hesap silinemedi daha sonra tekrar deneyiniz...' });
+      return res 
+        .json({ message: errorMessages.ACCOUNT_DELETION_FAILED});
         res.clearCookie('token', { path: '/' });   
         return res.status(200).json({ message: 'Hesap silindi.' });
   } else {
-    return res.status(401).json({ message: 'Şifre doğru değil.' });
+    return res.json({ message: errorMessages.PASSWORD_MISMATCH});
   }
 } catch (error) {
   console.error('Hata:', error);
@@ -92,9 +92,8 @@ const favoriPostAndDelete = async (req, res) => {
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: 'Favorilere eklemek için giriş yapmalısınız.' });
+      return res 
+        .json({ message: errorMessages.UNAUTHORIZED_ACCESS });
     }
     let { adId } = req.body;
     const value = {
@@ -129,7 +128,7 @@ const isFavori = async (req, res) => {
 
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
     }
     const ret = await Favori.find({ userId: user?._id, adId: adId });
 
@@ -146,11 +145,11 @@ const favoriGet = async (req, res) => {
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
     }
     const ret = await Favori.find({ userId: user?._id });
     if (!ret) {
-      return res.send('Bir hata oluştu');
+      return res.send(errorMessages.SERVER_ERROR);
     }
     return res.send(ret);
   } catch (error) {
@@ -162,7 +161,7 @@ const favoriCount = async (req, res) => {
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message:  errorMessages.USER_NOT_FOUND  });
     }
     let { adId } = req.body;
     const result = await Favori.countDocuments({ adId: adId });
@@ -179,7 +178,7 @@ const isViewing = async (req, res) => {
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message:  errorMessages.USER_NOT_FOUND  });
     }
     const ad = await Ad.findById(adId);
     if (ad?.user?._id == user?.id || ad?.viewing?.includes(user?._id)) {
@@ -190,7 +189,7 @@ const isViewing = async (req, res) => {
     } else {
       await Ad.findByIdAndUpdate(
         ad?._id,
-        { $addToSet: { viewing: user?._id } }, // Eğer zaten varsa ekleme
+        { $addToSet: { viewing: user?._id } }, 
         { new: true }
       );
       return res.json({
@@ -208,9 +207,8 @@ const contactInfo = async (req, res) => {
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res
-        .status(404)
-        .json({ message: 'Bu işlem için üye olmanız gerekiyor.' });
+      return res 
+        .json({ message:  errorMessages.UNAUTHORIZED_ACCESS});
     }
     const adids = await Ad.findById(adId);
     if (!adids) {
@@ -234,7 +232,7 @@ const getUserDetails = async (req, res) => {
     const user = await User.findById(userId).select('-password');
 
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND  });
     }
     return res.status(200).json({
       success: true,
@@ -242,7 +240,7 @@ const getUserDetails = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Server Error' });
+    return res.json({ message:  errorMessages.SERVER_ERROR });
   }
 };
 module.exports = {

@@ -6,7 +6,7 @@ const path = require('path');
 dotenv.config();
 mongoose.connect(process.env.MONGO_URI);
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = process.env.BASE_URL;
 
 const fixImagePaths = async () => {
   try {

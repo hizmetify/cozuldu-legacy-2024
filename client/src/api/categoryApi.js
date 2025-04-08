@@ -42,8 +42,8 @@ export const fetchAdsByCategory = async (categoryId, filters = {}) => {
 
     const queryString = queryParams.toString()
       ? `?${queryParams.toString()}`
-      : '';
-
+      : ''; 
+    
     const response = await axiosInstance.get(
       `/ads/category/${categoryId}${queryString}`
     );

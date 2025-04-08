@@ -109,11 +109,18 @@ const StepThree = () => {
         dispatch(updateRegisterData(values));
         const finalData = { ...registerData, ...values };
 
-        await dispatch(register(finalData)).unwrap();
-        dispatch(showToast({ message: 'Kayıt başarılı!', type: 'success' }));
-        navigate('/dashboard');
+        const result=await dispatch(register(finalData)).unwrap();
+        if(result?.error)
+          dispatch(showToast({ message: result?.error, type: 'error' }));
+        if(result?.token){
+          
+          localStorage.setItem('isLogin',true)
+          dispatch(showToast({ message: 'Kayıt başarılı!', type: 'success' }));  
+          navigate('/dashboard');
+        }
+        
       } catch (error) {
-        dispatch(showToast({ message: error, type: 'error' }));
+        dispatch(showToast({ message: 'Beklenmeyen bir hata oluştu. Lütfen Tekrar deneyiniz', type: 'error' }));
       } finally {
         setSubmitting(false);
         if (setIsSubmitting) {

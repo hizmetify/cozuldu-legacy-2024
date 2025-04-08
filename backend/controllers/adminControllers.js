@@ -7,6 +7,7 @@ const SSS = require("../models/sss");
 const Category = require("../models/category");
 const SubCategory = require("../models/subCategory"); 
 const Ad = require('../models/ad');
+const { errorMessages } = require("../middlewares/errorMessageMiddleware");
 
 const GetAdmin=async(req,res)=>{
     const {action}=req.params  
@@ -33,12 +34,12 @@ const GetAdmin=async(req,res)=>{
     return res.json(result)
 }
 const PostAdmin=async(req,res)=>{
-    // try{
+    try{
         const {action}=req.params  
         switch(action){
             case 'createAdmin':
                 if ( !req.body.email || !req.body.password ) {
-                    return res.status(400).json({ message:'Eksik veya yanlış parametre gönderildi' });
+                    return res.json({ message: errorMessages.MISSING_FIELDS });
                 } 
                 const admins=await Admin.findOne({email:req.body.email})
                 if(admins)
@@ -84,11 +85,11 @@ const PostAdmin=async(req,res)=>{
                 const savedSubCategory=await subCategory.save()
                 return res.json(subCategory)
             default:
-                return res.json({status:400,message:'Geçersiz istek.'})
+                return res.json({message: errorMessages.INVALID_REQUEST})
         }
-    // }catch(error){
-    //     return res.json({status:500,message:'Beklenmeyen bir hata meydana geldi.'})
-    // }
+    }catch(error){
+        return res.json({message: errorMessages.SERVER_ERROR})
+    }
 }
 const PutAdmin=async(req,res)=>{
     const {action}=req.params
@@ -103,12 +104,12 @@ const PutAdmin=async(req,res)=>{
         case 'updateAddStatus':
              const adId = req.params.id;
             if (!mongoose.Types.ObjectId.isValid(adId)) {
-            return res.status(400).json({ message: 'Geçersiz ilan ID' });
+            return res.json({ message: errorMessages.POST_NOT_FOUND});
             }
             const { status } = req.body;
             const existingAd = await Ad.findById(adId);
             if (!existingAd) {
-              return res.status(404).json({ message: 'İlan bulunamadı' });
+              return res.json({ message: errorMessages.POST_NOT_FOUND});
             }
             existingAd.status = status;
                 
@@ -144,26 +145,26 @@ const DeleteAdmin=async(req,res)=>{
             const category=await Category.findOne({name:req.body.name})
             const otherCategory=await Category.findOne({name:'Diğer'})
             if(!category || !otherCategory)
-                return res.status(404).json({ message: "Category not found" });
+                return res.json({ message: errorMessages.CATEGORY_NOT_FOUND});
             const subCategory=await SubCategory.updateMany({category:category._id},{category:otherCategory._id})
             await subCategory.save()
             const deleteCateogry = await Category.deleteOne({ name: req.body.name });
             console.log(deleteCateogry); // Silinen kayıt sayısını kontrol et
 
             if (deleteCateogry.deletedCount === 0) {
-                return res.status(404).json({ message: "Category not found" });
+                 return res.json({ message: errorMessages.CATEGORY_NOT_FOUND});
             } 
             return res.json({ message: "Category deleted successfully" });
         case 'deleteSubCategory':
             const subsCategory=await SubCategory.deleteOne({_id:req.body.id})
             if (subsCategory.deletedCount === 0) {
-                return res.status(404).json({ message: "Category not found" });
+                 return res.json({ message: errorMessages.CATEGORY_NOT_FOUND});
             } 
             return res.json({ message: "Category deleted successfully" });
         case 'deleteSSS':
             const sss=await SSS.deleteOne({_id:req.body.id})
             if(sss.deletedCount===0){
-                return res.status(404).json({message:'SSS not found'})
+                return res.json({message: errorMessages.SSS_NOT_FOUND})
             }
             return res.json({message:"SSS deleted successfully"})
     }

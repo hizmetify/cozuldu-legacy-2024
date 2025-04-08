@@ -356,13 +356,7 @@ const MyAdsList = () => {
   useEffect(() => {
     dispatch(fetchUserAds());
     const checkMobile = () => {
-      const isMobileView = window.innerWidth < 768;
-      console.log(
-        'Ekran genişliği:',
-        window.innerWidth,
-        'Mobil mi:',
-        isMobileView
-      );
+      const isMobileView = window.innerWidth < 768; 
       setIsMobile(isMobileView);
     };
 
@@ -372,6 +366,7 @@ const MyAdsList = () => {
     return () => {
       window.removeEventListener('resize', checkMobile);
     };
+
   }, [dispatch]);
 
   const handleDeleteClick = (adId) => {
@@ -484,11 +479,9 @@ const MyAdsList = () => {
     return 'newest';
   };
 
-  const toggleViewMode = () => {
-    console.log('Görünüm modu değişiyor. Şu anki mod:', viewMode);
+  const toggleViewMode = () => { 
     const newMode = viewMode === 'grid' ? 'list' : 'grid';
-    setViewMode(newMode);
-    console.log('Yeni görünüm modu:', newMode);
+    setViewMode(newMode); 
   };
 
   const filteredAds = useMemo(() => {

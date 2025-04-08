@@ -12,6 +12,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (!error.response) {
       console.error('Network veya Sunucuya erişilemedi:', error.message);
+      
     } else {
       const { status, data } = error.response;
       const errorMessage = data?.message || error.message;
@@ -19,6 +20,7 @@ axiosInstance.interceptors.response.use(
       console.error('Status Kodu:', status);
       console.error('Hata Mesajı:', errorMessage);
       console.error('Hata Detayı (data):', data);
+      return Promise.reject(data?.error);
     }
     return Promise.reject(error);
   }

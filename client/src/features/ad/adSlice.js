@@ -32,8 +32,9 @@ export const fetchAllAds = createAsyncThunk(
   'ads/fetchAllAds',
   async (_, thunkAPI) => {
     try {
-      const response = await getAllAdsRequest();
-      return response;
+      const response = await getAllAdsRequest(); 
+      
+      return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
     }
@@ -56,8 +57,7 @@ export const fetchSingleAd = createAsyncThunk(
   'ads/fetchSingleAd',
   async (adId, thunkAPI) => {
     try {
-      const response = await getSingleAdRequest(adId);
-      console.log('fetchSingleAd response:', response);
+      const response = await getSingleAdRequest(adId); 
       return response.data;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);
@@ -93,7 +93,9 @@ export const updateAd = createAsyncThunk(
   'ads/updateAd',
   async ({ adId, adData }, thunkAPI) => {
     try {
-      const response = await updateAdRequest({ adId, adData });
+      
+      const response = await updateAdRequest({ adId, adData }); 
+      
       return response;
     } catch (error) {
       return thunkAPI.rejectWithValue(error);

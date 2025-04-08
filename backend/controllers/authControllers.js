@@ -6,6 +6,7 @@ const {
 } = require('../validations/authValidation');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { errorMessages } = require('../middlewares/errorMessageMiddleware');
 
 const register = async (req, res) => {
   try {
@@ -28,13 +29,13 @@ const register = async (req, res) => {
     });
 
     if (error) {
-      return res.status(401).json({ error: error.details[0].message });
+      return res.json({ error: errorMessages.MISSING_FIELDS });
     }
 
     const emailExists = await User.findOne({ email });
 
     if (emailExists) {
-      return res.status(400).json({ error: 'Email already exists' });
+      return res.json({ error: errorMessages.EMAIL_ALREADY_EXISTS});
     }
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -75,9 +76,9 @@ const register = async (req, res) => {
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    res.json({
       error:
-        'Kayıt olurken sunucuda bir hata oluştu lütfen daha sonra tekrar deneyiniz.',
+       errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -88,18 +89,18 @@ const login = async (req, res) => {
 
     const { error } = loginSchema.validate({ email, password });
     if (error) {
-      return res.status(401).json({ error: error.details[0].message });
+      return res.json({ error: errorMessages.MISSING_FIELDS });
     }
 
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
+      return res.json({ error: errorMessages.USER_NOT_FOUND });
     }
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
 
     if (!isPasswordMatch) {
-      return res.status(401).json({ error: 'Şifre hatalı.' });
+      return res.status(401).json({ error: errorMessages.INVALID_CREDENTIALS });
     }
 
     const token = generateToken(user._id);
@@ -120,7 +121,7 @@ const login = async (req, res) => {
       .json({ message: 'Başarıyla giriş yapıldı.', token, user: userData });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Giriş yapılırken bir hata oluştu.' });
+    res.json({ error: errorMessages.LOGIN_FAILED });
   }
 };
 
@@ -128,7 +129,7 @@ const me = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: 'Yetkisiz erişim' });
+    return res.json({ message: errorMessages.ACCESS_DENIED });
   }
 
   try {
@@ -138,7 +139,7 @@ const me = async (req, res) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Bir hata oluştu' });
+    res.json({ error: errorMessages.SERVER_ERROR });
   }
 };
 

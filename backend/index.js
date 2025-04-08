@@ -14,6 +14,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 const compression = require('compression');
+const { errorMessages } = require('./middlewares/errorMessageMiddleware');
 
 dotenv.config();
 connectDB();
@@ -22,7 +23,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONT_URL,
     credentials: true,
     methods: ['GET', 'POST', 'DELETE', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -33,7 +34,7 @@ app.use(
   '/uploads',
   express.static(path.join(__dirname, 'uploads'), {
     setHeaders: (res, path) => {
-      res.set('Access-Control-Allow-Origin', 'http://localhost:5173');
+      res.set('Access-Control-Allow-Origin', `${process.env.FRONT_URL}`);
       res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
       res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     },
@@ -64,7 +65,7 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     success: false,
-    message: 'Sunucu hatası oluştu. Lütfen tekrar deneyin.',
+    message: errorMessages.SERVER_ERROR,
   });
 });
 

@@ -45,6 +45,7 @@ import { clearToast } from './features/toast/toastSlice';
 import { toast } from 'react-hot-toast';
 import LoadingOverlay from './components/UI/LoadingOverlay';
 import LoadingSpinner from './components/UI/LoadingSpinner';
+import AllAds from './pages/Ads/AllAds';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -53,6 +54,7 @@ const App = () => {
 
   useEffect(() => {
     dispatch(fetchMe());
+    
   }, [dispatch]);
 
   useEffect(() => {
@@ -91,16 +93,18 @@ const App = () => {
                 <Route path="new" element={<MyAdsNew />} />
                 <Route path=":adId" element={<MyAdsDetail />} />
                 <Route path=":adId/edit" element={<MyAdsEdit />} />
-              </Route>
+              </Route> 
+              <Route path='allAds' element={<AllAds/>}/>
+              <Route path='allAds/:adId' element={<MyAdsDetail/>}/>
               <Route path="settings" element={<Settings />} />
               <Route path="statistics" element={<Statistics />} />
-              <Route path="favorites" element={<Favorites />} />
+              <Route path="favorites" element={<Favorites />} /> 
             </Route>
             <Route path="/emailverify" element={<EmailVerify />} />
             <Route path="/resetPassword/:email" element={<ResetPassword />} />
 
             <Route element={<PublicRoute restricted={true} />}>
-              <Route path="/" element={<Home />} />
+            <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/category/:categoryId" element={<CategoryAds />} />

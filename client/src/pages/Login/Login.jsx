@@ -61,16 +61,20 @@ const Login = () => {
 
   const handleSubmit = async (values, { setErrors }) => {
     try {
-      await dispatch(login(values)).unwrap();
+      const result=await dispatch(login(values)).unwrap();
 
       if (values.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       } else {
         localStorage.removeItem('rememberMe');
+      } 
+      if(result?.token){
+        dispatch(showToast({ message: 'Giriş başarılı!', type: 'success' }));
+        navigate('/dashboard'); 
+        localStorage.setItem('isLogin',true)
+      }else{
+        dispatch(showToast({message:result.error, type:'error'}))
       }
-
-      dispatch(showToast({ message: 'Giriş başarılı!', type: 'success' }));
-      navigate('/dashboard');
     } catch (error) {
       dispatch(showToast({ message: error, type: 'error' }));
       if (typeof error === 'object' && error.errors) {

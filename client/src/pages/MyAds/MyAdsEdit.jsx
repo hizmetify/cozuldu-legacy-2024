@@ -94,8 +94,8 @@ const MyAdsEdit = () => {
   }, [dispatch, adId]);
 
   useEffect(() => {
-    if (selectedAd?.data) {
-      const ad = selectedAd.data;
+    if (selectedAd) {
+      const ad = selectedAd;
       const categoryId = ad.category?._id || ad.category;
       if (categoryId) {
         handleCategoryChange(categoryId, () => {});
@@ -179,7 +179,7 @@ const MyAdsEdit = () => {
     );
   };
 
-  if (singleAdStatus === 'loading' || !selectedAd?.data) {
+  if (singleAdStatus === 'loading' || !selectedAd) {
     return (
       <div className="flex justify-center items-center h-64">
         <LoadingSpinner />
@@ -187,7 +187,7 @@ const MyAdsEdit = () => {
     );
   }
 
-  const ad = selectedAd.data;
+  const ad = selectedAd;
   const initialValues = {
     title: ad.title || '',
     description: ad.description || '',

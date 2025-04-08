@@ -6,15 +6,15 @@ import Header from '../components/Header/Header';
 const PublicRoute = ({ restricted = false }) => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const location = useLocation();
-
+  const isLogin=localStorage.getItem('isLogin')
   const isRegisterPage = location.pathname.startsWith('/register');
 
-  if (isAuthenticated && restricted) {
+  if (isLogin&& isAuthenticated && restricted) {
     return <Navigate to="/dashboard" />;
   }
   return (
     <>
-      {isRegisterPage ? null : <Header />}
+      { isRegisterPage ? null : <Header />}
       <Outlet />
     </>
   );

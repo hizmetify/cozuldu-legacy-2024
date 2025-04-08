@@ -64,8 +64,7 @@ export const resendVerificationCode = async () => {
       {
         withCredentials: true,
       }
-    );
-    console.log('Resend response:', response);
+    ); 
     return response.data;
   } catch (error) {
     console.error('Resend error details:', {

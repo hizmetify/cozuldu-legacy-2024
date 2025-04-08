@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const SubCategory = require('../models/subCategory');
 const City = require('../models/city');
+const { errorMessages } = require('../middlewares/errorMessageMiddleware');
 
 const getStats = async (req, res) => {
   try {
@@ -14,7 +15,7 @@ const getStats = async (req, res) => {
     return res.json(result);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
+    return res.json({ message: errorMessages.SERVER_ERROR});
   }
 };
 

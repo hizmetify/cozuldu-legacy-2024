@@ -569,24 +569,24 @@ const MyAdsDetail = () => {
     return <LoadingSpinner message="İlan detayları yükleniyor" />;
   }
 
-  if (!selectedAd || !selectedAd.data) {
-    return <NotFound />;
-  }
+  // if (!selectedAd || !selectedAd.data) {
+  //   return <NotFound />;
+  // }
 
-  const ad = selectedAd.data;
+  const ad = selectedAd; 
+  
+  const metaDescription = ad?.description
+    ? ad?.description.substring(0, 160)
+    : `${ad?.title} - Detaylı bilgi için tıklayın.`;
 
-  const metaDescription = ad.description
-    ? ad.description.substring(0, 160)
-    : `${ad.title} - Detaylı bilgi için tıklayın.`;
+  const metaKeywords = `${ad?.title}, ${ad?.category?.name || ''}, ${
+    ad?.subCategory?.name || ''
+  }, ${ad?.city || ''}, ${ad?.serviceType || ''}`;
 
-  const metaKeywords = `${ad.title}, ${ad.category?.name || ''}, ${
-    ad.subCategory?.name || ''
-  }, ${ad.city || ''}, ${ad.serviceType || ''}`;
-
-  const ogImage = ad.images && ad.images.length > 0 ? ad.images[0] : '';
+  const ogImage = ad?.images && ad?.images.length > 0 ? ad?.images[0] : '';
 
   return (
-    <>
+    selectedAd==null?<NotFound/>:<>
       <div className="min-h-screen bg-gray-50 p-4 md:p-8 overflow-x-hidden">
         <MetaHelmet
           title={ad.title}

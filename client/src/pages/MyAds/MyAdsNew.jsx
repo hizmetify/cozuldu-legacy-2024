@@ -196,7 +196,6 @@ const MyAdsNew = () => {
       console.error('API Hatası:', error);
       console.error('Hata Detayları:', {
         message: error.message,
-        status: error.response?.status,
         data: error.response?.data,
       });
 

@@ -14,7 +14,7 @@ const PasswordSend=async (req,res)=>{
       
       if(!user?.isVerification)
         return res.json({message:'E-Mail doğrulanmadığı için güncelleme işlemi yapılamıyor. Sorununuzu çözmek için lütfen müşteri hizmetleri ile iletişime geçiniz.',status:false})
-      const resetPasswordUrl = `http://localhost:5173/resetPassword/${user?.email}`;
+      const resetPasswordUrl = `${process.env.FRONT_URL}/resetPassword/${user?.email}`;
     
       const mailOptions = {
         from: process.env.EMAIL_USER,
@@ -33,17 +33,18 @@ const PasswordSend=async (req,res)=>{
         emailVerify=user?.email
         res.status(200).json({ message: 'Mail gönderildi.' });
       } catch (error) {
-        res.status(500).json({ message: 'Mail gönderilemedi', error });
+        res.json({ message: 'Mail gönderilemedi' });
       }
 } 
 
 const bcrypt = require('bcryptjs');
+const { errorMessages } = require('./errorMessageMiddleware');
 const PasswordChange=async(req,res)=>{
     try { 
         let { email,password } = req.body; 
         const user = await User.findOne({ email: email }); 
         if (!user) {
-            return res.json({ message: "Kullanıcı bulunamadı!", status: false });
+            return res.json({ message: errorMessages.USER_NOT_FOUND, status: false });
         } 
         const salt = await bcrypt.genSalt(10);
         user.password = await bcrypt.hash(password, salt);

@@ -217,7 +217,7 @@ const CategoryAds = () => {
     .slice(0, 3)
     .map((sc) => sc.name)
     .join(', ')}`;
-  const canonical = `https://xn--zld-1la9esbc.com/category/${categoryId}`;
+  const canonical = `http://xn--zld-1la9esbc.com/category/${categoryId}`;
 
   if (loading && !ads.length) {
     return (

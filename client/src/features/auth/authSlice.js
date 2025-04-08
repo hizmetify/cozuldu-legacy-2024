@@ -5,17 +5,19 @@ import {
   logout as logoutApi,
   getMe as getMeApi,
 } from '../../api/authApi';
-
+ 
 const getErrorMessage = (error) =>
+  error || 
+  error.response?.error ||
   error.response?.data?.message ||
   error.message ||
-  'Bilinmeyen bir hata oluştu';
+  'Bilinmeyen bir hata oluştu. Lütfen bir süre sonra tekrar deneyiniz.';
 
 export const fetchMe = createAsyncThunk(
   'auth/fetchMe',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getMeApi();
+      const response = await getMeApi();  
       return response;
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
@@ -28,6 +30,7 @@ export const login = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const user = await loginApi(credentials);
+      
       return user;
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));

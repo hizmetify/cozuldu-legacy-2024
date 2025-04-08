@@ -1,3 +1,4 @@
+const { errorMessages } = require("../middlewares/errorMessageMiddleware");
 const Ad = require("../models/ad");
 const Logs = require("../models/logs");
 const User = require("../models/user");
@@ -12,7 +13,7 @@ const logAction=async(req,res)=>{
     let decoded = await decodedId(req);
     const user = await User.findById(decoded).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
     }
 
     const date = new Date(Date.now());

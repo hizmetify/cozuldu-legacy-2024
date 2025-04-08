@@ -1,28 +1,24 @@
 const jwt = require('jsonwebtoken');  
+const { errorMessages } = require('../middlewares/errorMessageMiddleware');
 const verify = (req,res,next) => {
-//   try {
+  try {
     const cookies = req.headers.cookie;
     if (!cookies) {
-        return res.status(401).json({ message: "Access Denied: No Token Provided" });
-    }
-
-    // Çerezin içinden "token" değerini al
+      return res.json({ message: errorMessages.ACCESS_DENIED });
+    } 
     const token = cookies.split('; ').find(row => row.startsWith('token='));
     if (!token) {
-        return res.status(401).json({ message: "Access Denied: No Token Found" });
-    }
-
-    // "token=" kısmını kaldır
+        return res.json({ message: errorMessages.ACCESS_DENIED });
+    } 
     const jwtToken = token.split('=')[1];
-
-    // Token doğrulama işlemi
+ 
     const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
-    req.user = decoded; // Kullanıcı bilgisini req içine ekle 
+    req.user = decoded;  
     next();
-//   } catch (error) {
-//     return res.send('Access Denied: No Token Provided');
+  } catch (error) {
+    return res.send('Access Denied: No Token Provided');
     
-//   }
+  }
 };
 
 

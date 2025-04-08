@@ -186,7 +186,7 @@ const getEmailTemplate = (privateCode) => {
           Doğrulama kodunu girmek için aşağıdaki butona tıklayabilir veya doğrudan uygulamamıza gidebilirsiniz.
         </p>
 
-        <a href="http://localhost:5173/emailverify" class="verification-button">
+        <a href="${process.env.FRONT_URL}/emailverify" class="verification-button">
           Hesabımı Doğrula
         </a>
 

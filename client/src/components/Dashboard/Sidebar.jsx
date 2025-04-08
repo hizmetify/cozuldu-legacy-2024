@@ -6,7 +6,7 @@ import {
 } from '../../features/sidebar/sidebarSlice';
 import { FaBullhorn } from 'react-icons/fa6';
 import { IoMdSettings } from 'react-icons/io';
-import { FaSignOutAlt } from 'react-icons/fa';
+import { FaBullseye, FaSignOutAlt } from 'react-icons/fa';
 import { DiGoogleAnalytics } from 'react-icons/di';
 import { MdFavorite } from 'react-icons/md';
 import SidebarLink from './SidebarLink';
@@ -14,34 +14,41 @@ import SidebarLink from './SidebarLink';
 const sidebarLinks = [
   {
     id: 1,
+    href: '/dashboard/allAds',
+    label: 'Bütün İlanlar',
+    icon: FaBullseye,
+    isLogout: false,
+  },
+  {
+    id: 2,
     href: '/dashboard/my-ads',
     label: 'İlanlarım',
     icon: FaBullhorn,
     isLogout: false,
   },
   {
-    id: 2,
+    id: 3,
     href: '/dashboard/statistics',
     label: 'İstatistikler',
     icon: DiGoogleAnalytics,
     isLogout: false,
   },
   {
-    id: 3,
+    id: 4,
     href: '/dashboard/favorites',
     label: 'Favoriler',
     icon: MdFavorite,
     isLogout: false,
   },
   {
-    id: 4,
+    id: 5,
     href: '/dashboard/settings',
     label: 'Ayarlar',
     icon: IoMdSettings,
     isLogout: false,
   },
   {
-    id: 5,
+    id: 6,
     label: 'Çıkış yap',
     icon: FaSignOutAlt,
     isLogout: true,

@@ -2,8 +2,9 @@ const mongoose = require('mongoose');
 const Ad = require('../models/ad');
 const Category = require('../models/category');
 const fs = require('fs');
-const path=require('path')
-const BASE_URL = 'http://localhost:5000';
+const path=require('path');
+const { errorMessages } = require('../middlewares/errorMessageMiddleware');
+const BASE_URL = process.env.BASE_URL;
 
 
 const normalizeImagePath = (originalPath) => {
@@ -42,8 +43,8 @@ const createAd = async (req, res) => {
   try {
     const userId = req.user?._id;
     if (!userId) {
-      return res.status(401).json({
-        message: 'Kullanıcı girişi gerekli. createAd başarısız.',
+      return res.json({
+        message: errorMessages.UNAUTHORIZED_ACCESS,
       });
     }
     const {
@@ -84,9 +85,9 @@ const createAd = async (req, res) => {
     });
   } catch (error) {
     console.error('createAd error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. createAd başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -98,22 +99,23 @@ const updateAd = async (req, res) => {
     const adId = req.params.id;
     const userId = req.user._id;
     if (!mongoose.Types.ObjectId.isValid(adId)) {
-      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
 
-    const { title, description, category, subCategory, price, status } =
+    const { title, description, category, subCategory, price, status, city } =
       req.body;
+    console.log(req.body);
+    
     const imagesToDelete = req.body.imagesToDelete || [];
     const newImages = req.files ? req.files.map((file) => file.path) : [];
 
     const existingAd = await Ad.findById(adId);
     if (!existingAd) {
-      return res.status(404).json({ message: 'İlan bulunamadı' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
     if (existingAd.user.toString() !== userId.toString()) {
-      return res
-        .status(403)
-        .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
+      return res 
+        .json({ message: errorMessages.ACCESS_DENIED });
     }
 
     
@@ -150,6 +152,7 @@ const updateAd = async (req, res) => {
     console.log('Güncellenecek resim listesi:', updatedImages);
 
     existingAd.title = title || existingAd.title;
+    existingAd.city=city || existingAd.city
     existingAd.description = description || existingAd.description;
     existingAd.category = category || existingAd.category;
     existingAd.subCategory = subCategory || existingAd.subCategory;
@@ -168,16 +171,16 @@ const updateAd = async (req, res) => {
     });
   } catch (error) {
     console.error('updateAd error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. updateAd başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
 
 const getAllAds = async (req, res) => {
   try {
-    const ads = await Ad.find
+    const ads = await Ad.find()
       .populate('user', 'name avatar')
       .populate('category', 'name')
       .populate('subCategory', 'name')
@@ -195,9 +198,9 @@ const getAllAds = async (req, res) => {
     });
   } catch (error) {
     console.error('getAllAds error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. getAllAds başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -207,7 +210,7 @@ const getUserAds = async (req, res) => {
     const user= req.user._id; 
     const objectId = mongoose.Types.ObjectId.isValid(user) ? new mongoose.Types.ObjectId(user) : null;
     if (!user || !objectId) {
-      return res.status(401).json({ message: 'Kullanıcı girişi gerekli' });
+      return res.json({ message: errorMessages.UNAUTHORIZED_ACCESS });
     } 
     
     const ads = await Ad.find({ user:objectId })
@@ -224,9 +227,9 @@ const getUserAds = async (req, res) => {
     });
   } catch (error) {
     console.error('getUserAds error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. getUserAds başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -236,7 +239,7 @@ const getSingleAd = async (req, res) => {
     const adId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(adId)) {
-      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
 
     const ad = await Ad.findById(adId)
@@ -246,7 +249,7 @@ const getSingleAd = async (req, res) => {
       .populate('city', 'name');
 
     if (!ad) {
-      return res.status(404).json({ message: 'İlan bulunamadı' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
 
     return res.status(200).json({
@@ -258,9 +261,9 @@ const getSingleAd = async (req, res) => {
     });
   } catch (error) {
     console.error('getSingleAd error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. getSingleAd başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -270,16 +273,16 @@ const deleteAd = async (req, res) => {
     const userId = req.user._id;
 
     if (!mongoose.Types.ObjectId.isValid(adId)) {
-      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
 
     const ad = await Ad.findById(adId);
     if (!ad) {
-      return res.status(404).json({ message: 'İlan bulunamadı' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
 
     if (ad.user.toString() !== userId.toString()) {
-      return res.status(403).json({ message: 'Bu ilanı silmeye yetkiniz yok' });
+      return res.json({ message:errorMessages.ACCESS_DENIED });
     }
     const imagesToDelete=ad?.images
     imagesToDelete.forEach((img) => { 
@@ -305,9 +308,9 @@ const deleteAd = async (req, res) => {
     });
   } catch (error) {
     console.error('deleteAd error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. deleteAd başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -316,17 +319,16 @@ const makeAdStatusChange = async (req, res) => {
     const adId = req.params.id;
     const userId = req.user._id;
     if (!mongoose.Types.ObjectId.isValid(adId)) {
-      return res.status(400).json({ message: 'Geçersiz ilan ID' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND});
     }
     const { status } = req.body;
     const existingAd = await Ad.findById(adId);
     if (!existingAd) {
-      return res.status(404).json({ message: 'İlan bulunamadı' });
+      return res.json({ message: errorMessages.POST_NOT_FOUND });
     }
     if (existingAd.user.toString() !== userId.toString()) {
       return res
-        .status(403)
-        .json({ message: 'Bu ilanı güncelleme yetkiniz yok' });
+        .json({ message: errorMessages.UNAUTHORIZED_ACCESS });
     }
     existingAd.status = status;
 
@@ -338,9 +340,9 @@ const makeAdStatusChange = async (req, res) => {
     });
   } catch (error) {
     console.error('updateAd error:', error);
-    return res.status(500).json({
-      message: 'Sunucu hatası. updateAd başarısız.',
-      error: error.message,
+    return res.json({
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };
@@ -359,7 +361,7 @@ const getAdsByCategory = async (req, res) => {
     } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(categoryId)) {
-      return res.status(400).json({ message: 'Geçersiz kategori ID' });
+      return res.json({ message: errorMessages.CATEGORY_NOT_FOUND });
     }
 
     const query = {
@@ -416,10 +418,10 @@ const getAdsByCategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Kategori ilanlarını alırken hata oluştu:', error);
-    res.status(500).json({
+    res.json({
       success: false,
-      message: 'Sunucu hatası',
-      error: error.message,
+      message: errorMessages.SERVER_ERROR,
+      error: errorMessages.SERVER_ERROR,
     });
   }
 };

@@ -22,8 +22,7 @@ export const getAdsByCategoryRequest = async (categoryId, filters = {}) => {
     const response = await axiosInstance.get(
       `/ads/category/${categoryId}${queryString}`
     );
-    
-    console.log( `/ads/category/${categoryId}${queryString}`);
+     
     return response.data;
   } catch (error) {
     console.error('Kategori ilanlarını alırken hata oluştu:', error);
@@ -51,7 +50,7 @@ export const createAdRequest = async (adData) => {
   return response.data;
 };
 
-export const updateAdRequest = async ({ adId, adData }) => {
+export const updateAdRequest = async ({ adId, adData }) => { 
   const response = await axiosInstance.put(`/ads/${adId}`, adData);
   return response.data;
 };

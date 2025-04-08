@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { errorMessages } = require('./errorMessageMiddleware');
 
 const protect = async (req, res, next) => {
   let token = req.cookies.token;
@@ -13,9 +14,8 @@ const protect = async (req, res, next) => {
 
   if (!token) {
     console.log('No token found => 401');
-    return res
-      .status(401)
-      .json({ message: 'Yetkisiz erişim! Token bulunamadı.' });
+    return res 
+      .json({ message: errorMessages.ACCESS_DENIED});
   }
 
   try {
@@ -23,14 +23,14 @@ const protect = async (req, res, next) => {
 
     const user = await User.findById(decoded.id).select('-password');
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
     }
 
     req.user = user._id;
 
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Geçersiz token!' });
+    res.json({ message: errorMessages.TOKEN_EXPIRED});
   }
 };
 

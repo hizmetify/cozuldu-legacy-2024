@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const getEmailTemplate = require('../utils/mailUI');
+const { errorMessages } = require('./errorMessageMiddleware');
 
 const userVerificationData = new Map();
 
@@ -55,9 +56,8 @@ const sendEmail = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res
-      .status(401)
-      .json({ message: 'Yetkisiz erişim! Token bulunamadı.' });
+    return res 
+      .json({ message: errorMessages.ACCESS_DENIED });
   }
 
   try {
@@ -65,7 +65,7 @@ const sendEmail = async (req, res) => {
     const user = await User.findById(decoded.id).select('-password');
 
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND});
     }
 
     if (!user.isVerification) {
@@ -86,7 +86,7 @@ const sendEmail = async (req, res) => {
     return res.json({ status: 'continue' });
   } catch (err) {
     console.error('Send email error:', err);
-    res.status(401).json({ message: 'Geçersiz token!' });
+    res.json({ message: errorMessages.TOKEN_EXPIRED });
   }
 };
 
@@ -94,7 +94,7 @@ const EmailVerify = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: 'Yetkisiz erişim!' });
+    return res.json({ message: errorMessages.ACCESS_DENIED });
   }
 
   try {
@@ -103,7 +103,7 @@ const EmailVerify = async (req, res) => {
     const userVerify = await User.findById(userId).select('-password');
 
     if (!userVerify) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND});
     }
 
     const userData = userVerificationData.get(userId);
@@ -144,14 +144,14 @@ const EmailVerify = async (req, res) => {
     }
   } catch (err) {
     console.error('Email verify error:', err);
-    res.status(401).json({ message: 'Geçersiz token!' });
+    res.json({ message: errorMessages.TOKEN_EXPIRED });
   }
 };
 const resendVerificationCode = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: 'Yetkisiz erişim!' });
+    return res.json({ message: errorMessages.ACCESS_DENIED});
   }
 
   try {
@@ -160,7 +160,7 @@ const resendVerificationCode = async (req, res) => {
     const user = await User.findById(userId).select('-password');
 
     if (!user) {
-      return res.status(404).json({ message: 'Kullanıcı bulunamadı!' });
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
     }
 
     let userData = userVerificationData.get(userId);
@@ -205,7 +205,7 @@ const resendVerificationCode = async (req, res) => {
     });
   } catch (err) {
     console.error('Resend verification code error:', err);
-    res.status(401).json({ message: 'Geçersiz token!' });
+    res.json({ message: errorMessages.INVALID_TOKEN});
   }
 };
 

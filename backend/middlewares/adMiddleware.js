@@ -1,4 +1,5 @@
 const adValidationSchema = require('../validations/adValidation');
+const { errorMessages } = require('./errorMessageMiddleware');
 
 const validateAd = (req, res, next) => {
   if (req.body && typeof req.body.imagesToDelete === 'string') {
@@ -16,7 +17,7 @@ const validateAd = (req, res, next) => {
 
   if (error) {
     return res.status(400).json({
-      message: 'Validation hatası',
+      message: errorMessages.MISSING_FIELDS,
       errors: error.details.map((detail) => detail.message),
     });
   }
