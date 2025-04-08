@@ -6,7 +6,8 @@ import {
   updateUserEmail,
   updateUserName,
   removeUserAccount,
-  fetchUserDetails,
+  fetchUserDetails, 
+  updateProfilePicture,
 } from '../../features/user/userSlice';
 import MetaHelmet from '../../utils/MetaHelmet';
 import {
@@ -23,6 +24,7 @@ import {
 import InputField from '../../components/UI/InputField';
 import Avatar from '../../components/Profile/Avatar';
 import LoadingSpinner from '../../components/UI/LoadingSpinner';
+import { updateAd } from '../../features/ad/adSlice';
 
 const TabButton = ({ active, icon: Icon, label, onClick }) => (
   <button
@@ -43,27 +45,37 @@ const Settings = () => {
 
   const { loading, error, user } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    dispatch(fetchUserDetails());
-  }, [dispatch]);
-
+  
   const [activeTab, setActiveTab] = useState('profile');
 
-  const [profileImage, setProfileImage] = useState(user?.profileImage || null);
+  const [profileImage, setProfileImage] = useState(user?.profilePic);
   const fileInputRef = useRef(null);
+  useEffect(() => {
+    dispatch(fetchUserDetails());
+    setProfileImage(user?.profilePic)
+  }, [dispatch]);
+
   const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
+    const file = event.target.files[0];  
+    if (file) { 
       const reader = new FileReader();
       reader.onload = (e) => {
         setProfileImage(e.target.result);
+        
       };
       reader.readAsDataURL(file);
+       
     }
+    const formData = new FormData();
+    formData.append('images', file); 
+ 
+    dispatch(updateProfilePicture(formData));
+    
   };
 
   const triggerFileInput = () => {
-    fileInputRef.current.click();
+    fileInputRef.current.click(); 
+    
   };
   const renderTabContent = () => {
     if (loading && !user) {
@@ -82,7 +94,7 @@ const Settings = () => {
                 <div className="relative">
                   <div className="h-24 w-24 rounded-full border-4 border-white bg-white overflow-hidden flex items-center justify-center">
                     <Avatar
-                      profilePicture={profileImage}
+                      profilePicture={profileImage || user?.profilePic}
                       name={user?.name}
                       size="w-24 h-24"
                       textSize="text-3xl"

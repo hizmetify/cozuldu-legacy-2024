@@ -87,3 +87,18 @@ export const getUserDetails = async () => {
   const response = await axiosInstance.get('/user/getUserDetails');
   return response.data;
 };
+export const profilePicChange = async (adData ) => { 
+  try { 
+    
+  const response = await axiosInstance.put(`/user/profilPicChange`, adData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true, // Cookie ile token gidiyorsa şart
+  }); 
+  
+  return response;
+} catch (error) {
+  throw error.response?.message || 'Bir hata oluştu';
+}
+};

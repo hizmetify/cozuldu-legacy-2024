@@ -104,7 +104,6 @@ const updateAd = async (req, res) => {
 
     const { title, description, category, subCategory, price, status, city } =
       req.body;
-    console.log(req.body);
     
     const imagesToDelete = req.body.imagesToDelete || [];
     const newImages = req.files ? req.files.map((file) => file.path) : [];

@@ -243,6 +243,36 @@ const getUserDetails = async (req, res) => {
     return res.json({ message:  errorMessages.SERVER_ERROR });
   }
 };
+const formatImagePath = (imgPath) => {
+  if (!imgPath) return '';
+  if (imgPath.startsWith('http')) return imgPath;
+  const cleanedPath = imgPath
+    .replace(/^.*[\\/](uploads[\\/])/, '/uploads/')
+    .replace(/\\/g, '/');
+  return `${process.env.BASE_URL}${cleanedPath}`;
+};
+const profilPicChange=async(req,res)=>{
+  try{   
+    
+    const decoded= await decodedId(req);
+    const user = await User.findById(decoded).select('-password');
+    if (!user) {
+      return res.json({ message: errorMessages.USER_NOT_FOUND });
+    }
+    const images = req.files ? req.files.map((file) => file.path) : [];
+    const defaultImage=user?.profilePic==null?'':user?.profilePic 
+    user.profilePic=images.length>0?formatImagePath(images[0]):defaultImage
+    user.save()
+    return res.json(user)
+  }catch{
+    return res.json({
+      message:errorMessages.SERVER_ERROR,
+      error:errorMessages.SERVER_ERROR
+    })
+  }
+ 
+  
+}
 module.exports = {
   emailUpdate,
   nameInfoUpdate,
@@ -254,4 +284,5 @@ module.exports = {
   contactInfo,
   favoriCount,
   getUserDetails,
+  profilPicChange
 };

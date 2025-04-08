@@ -21,6 +21,7 @@ const errorMessages = {
     CATEGORY_NOT_FOUND:"Kategori bulunamadı.",
     SUB_CATEGORY_NOT_FOUND:"Alt Kategori bulunamadı.",
     SSS_NOT_FOUND:"SSS bulunamadı.",
+    IMAGE_DELETED_ERROR:"Resim silinirken bir hata oluştu. Lütfen tekrar deneyin.",
     // İlan İlgili Hata Mesajları
     POST_NOT_FOUND: "İlan bulunamadı.",
     POST_CREATION_FAILED: "İlan oluşturulamadı.",

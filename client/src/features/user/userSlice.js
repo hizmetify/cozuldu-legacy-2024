@@ -4,7 +4,9 @@ import {
   updateNameInfo,
   deleteAccount,
   getUserDetails,
+  profilePicChange,
 } from '../../api/userApi';
+import { updateAdRequest } from '../../api/adsApi';
 
 export const fetchUserDetails = createAsyncThunk(
   'user/getUserDetails',
@@ -50,7 +52,19 @@ export const removeUserAccount = createAsyncThunk(
     }
   }
 );
-
+export const updateProfilePicture = createAsyncThunk(
+  
+  `/user/profilPicChange`,
+  async (formData, { rejectWithValue }) => {
+    try {
+       
+      const response =await profilePicChange(formData)
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Bir hata oluştu.");
+    }
+  }
+);
 const initialState = {
   user: null,
   loading: false,

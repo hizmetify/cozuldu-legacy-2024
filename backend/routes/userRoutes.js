@@ -12,9 +12,13 @@ const {
   contactInfo,
   favoriCount,
   getUserDetails,
-} = require('../controllers/userControllers');
+  profilPicChange,
+} = require('../controllers/userControllers'); 
+const upload = require('../middlewares/uploadMiddleware');
+const protect = require('../middlewares/authMiddleware');
 
 router.post('/favoriAction', favoriPostAndDelete);
+router.put('/profilPicChange',upload.array("images", 1), profilPicChange)
 router.put('/emailUpdate', emailUpdate);
 router.put('/nameInfoUpdate', nameInfoUpdate);
 router.delete('/deleteAccount/:password', deleteAccount);
