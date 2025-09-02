@@ -27,5 +27,4 @@ Proje 2025 Ağustos ayı itibarıyla **Hizmetify** adıyla yeni bir mimariye evr
 ## Kısa Zaman Çizelgesi
 
 - **2024 Q3:** İlk prototip
-- **2024 Q4:** E-posta doğrulama, medya yükleme, temel ilan akışı
 - **2025:** Yeni mimariye geçiş
