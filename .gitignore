@@ -1,0 +1,19 @@
+# Genel
+**/node_modules/
+**/.env
+**/.env.*
+**/uploads/
+**/public/uploads/
+**/.DS_Store
+**/.idea/
+**/.vscode/
+
+# Build/Cache
+**/dist/
+**/build/
+**/.next/
+**/.cache/
+**/coverage/
+**/tmp/
+**/logs/
+**/*.log
