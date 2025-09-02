@@ -1,7 +1,7 @@
 # Çözüldü (2024) — **Archived**
 
 Bu depo, 2024’te geliştirdiğimiz **Çözüldü** prototipinin _tarihsel_ kaynak kodlarını barındırır.  
-Proje 2025 itibarıyla **Hizmetify** adıyla yeni bir mimariye evrilmiştir.
+Proje 2025 Ağustos ayı itibarıyla **Hizmetify** adıyla yeni bir mimariye evrilmiştir.
 
 > **Durum:** Arşiv (read-only). Bakım, destek ve yeni özellik yoktur.  
 > **Yeni kodlar:** **Açık kaynak değildir** (proprietary). Bu depodaki lisans yeni projeleri kapsamaz.
